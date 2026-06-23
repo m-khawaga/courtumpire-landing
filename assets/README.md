@@ -5,7 +5,11 @@ CourtUmpire website image assets.
 Current files:
 
 - `brand-splash.jpg` — main CourtUmpire brand visual
-- `app-icon.jpg` — Android app icon
+- `app-icon-clean.png` — clean CourtUmpire icon used for site branding
+- `favicon-32.png` — browser favicon generated from the clean icon
+- `favicon-192.png` — large browser/site icon generated from the clean icon
+- `apple-touch-icon.png` — Apple touch icon generated from the clean icon
+- `app-icon.jpg` — original Android app icon screenshot retained for reference
 - `phone-live-match.jpg` — live scoring and match log
 - `phone-scoreboard-landscape.jpg` — landscape scoreboard
 - `watch-app-icon.png` — app icon on the Wear OS launcher

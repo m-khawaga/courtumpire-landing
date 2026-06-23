@@ -82,8 +82,8 @@ figcaption span { color: var(--grey); font-size: .86rem; }
 .audience-list li::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 13px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(223,255,0,.08); }
 
 .release-card { display: grid; grid-template-columns: 130px 1fr auto; gap: 38px; align-items: center; padding: 45px; border: 1px solid var(--line); border-radius: 30px; background: linear-gradient(135deg, #0c213c, #061326); }
-.release-icon { padding: 8px; border-radius: 50%; background: #020916; }
-.release-icon img { border-radius: 50%; }
+.release-icon { padding: 8px; border-radius: 28px; background: #020916; }
+.release-icon img { border-radius: 22px; }
 .release-card h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
 .release-card p:last-child { margin-bottom: 0; }
 
