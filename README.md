@@ -1,2 +1,3 @@
 # courtumpire-landing
-Landing page for CourtUmpire tennis scoring app.
+
+Static landing page for CourtUmpire, including the product overview, privacy policy, legal notice, contact page, and current Android and Wear OS product screenshots.
