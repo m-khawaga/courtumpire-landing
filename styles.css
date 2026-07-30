@@ -33,6 +33,7 @@ nav .button { color: #08111d; }
 
 .button { display: inline-block; padding: 13px 24px; border-radius: 999px; background: var(--green); color: #08111d; text-decoration: none; font-weight: 800; box-shadow: 0 8px 28px rgba(223, 255, 0, .12); transition: transform .2s, background .2s; }
 .button:hover, .button:focus { transform: translateY(-2px); background: #edff61; }
+nav .button, nav .button:visited, nav .button:hover, nav .button:focus, nav .button:active { color: #08111d; }
 .small-button { padding: 10px 18px; font-size: .88rem; }
 
 .hero { padding: 78px 0 90px; background: radial-gradient(circle at 78% 35%, rgba(48, 91, 141, .2), transparent 32%), var(--ink); overflow: hidden; }
@@ -43,7 +44,10 @@ h1 { margin-bottom: 25px; font-size: clamp(3.2rem, 7vw, 6.3rem); line-height: .9
 h1 span { color: var(--green); }
 .lead { max-width: 660px; color: #b5c1cf; font-size: clamp(1.05rem, 2vw, 1.25rem); }
 .button-row { display: flex; align-items: center; gap: 28px; margin: 34px 0 22px; }
+.play-badge-link { display: inline-block; line-height: 0; }
+.play-badge { display: block; width: 190px; height: auto; max-width: 100%; object-fit: contain; }
 .text-link { color: var(--white); font-weight: 700; text-underline-offset: 5px; }
+.beta-helper { margin: 0 0 10px; color: #8d9caf; font-size: .82rem; }
 .trust-line { margin: 0; color: #73859a; font-size: .83rem; }
 .brand-visual { max-width: 300px; max-height: 540px; justify-self: center; padding: 10px; border: 1px solid var(--line); border-radius: 34px; background: #051021; box-shadow: 28px 28px 0 rgba(223, 255, 0, .035), 0 35px 80px rgba(0, 0, 0, .4); transform: rotate(2deg); overflow: hidden; }
 .brand-visual img { display: block; width: auto; max-width: 100%; height: auto; max-height: 518px; object-fit: contain; object-position: center; margin: 0 auto; border-radius: 26px; }
@@ -83,11 +87,12 @@ figcaption span { color: var(--grey); font-size: .86rem; }
 .audience-list li { padding: 16px 20px; border: 1px solid #28425f; border-radius: 15px; background: rgba(255,255,255,.025); font-weight: 700; }
 .audience-list li::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 13px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(223,255,0,.08); }
 
-.release-card { display: grid; grid-template-columns: 130px 1fr auto; gap: 38px; align-items: center; padding: 45px; border: 1px solid var(--line); border-radius: 30px; background: linear-gradient(135deg, #0c213c, #061326); }
+.release-card { display: grid; grid-template-columns: 130px minmax(0, 1fr) 220px; gap: 38px; align-items: center; padding: 45px; border: 1px solid var(--line); border-radius: 30px; background: linear-gradient(135deg, #0c213c, #061326); }
 .release-icon { padding: 8px; border-radius: 28px; background: #020916; }
 .release-icon img { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 22px; }
 .release-card h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
 .release-card p:last-child { margin-bottom: 0; }
+.release-actions { display: flex; width: 100%; max-width: 100%; align-items: center; justify-content: center; }
 
 .site-footer { padding: 36px 0; border-top: 1px solid rgba(255,255,255,.08); background: #010713; color: var(--grey); }
 .footer-inner { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 50px; }
@@ -131,7 +136,7 @@ figcaption span { color: var(--grey); font-size: .86rem; }
   .screenshot-card.wide-shot { grid-column: span 12; }
   .screenshot-card.watch-shot { grid-column: span 6; }
   .release-card { grid-template-columns: 100px 1fr; }
-  .release-card > .button { grid-column: 2; justify-self: start; }
+  .release-card > .release-actions { grid-column: 2; justify-self: stretch; }
   .footer-inner { grid-template-columns: 1fr auto; }
   .status { grid-column: 1 / -1; }
 }
@@ -155,7 +160,7 @@ figcaption span { color: var(--grey); font-size: .86rem; }
   .watch-shot .image-frame { max-width: 420px; margin: 0 auto; }
   .release-card { grid-template-columns: 1fr; padding: 30px 24px; }
   .release-icon { width: 100px; }
-  .release-card > .button { grid-column: auto; }
+  .release-card > .release-actions { grid-column: auto; }
   .footer-inner { grid-template-columns: 1fr; gap: 22px; }
   .status { grid-column: auto; }
   .legal-card, .contact-card { padding: 30px 23px; }
