@@ -33,6 +33,7 @@ nav .button { color: #08111d; }
 
 .button { display: inline-block; padding: 13px 24px; border-radius: 999px; background: var(--green); color: #08111d; text-decoration: none; font-weight: 800; box-shadow: 0 8px 28px rgba(223, 255, 0, .12); transition: transform .2s, background .2s; }
 .button:hover, .button:focus { transform: translateY(-2px); background: #edff61; }
+nav .button, nav .button:visited, nav .button:hover, nav .button:focus, nav .button:active { color: #08111d; }
 .small-button { padding: 10px 18px; font-size: .88rem; }
 
 .hero { padding: 78px 0 90px; background: radial-gradient(circle at 78% 35%, rgba(48, 91, 141, .2), transparent 32%), var(--ink); overflow: hidden; }
@@ -91,7 +92,9 @@ figcaption span { color: var(--grey); font-size: .86rem; }
 .release-icon img { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 22px; }
 .release-card h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
 .release-card p:last-child { margin-bottom: 0; }
-.release-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.release-actions { display: flex; width: 190px; max-width: 100%; flex-direction: column; align-items: flex-start; gap: 9px; }
+.release-helper { margin: 0; color: #8d9caf; font-size: .78rem; line-height: 1.5; }
+.release-helper a { color: var(--green); font-weight: 700; text-underline-offset: 3px; }
 
 .site-footer { padding: 36px 0; border-top: 1px solid rgba(255,255,255,.08); background: #010713; color: var(--grey); }
 .footer-inner { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 50px; }
