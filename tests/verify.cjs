@@ -9,7 +9,7 @@ const path = require('node:path');
 const http = require('node:http');
 const root = path.resolve(__dirname, '..');
 const pages = ['index.html', 'contact.html', 'privacy.html', 'impressum.html'];
-const ID = 'G-79B08QBGVE';
+const ID = 'G-H387MYJ9KJ';
 const KEY = 'courtumpire.analytics.v1';
 const ttl = 180 * 86400000;
 const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.xml': 'application/xml', '.txt': 'text/plain', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
@@ -26,7 +26,7 @@ const stub = `window.__recordedGtag=[];
 for(const item of window.dataLayer) window.__recordedGtag.push(Array.from(item));
 const push=window.dataLayer.push.bind(window.dataLayer);
 window.dataLayer.push=function(item){window.__recordedGtag.push(Array.from(item));return push(item)};
-if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';document.cookie='cu_ga_79B08QBGVE=test; Domain=courtumpire.com; Path=/; Secure';}`;
+if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';document.cookie='cu_ga_H387MYJ9KJ=test; Domain=courtumpire.com; Path=/; Secure';}`;
 
 (async () => {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -163,6 +163,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     const r = await fixture();
     await r.open();
     check(r.requests.length === 0 && await scriptCount(r.page) === 0, 'Fresh visit has no external Google requests');
+    check(await r.page.evaluate(id => window['ga-disable-' + id] === true, ID), 'Correct stream disabled before consent');
     check((await r.context.cookies()).every(c => !/^(cu_ga|_ga)/.test(c.name)), 'Fresh visit has no GA cookies');
     await r.page.getByRole('button', { name: 'Reject analytics', exact: true }).click();
     await r.open('contact.html'); await r.page.reload();
@@ -186,6 +187,8 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     await a.page.waitForFunction(() => window.__recordedGtag);
     let calls = await commands(a.page);
     check(await scriptCount(a.page) === 1 && a.requests.filter(url => url.includes('/gtag/js')).length === 1, 'Exactly one script after acceptance');
+    check(await a.page.locator('script[src*="googletagmanager"]').getAttribute('src') === 'https://www.googletagmanager.com/gtag/js?id=' + ID, 'Single Google script uses the correct stream');
+    check(await a.page.evaluate(id => window['ga-disable-' + id] === false, ID), 'Correct stream enabled only after consent');
     check(calls.filter(c => c[0] === 'config' && c[1] === ID).length === 1, 'Correct measurement ID configured once');
     check(calls.filter(c => c[0] === 'event' && c[1] === 'page_view').length === 1, 'Exactly one manual page_view');
     check(calls.findIndex(c => c[0] === 'consent' && c[1] === 'default') < calls.findIndex(c => c[0] === 'config'), 'Consent defaults precede config');
@@ -204,6 +207,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     calls = await commands(a.page);
     assert.deepEqual(calls.filter(c => c[0] === 'event' && c[1] === 'google_play_click').map(c => c[2].placement), ['header', 'hero', 'download_section']);
     check((await a.context.cookies()).some(c => c.name === 'cu_ga'), 'Stub simulated integration cookies');
+    check((await a.context.cookies()).some(c => c.name === 'cu_ga_' + ID.slice(2)), 'Stub simulated cookie suffix matches the correct stream');
     for (const name of pages.slice(1)) {
       await a.open(name); await a.page.waitForFunction(() => window.__recordedGtag);
       check((await commands(a.page)).filter(c => c[0] === 'event' && c[1] === 'page_view').length === 1, name + ': saved acceptance emits one page_view');

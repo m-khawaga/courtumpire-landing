@@ -6,7 +6,7 @@
   if (window.courtUmpireConsentLoaded) return;
   window.courtUmpireConsentLoaded = true;
 
-  const ID = 'G-79B08QBGVE';
+  const ID = 'G-H387MYJ9KJ';
   const KEY = 'courtumpire.analytics.v1';
   const COOKIE = 'cu_consent';
   const TTL = 180 * 24 * 60 * 60 * 1000;
