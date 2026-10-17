@@ -3,18 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Privacy policy for the CourtUmpire Android and Wear OS app.">
+  <meta name="description" content="How CourtUmpire handles local Android and Wear OS match data, email support and optional website analytics.">
   <title>Privacy Policy — CourtUmpire</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=5">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png?v=5">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5">
+  <link rel="canonical" href="https://courtumpire.com/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CourtUmpire">
+  <meta property="og:title" content="Privacy Policy — CourtUmpire">
+  <meta property="og:description" content="How CourtUmpire handles local Android and Wear OS match data, email support and optional website analytics.">
+  <meta property="og:url" content="https://courtumpire.com/privacy.html">
+  <meta property="og:image" content="https://courtumpire.com/assets/social-card.jpg">
+  <meta property="og:image:width" content="718">
+  <meta property="og:image:height" content="718">
+  <meta property="og:image:alt" content="CourtUmpire app icon with the CU logo and tennis ball">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Privacy Policy — CourtUmpire">
+  <meta name="twitter:description" content="How CourtUmpire handles local Android and Wear OS match data, email support and optional website analytics.">
+  <meta name="twitter:image" content="https://courtumpire.com/assets/social-card.jpg">
+  <meta name="twitter:image:alt" content="CourtUmpire app icon with the CU logo and tennis ball">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <script src="analytics.js" defer></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="CourtUmpire home">
-        <img src="assets/app-icon-clean.png" alt="CourtUmpire app icon">
+        <img src="assets/app-icon-256.webp" alt="CourtUmpire app icon" width="42" height="42">
         <span>Court<span class="accent-text">Umpire</span></span>
       </a>
       <nav aria-label="Main navigation">
@@ -23,16 +41,16 @@
         <a class="active" href="privacy.html" aria-current="page">Privacy</a>
         <a href="contact.html">Contact</a>
         <a href="impressum.html">Legal Notice</a>
-        <a class="button small-button" href="https://play.google.com/store/apps/details?id=com.mahmoud.courtvoice" target="_blank" rel="noopener noreferrer">Get it on Google Play</a>
+        <a class="button small-button" data-play-placement="header" href="https://play.google.com/store/apps/details?id=com.mahmoud.courtvoice" target="_blank" rel="noopener noreferrer">Get it on Google Play</a>
       </nav>
     </div>
   </header>
 
-  <main class="legal-main">
+  <main id="main-content" tabindex="-1" class="legal-main">
     <div class="container narrow-container">
       <p class="eyebrow">Your data, your device</p>
       <h1>Privacy Policy</h1>
-      <p class="last-updated">Effective date: 22 June 2026<br>Last updated: 11 July 2026</p>
+      <p class="last-updated">Effective date: 22 June 2026<br>Last updated: 17 October 2026</p>
 
       <div class="legal-card">
         <section>
@@ -41,13 +59,13 @@
         </section>
 
         <section>
-          <h2>Privacy at a glance</h2>
-          <p>No account is required. CourtUmpire does not use ads. CourtUmpire does not intentionally collect personal match data through an online account or cloud service, and does not intentionally use analytics, advertising cookies, external tracking, payments, or backend services.</p>
+          <h2>App privacy at a glance</h2>
+          <p>The CourtUmpire Android and connected Wear OS app requires no account and has no ads. Match records stay locally on your device. The app does not intentionally use analytics, advertising cookies, external tracking, payments, or backend services. Optional analytics on this website is separate and does not give us access to your app’s match data.</p>
         </section>
 
         <section>
           <h2>Match information</h2>
-          <p>The app allows you to enter match information such as player names, scores, match log entries, and match settings. This information is stored locally on your device. CourtUmpire does not receive, transmit, or access this match information.</p>
+          <p>The app allows you to enter match information such as player names, scores, match log entries, and match settings. This information is stored locally on your device. The developer does not receive or access this match information through the website. A connected Wear OS companion can control the active match on your phone.</p>
           <p>Local match data remains on your device until you delete the match data, clear the app data, or uninstall the app.</p>
         </section>
 
@@ -59,7 +77,22 @@
 
         <section>
           <h2>Website access data</h2>
-          <p>When you visit courtumpire.com, the website hosting provider may process technical access data such as your IP address, browser information, the date and time of access, and server logs. This is used to deliver the website securely and reliably. CourtUmpire does not use website analytics, advertising cookies, or tracking cookies.</p>
+          <p>When you visit courtumpire.com, the website hosting provider, GitHub Pages, may process technical access data such as your IP address, browser information, the date and time of access, and server logs. This is used to deliver the website securely and reliably, independently of your optional analytics choice.</p>
+        </section>
+
+        <section id="website-analytics">
+          <h2>Optional website analytics</h2>
+          <p>Only if you select “Accept analytics”, this production website loads Google Analytics 4 (measurement ID G-79B08QBGVE), a service from Google. For users in the European Economic Area and Switzerland, Google identifies Google Ireland Limited as the provider of its services. We use analytics to understand page visits and clicks on links to Google Play, so we can improve the website. A Google Play click does not tell us that you installed the app.</p>
+          <p>After acceptance, Google receives event information, a browser identifier stored in first-party analytics cookies, and technical information such as browser/device characteristics and connection information. Google states that Analytics uses IP addresses for coarse location and discards them before logging for users in the EU, Switzerland and UK; see <a href="https://support.google.com/analytics/answer/12017362?hl=en">Google’s regional data and privacy information</a>. This does not mean that analytics is anonymous. We send only the known page URL without query strings or fragments, omit the referrer, and use fixed Google Play placement labels. We do not send match records, player names or email messages to Analytics.</p>
+          <p>Analytics cookies created by this integration use names beginning with <code>cu_ga</code> and help distinguish visits and sessions. Their configured lifetime is at most the remaining analytics consent period, without extending it on each visit. Browser settings may shorten this period. Advertising consent stays denied; Google Signals and advertising personalization are disabled in the website configuration.</p>
+          <p>Before you accept, and after you reject, this integration loads no Google Analytics or Tag Manager script and sends no analytics requests, including cookieless consent pings. The website works without acceptance. Google may process information outside your country; see <a href="https://policies.google.com/privacy">Google’s Privacy Policy</a>, <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from sites using its services</a> and <a href="https://support.google.com/analytics/answer/11397207?hl=en">Google’s explanation of Analytics cookies</a>.</p>
+        </section>
+
+        <section>
+          <h2>Remembering and changing your website choice</h2>
+          <p>We remember explicit acceptance or rejection for 180 days using the local storage key <code>courtumpire.analytics.v1</code> and a first-party preference cookie named <code>cu_consent</code>. These contain your choice and its timing, not match data. Both must confirm acceptance before analytics starts on a later visit. Missing, invalid or expired choices do not authorize analytics. If your browser cannot save the choice, analytics stays off and we may ask again.</p>
+          <p>Use “Analytics settings” in any page’s footer to reopen the controls. Select “Reject analytics” to withdraw consent: tracking stops, accessible analytics cookies from this integration are removed, rejection is saved, and the page reloads if the Google script was started. If preferences cannot be saved, an <code>analytics=off</code> URL flag carries rejection through the reload and internal links to prevent stale acceptance from restarting tracking. You can also clear this site’s storage and cookies in your browser.</p>
+          <p>Owner verification is still required for GA4 account data retention, Enhanced Measurement, data sharing, Google Signals, advertising links/features, and applicable provider terms and international transfer information. No specific account retention period or contractual arrangement is asserted here. This policy must be reviewed against the actual account settings before analytics is deployed.</p>
         </section>
 
         <section>
@@ -73,6 +106,7 @@
             <li>You can avoid entering real player names.</li>
             <li>You can delete local app data from your device.</li>
             <li>You choose whether to export or share PDF reports.</li>
+            <li>You can reject optional website analytics or withdraw through “Analytics settings”.</li>
           </ul>
         </section>
 
@@ -83,31 +117,31 @@
 
         <section>
           <h2>No automated decision-making</h2>
-          <p>CourtUmpire does not use automated decision-making or profiling.</p>
+          <p>The CourtUmpire app does not use automated decision-making or profiling. Website analytics is used to understand visits and link clicks, not to make decisions about individual users.</p>
         </section>
 
         <section>
           <h2>Children and younger users</h2>
           <p>CourtUmpire is intended for tennis players, coaches, and match organizers aged 13 and over. The app is not designed for children under 13.</p>
-          <p>CourtUmpire does not require an account, does not use advertising, does not use analytics, and does not intentionally collect personal data from children or younger users.</p>
+          <p>The CourtUmpire app does not require an account, does not use advertising or analytics, and does not intentionally collect personal data from children or younger users. This website’s separate analytics is optional; visitors can reject it.</p>
           <p>If the app is used by minors in training, club, school, or tournament contexts, users should avoid entering unnecessary personal information. Player names can be entered as first names, initials, nicknames, or temporary labels.</p>
         </section>
 
         <section>
           <h2>Future features</h2>
-          <p>This policy must be updated before CourtUmpire adds analytics, cloud sync, crash reporting, ads, payments, accounts, contact forms, or third-party SDKs.</p>
+          <p>This policy must be updated before the app adds analytics, cloud sync, crash reporting, ads, payments, accounts, or third-party SDKs, or the website adds new forms of data collection.</p>
         </section>
 
         <section>
           <h2>Changes to this policy</h2>
-          <p>This policy may be updated when the app changes. The latest version will always be available on this page.</p>
+          <p>This policy may be updated when the app or website changes. The latest version will always be available on this page.</p>
         </section>
       </div>
     </div>
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-inner"><div><strong>Court<span class="accent-text">Umpire</span></strong><p>Tennis scoring for Android and Wear OS.</p></div><div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="contact.html">Contact</a><a href="impressum.html">Impressum / Legal Notice</a></div><p class="status"><span></span>Available on Google Play · Android tennis scoring · Wear OS companion</p></div>
+    <div class="container footer-inner"><div><strong>Court<span class="accent-text">Umpire</span></strong><p>Tennis scoring for Android and Wear OS.</p></div><div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="contact.html">Contact</a><a href="impressum.html">Impressum / Legal Notice</a><button type="button" class="analytics-settings" data-analytics-settings hidden>Analytics settings</button></div><p class="status"><span></span>Available on Google Play · Android tennis scoring · Wear OS companion</p></div>
   </footer>
 </body>
 </html>
