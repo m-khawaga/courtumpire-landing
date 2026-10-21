@@ -4,26 +4,34 @@
  */
 const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'..'),out=path.join(root,'.local-review/analytics-alignment');
+const root=path.resolve(__dirname,'..'),live=process.env.ANALYTICS_REVIEW_LIVE==='1',out=path.join(root,'.local-review',live?'analytics-live-release':'analytics-activation-release');
 fs.mkdirSync(out,{recursive:true});
 const ID='G-H387MYJ9KJ',origin='https://courtumpire.com',source=fs.readFileSync(path.join(root,'analytics.js'),'utf8');
-assert(source.includes('const ACCOUNT_SETTINGS_REVIEWED = false;'));
+assert(source.includes('const ACCOUNT_SETTINGS_REVIEWED = true;'));
 const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.xml':'application/xml','.txt':'text/plain'};
-const scripts=new Map(),records=[],blocked=[],errors=[],checks=[],scenarios=[];
+const scripts=new Map(),records=[],blocked=[],errors=[],checks=[],scenarios=[],siteAssetHashes={};
 const check=(value,label)=>{assert.ok(value,label);checks.push(label);};
 let stage='setup';
 function decode(request){
  const u=new URL(request.url()),common=Object.fromEntries(u.searchParams),body=request.postData()||'';
  return (body?body.split(/\r?\n/):['']).map(line=>({stage,endpoint:u.origin+u.pathname,method:request.method(),parameters:{...common,...Object.fromEntries(new URLSearchParams(line))}}));
 }
-async function fixture(browser,{enabled=false,host=origin,viewport={width:1440,height:1000},seed}={}){
+async function fixture(browser,{disabled=false,host=origin,viewport={width:1440,height:1000},seed}={}){
  const context=await browser.newContext({viewport,serviceWorkers:'block',permissions:['clipboard-read','clipboard-write'],reducedMotion:'reduce'});
  await context.route('**/*',async route=>{
   const request=route.request(),u=new URL(request.url());
   if(u.origin===host){
+   if(live&&host===origin&&!disabled){
+    assert.equal(request.method(),'GET','Live site requests must be read-only');
+    // Browser query markers stay in the fixture, never in requests to the live server.
+    const response=await fetch(origin+u.pathname,{redirect:'error',signal:AbortSignal.timeout(30000),headers:{'Cache-Control':'no-cache'}});
+    const body=Buffer.from(await response.arrayBuffer());siteAssetHashes[u.pathname]=crypto.createHash('sha256').update(body).digest('hex');
+    if(u.pathname==='/analytics.js')assert.equal(body.toString().replace(/\r\n/g,'\n'),source.replace(/\r\n/g,'\n'),'Live activation source matches reviewed source, allowing checkout line endings only');
+    return route.fulfill({status:response.status,contentType:response.headers.get('content-type')||'application/octet-stream',body});
+   }
    let file=path.resolve(root,'.'+decodeURIComponent(u.pathname));if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
    if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:'Not found'});
-   let body=fs.readFileSync(file);if(enabled&&u.pathname==='/analytics.js')body=Buffer.from(body.toString().replace('const ACCOUNT_SETTINGS_REVIEWED = false;','const ACCOUNT_SETTINGS_REVIEWED = true;'));
+   let body=fs.readFileSync(file);if(disabled&&u.pathname==='/analytics.js')body=Buffer.from(body.toString().replace('const ACCOUNT_SETTINGS_REVIEWED = true;','const ACCOUNT_SETTINGS_REVIEWED = false;'));
    return route.fulfill({contentType:mime[path.extname(file)]||'application/octet-stream',body});
   }
   if(u.hostname==='www.googletagmanager.com'&&['/gtag/js','/gtag/destination'].includes(u.pathname)&&[ID,'GT-K8G6D3F9'].includes(u.searchParams.get('id'))){
@@ -54,14 +62,14 @@ const names=()=>records.map(r=>r.parameters.en).filter(Boolean);
 (async()=>{
  const browser=await chromium.launch({headless:true,channel:process.env.BROWSER_CHANNEL||'chrome'});
  try{
-  stage='guard-off';const guard=await fixture(browser);await guard.open('/contact.html');
+  stage='guard-off';const guard=await fixture(browser,{disabled:true});await guard.open('/contact.html');
   for(const width of [1440,390]){await guard.page.setViewportSize({width,height:1000});await guard.page.screenshot({path:path.join(out,'consent-'+width+'.png'),fullPage:true});check(await guard.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Expanded consent copy has no overflow '+width);}
   await guard.page.locator('[data-choice=accepted]').click();await pause(guard.page);
-  check(scripts.size===0&&records.length===0,'Unmodified production guard: acceptance loads no Google and makes no collection attempt');await guard.context.close();
-  for(const host of ['http://localhost:4179','https://preview.example.test']){stage='excluded-host';const f=await fixture(browser,{host,enabled:true});await f.open();await f.page.locator('[data-choice=accepted]').click();await pause(f.page);check(scripts.size===0&&records.length===0,'Excluded host never starts Google: '+host);await f.context.close();}
-  for(const version of [1,2])for(const choice of ['accepted','rejected']){stage='migration';const f=await fixture(browser,{enabled:true,seed:{version,choice}});await f.open();check((await f.page.evaluate(()=>CourtUmpireAnalytics.status().consent))===(choice==='accepted'?'unknown':'rejected'),'Legacy choice migration '+version+' '+choice);check(scripts.size===0&&records.length===0,'Legacy choice does not start Google');await f.context.close();}
-  stage='fresh-rejection';const rejected=await fixture(browser,{enabled:true});await rejected.open('/contact.html');await rejected.page.locator('[data-choice=rejected]').click();await rejected.page.locator('[value=problem]').check();await rejected.page.locator('[data-contact-copy]').click();await pause(rejected.page);check(records.length===0&&scripts.size===0,'Fresh rejection and real contact actions start no Google or collection');await rejected.context.close();
-  stage='pre-consent';const f=await fixture(browser,{enabled:true}),p=f.page;await f.open('/?qa_query=PRIVATE_QUERY#PRIVATE_FRAGMENT');await p.evaluate(()=>CourtUmpireAnalytics.track('google_play_click',{placement:'hero'}));await pause(p);check(records.length===0&&scripts.size===0,'No Google asset or collection before consent; pre-consent custom action dropped');
+  check(scripts.size===0&&records.length===0,'Disabled-guard safety fixture: acceptance loads no Google and makes no collection attempt');await guard.context.close();
+  for(const host of ['http://localhost:4179','https://preview.example.test']){stage='excluded-host';const f=await fixture(browser,{host});await f.open();await f.page.locator('[data-choice=accepted]').click();await pause(f.page);check(scripts.size===0&&records.length===0,'Excluded host never starts Google: '+host);await f.context.close();}
+  for(const version of [1,2])for(const choice of ['accepted','rejected']){stage='migration';const f=await fixture(browser,{seed:{version,choice}});await f.open();check((await f.page.evaluate(()=>CourtUmpireAnalytics.status().consent))===(choice==='accepted'?'unknown':'rejected'),'Legacy choice migration '+version+' '+choice);check(scripts.size===0&&records.length===0,'Legacy choice does not start Google');await f.context.close();}
+  stage='fresh-rejection';const rejected=await fixture(browser,{});await rejected.open('/contact.html');await rejected.page.locator('[data-choice=rejected]').click();await rejected.page.locator('[value=problem]').check();await rejected.page.locator('[data-contact-copy]').click();await pause(rejected.page);check(records.length===0&&scripts.size===0,'Fresh rejection and real contact actions start no Google or collection');await rejected.context.close();
+  stage='pre-consent';const f=await fixture(browser,{}),p=f.page;await f.open('/?qa_query=PRIVATE_QUERY#PRIVATE_FRAGMENT');await p.evaluate(()=>CourtUmpireAnalytics.track('google_play_click',{placement:'hero'}));await pause(p);check(records.length===0&&scripts.size===0,'No Google asset or collection before consent; pre-consent custom action dropped');
   stage='home-accepted';await p.locator('[data-choice=accepted]').click();await p.waitForFunction(()=>window.google_tag_manager);await pause(p);await flush(p);
   check(scripts.size>0,'Actual unmodified Google tag executed');check(names().includes('page_view'),'Actual Google page_view collection payload captured');
   stage='repeat-acceptance';const before=records.length;await p.locator('[data-analytics-settings]').click();await p.locator('[data-choice=accepted]').click();await flush(p);check(records.slice(before).filter(r=>r.parameters.en==='page_view').length===0,'Repeat acceptance adds no real page_view');
@@ -107,7 +115,7 @@ const names=()=>records.map(r=>r.parameters.en).filter(Boolean);
   for(const event of ['scroll','click','form_start','form_submit','file_download'])check(events[event]>0,'Applicable automatic event was observed: '+event);
   const {activities}=await import('../practice/catalogue.mjs'),{videoReady}=await import('../practice/render.mjs');check(activities.every(a=>!videoReady(a.video)),'No published activity video; YouTube automatic video events are not applicable');
   const eventCoverage=Object.fromEntries(['page_view','scroll','click','form_start','form_submit','view_search_results','file_download','video_start','video_progress','video_complete'].map(event=>{const sample=records.filter(r=>r.parameters.en===event),leaks=sensitive.filter(marker=>decodedText(sample).includes(marker.toLowerCase()));return [event,{count:sample.length,status:leaks.length?'privacy-blocker':sample.length?'observed-and-verified':event==='view_search_results'?'disabled-by-confirmed-setting-five-probes-verified':event.startsWith('video_')?'not-applicable':'not-triggered-not-proven-safe',privateMarkers:leaks}];}));
-  const report={testedAt:new Date().toISOString(),browser:browser.version(),safetyStatus:findings.length?'blocked':'verified-for-applicable-events',productionGuard:false,servedCopyGuardOverride:true,collectionRequestsTransmitted:0,thirdPartyScriptsModified:false,checks,scenarios,assets,eventCounts:events,eventCoverage,consentCommands,pageVisits:f.visitPaths,sensitiveMarkersFound:findings,blockedOtherRequests:blocked,pageErrors:errors,records,limitations:['No GA receipt verification or remote setting mutation.','Absence of an automatic event does not establish safe payloads for that event.','Contact mailto navigation is prevented to avoid opening an email client; observed contact payloads are checked.','PNG/blob export is custom export_generated; file_download uses the existing public ITF PDF reference.','No published video or YouTube embed is present; retest if video content is introduced.']};
+  const report={testedAt:new Date().toISOString(),browser:browser.version(),liveSite:live,siteAssetHashes,safetyStatus:findings.length?'blocked':'verified-for-applicable-events',productionGuard:true,servedCopyGuardOverride:false,disabledGuardSafetyFixture:true,collectionRequestsTransmitted:0,thirdPartyScriptsModified:false,checks,scenarios,assets,eventCounts:events,eventCoverage,consentCommands,pageVisits:f.visitPaths,sensitiveMarkersFound:findings,blockedOtherRequests:blocked,pageErrors:errors,records,limitations:['No GA receipt verification or remote setting mutation.','Absence of an automatic event does not establish safe payloads for that event.','Contact mailto navigation is prevented to avoid opening an email client; observed contact payloads are checked.','PNG/blob export is custom export_generated; file_download uses the existing public ITF PDF reference.','No published video or YouTube embed is present; retest if video content is introduced.']};
   fs.writeFileSync(path.join(out,'real-tag-payloads.json'),JSON.stringify(report,null,2));
   console.log(JSON.stringify({checks:checks.length,assets:assets.length,eventCounts:events,sensitiveMarkersFound:findings,otherBlocked:blocked,collectionRequestsTransmitted:0},null,2));
   if(findings.length){console.error('BLOCKED: private marker in actual collection payload. Inspect real-tag-payloads.json; keep delivery disabled until the specific automatic-event issue is resolved.');process.exitCode=1;}

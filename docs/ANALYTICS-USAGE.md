@@ -1,6 +1,6 @@
 # Consent-gated usage analytics
 
-The single existing GA4 integration remains `analytics.js`, measurement ID **G-H387MYJ9KJ**. `ACCOUNT_SETTINGS_REVIEWED = false` deliberately blocks production tag loading and event delivery until the remaining rollout checks below are complete. The owner reviewed GA4 settings manually on 21 October 2026; live GA receipt is not yet verified. Advertising remains denied.
+The single existing GA4 integration remains `analytics.js`, measurement ID **G-H387MYJ9KJ**. `ACCOUNT_SETTINGS_REVIEWED = true` enables optional production delivery only after current-scope consent. On 21 October 2026 the owner confirmed the saved settings, reviewed the final disclosures, completed GA4's User Data Collection Acknowledgement and authorized the normal PR/Pages release. GA receipt remains unverified until the owner's manual accepted visit. Advertising remains denied.
 
 Consent version 3 adds scope `website-engagement-v3`, preserving the same key `courtumpire.analytics.v1`, preference cookie and fixed 180-day lifetime. Previous version-1 or version-2 acceptance requires a fresh choice for expanded purposes; an unexpired previous rejection remains rejected. Both cookie and storage must agree for acceptance. Withdrawal disables GA immediately, clears accessible integration cookies/debug records, saves rejection and reloads if the tag started. Failed stores fail closed; no pre-consent actions are queued or replayed.
 
@@ -28,7 +28,7 @@ Only exact HTTPS `courtumpire.com`, known public paths, reviewed account setting
 
 Exact enum lists and per-event schemas are centralized in `analytics.js`; unknown events, parameter names or values are rejected. Tool IDs are contact, practice_planner, scoreboard, tiebreak_calculator, result_card, rotation, checklists, rules, score_sheet, umpire_challenge and club_kit. Contact categories: general/help/problem/improvement/clubs/privacy. No per-point event stream, match state, names, reminders, logo/filename, message body, email, full mailto, raw errors or free text enters analytics. URLs are fixed allowlisted production paths without query/fragment; referrer is blank and title fixed to CourtUmpire. First interaction and page/tool views deduplicate per document. Actual successful output and print intent are distinct.
 
-## Account review and remaining activation checks — 21 October 2026
+## Account review and activation configuration — 21 October 2026
 
 Confirmed from owner screenshots and discussion:
 - Website stream G-H387MYJ9KJ (16150036647), tag GT-K8G6D3F9; existing sole destination is CourtUmpire website.
@@ -38,15 +38,18 @@ Confirmed from owner screenshots and discussion:
 - Account sharing: Technical support ON; Google products/services, modeling contributions/business insights and business recommendations OFF. These are account-wide; do not change unrelated properties.
 - Owner confirmed DPA acceptance and that the administrative primary-contact details were saved. Do not request this confirmation again. The administrative email and postal address are not published here; existing public Contact, Privacy and Impressum addresses remain unchanged.
 - Owner confirmed saved retention: event 14 months, user 14 months, reset on new activity OFF. Do not request these confirmations again.
+- Owner confirmed reviewing the final disclosures and completing GA4's User Data Collection Acknowledgement, then explicitly authorized activation and release. No further owner setting confirmation is outstanding.
 
 The published Google tag configuration was fetched read-only during this review: automatic detection flags ON, user-provided data disabled, Signals disallowed, email redaction enabled, and only the purchase rule marked as a conversion in that configuration. Fetching a tag is not proof of event delivery. Do not commit the third-party downloaded script.
 
 The refreshed real-tag review confirms the owner's saved Site search OFF configuration: 64 focused assertions passed, all five search-key probes reached measured pages without emitting search events/terms or private markers, and the search descriptor is absent from the actual tag. Other applicable automatic and custom events still work, twelve real visits produce twelve page views, and consent/withdrawal protections remain intact. The explicit same-origin public form actions remain in place. The earlier form-query and search-term issues are resolved for this verified configuration. See [the observed event matrix and evidence](ANALYTICS-ALIGNMENT-REVIEW.md). Every collection request was intercepted locally; none was transmitted. No account settings were changed by this work.
 
-Still required before changing `ACCOUNT_SETTINGS_REVIEWED`:
-1. Complete the owner's **User Data Collection Acknowledgement** against the final disclosures. This is the only outstanding owner confirmation. Stream settings, retention/reset and saved DPA contact details are already confirmed; do not request them again.
-2. Obtain separate activation authorization and change the guard only in a reviewed release. Preserve Site search OFF, stream history measurement OFF, the other confirmed measurements, consent version 3, old rejection, local/preview exclusion and all advertising denials. Current instructions explicitly keep the guard false and prohibit publishing or test delivery.
-3. For that later authorized release, use normal PR protections and verify live consent plus one expressly authorized accepted visit in GA Realtime. Intercepted payloads alone are not receipt confirmation.
+Activation configuration and release:
+1. Owner acknowledgement, saved settings and release authorization are complete. The enabled source preserves Site search OFF, stream history measurement OFF, the other confirmed measurements, consent version 3, old rejection, local/preview exclusion and all advertising denials.
+2. Verify the actual enabled source with collection intercepted, then publish through normal PR protections and GitHub Pages. Automated accepted-consent tests must intercept all collection before transmission, including live verification. Never commit downloaded tag scripts or raw payload evidence.
+3. After deployment the owner will perform one manual accepted visit and check GA Realtime. No automated test event is authorized for delivery. Intercepted payloads are not proof of GA receipt.
+
+Manual receipt check: open the published site in a fresh/private browser window, choose Accept analytics, visit Contact or build one practice plan, then open the CourtUmpire website property's Reports → Realtime overview and look for that active user/page_view (and the corresponding tool event if performed). Allow a few minutes and check the correct property/stream. Content/ad blockers may prevent the visit. When finished, withdraw using Analytics settings → Reject analytics. No message needs to be sent.
 
 Reuse the completed browser evidence for unaffected behavior. Keep the explicit query-free form actions and the five-key search-exclusion regression. Automatic video is not applicable until eligible content is introduced; absence is not a safety pass. Generated PNG blobs use custom `export_generated`; the existing public ITF PDF exercises automatic `file_download`. Future new forms/links/content must keep entered text, personal link text and visitor query strings out of metadata. Do not monkey-patch Google's code or browser transports to filter production analytics.
 

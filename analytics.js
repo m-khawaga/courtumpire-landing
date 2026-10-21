@@ -9,9 +9,9 @@
   const ID = 'G-H387MYJ9KJ';
   const KEY = 'courtumpire.analytics.v1';
   const CONSENT_VERSION = 3, SCOPE = 'website-engagement-v3';
-  // Keep delivery off until real-tag payload verification and the privacy acknowledgement are complete.
-  // Account review alone is not evidence that automatic events respect the intended data scope.
-  const ACCOUNT_SETTINGS_REVIEWED = false;
+  // Owner confirmed saved settings and the acknowledgement; real-tag payloads were checked.
+  // Exact production host, current-scope consent and all privacy controls still apply.
+  const ACCOUNT_SETTINGS_REVIEWED = true;
   const debug = ['localhost','127.0.0.1','[::1]'].includes(location.hostname) && new URL(location.href).searchParams.get('analytics_debug') === '1';
   const COOKIE = 'cu_consent';
   const TTL = 180 * 24 * 60 * 60 * 1000;

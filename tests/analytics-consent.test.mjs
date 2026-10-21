@@ -20,7 +20,7 @@ test('local tool forms cannot inherit visitor query strings in automatic form de
   }
   assert.ok(forms>=10,'cover the generated local forms, including club event details');
 });
-function fixture({version, choice = 'accepted', cookie = true, enabled = false, blocked = false, origin = 'https://courtumpire.com', query = ''} = {}) {
+function fixture({version, choice = 'accepted', cookie = true, enabled = true, blocked = false, origin = 'https://courtumpire.com', query = ''} = {}) {
   const storage = new Map(), cookies = new Map(), scripts = [], replacements = [], reloads = [];
   const savedAt = Date.now() - 1000;
   if (version) {
@@ -35,12 +35,16 @@ function fixture({version, choice = 'accepted', cookie = true, enabled = false, 
   Object.defineProperty(document,'cookie',{get:()=>[...cookies].map(([k,v])=>k+'='+v).join('; '),set:value=>{const [pair]=value.split(';'),i=pair.indexOf('='),k=pair.slice(0,i);if(value.includes('Max-Age=0'))cookies.delete(k);else cookies.set(k,pair.slice(i+1));}});
   const sandbox={document,location,URL,Date,Set,Object,JSON,Number,Math,clearTimeout(){},setTimeout(){return 1;},history:{replaceState(_a,_b,url){replacements.push(url.href);location.href=url.href;}},localStorage:{getItem:k=>storage.get(k)||null,setItem(k,v){if(blocked)throw Error('blocked');storage.set(k,v);}},addEventListener(){}};
   sandbox.window=sandbox;
-  vm.runInNewContext(enabled?source.replace('const ACCOUNT_SETTINGS_REVIEWED = false;', 'const ACCOUNT_SETTINGS_REVIEWED = true;'):source,sandbox);
+  vm.runInNewContext(enabled?source:source.replace('const ACCOUNT_SETTINGS_REVIEWED = true;', 'const ACCOUNT_SETTINGS_REVIEWED = false;'),sandbox);
   const select=choice=>panel.listeners.click({target:{closest:()=>({dataset:{choice}})}});
   return {sandbox,select,panel,status,storage,cookies,scripts,replacements,reloads,commands:()=>Array.from(sandbox.dataLayer||[],x=>Array.from(x))};
 }
-test('production guard stays off even with fresh version-3 consent',()=>{
-  const f=fixture({version:3});assert.equal(f.scripts.length,0);assert.equal(f.sandbox.CourtUmpireAnalytics.status().deliveryReady,false);assert.equal(f.sandbox.CourtUmpireAnalytics.track('page_view'),false);
+test('reviewed activation source starts only after current-scope consent',()=>{
+  assert.match(source,/const ACCOUNT_SETTINGS_REVIEWED = true;/);
+  const f=fixture();assert.equal(f.scripts.length,0);assert.equal(f.sandbox.CourtUmpireAnalytics.status().deliveryReady,true);f.select('accepted');assert.equal(f.scripts.length,1);
+});
+test('disabled guard safety fixture still overrides fresh consent',()=>{
+  const f=fixture({version:3,enabled:false});assert.equal(f.scripts.length,0);assert.equal(f.sandbox.CourtUmpireAnalytics.status().deliveryReady,false);assert.equal(f.sandbox.CourtUmpireAnalytics.track('page_view'),false);
 });
 test('both older acceptance versions require a fresh choice; both older rejections persist',()=>{
   for(const version of [1,2]){const a=fixture({version,enabled:true});assert.equal(a.panel.hidden,false);assert.equal(a.scripts.length,0);assert.equal(a.sandbox.CourtUmpireAnalytics.status().consent,'unknown');const r=fixture({version,choice:'rejected',enabled:true});assert.equal(r.panel.hidden,true);assert.equal(r.sandbox.CourtUmpireAnalytics.status().consent,'rejected');assert.equal(r.scripts.length,0);}
