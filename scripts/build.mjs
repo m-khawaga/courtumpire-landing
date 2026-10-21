@@ -54,6 +54,9 @@ function page(route, title, description, body, kind) {
   if(!definition) throw new Error('Register route before generating: '+route);
   title=definition.title || title;
   const canon = canonicalUrl(route);
+  // A form without an action inherits the complete current URL. Keep local tool
+  // destinations public and query-free, including automatic form metadata.
+  body = body.replace(/<form\b[^>]*>/g, tag => /\saction\s*=/i.test(tag) ? tag : tag.replace(/>$/, ` action="${route}">`));
   const canonicalTag=definition.noindex?'<meta name="robots" content="noindex, follow">':`<link rel="canonical" href="${canon}">`;
   const trail=ancestors(route);
   const breadcrumbData=definition.noindex||definition.sitemap===false?'':`<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:trail.map((r,i)=>({'@type':'ListItem',position:i+1,name:r.label,item:canonicalUrl(r.path)}))}).replaceAll('<','\\u003c')}</script>`;

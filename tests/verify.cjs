@@ -228,7 +228,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
         if (seed === 'unavailable') { Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } }); return; }
         if (seed === 'unavailable-cookie') Object.defineProperty(document, 'cookie', { get() { throw new Error('cookie access blocked'); }, set() { throw new Error('cookie writes blocked'); } });
         const savedAt = seed === 'expired' ? Date.now() - ttl - 1000 : seed === 'future' ? Date.now() + 100000 : Date.now();
-        localStorage.setItem(KEY, seed === 'invalid' ? '{invalid' : JSON.stringify({ version: seed === 'wrong-version' ? 99 : 2, scope:'tool-usage-v2', choice: 'accepted', savedAt, expiresAt: savedAt + ttl }));
+        localStorage.setItem(KEY, seed === 'invalid' ? '{invalid' : JSON.stringify({ version: seed === 'wrong-version' ? 99 : 3, scope:'website-engagement-v3', choice: 'accepted', savedAt, expiresAt: savedAt + ttl }));
         if (!['missing-cookie', 'unavailable-cookie'].includes(seed)) document.cookie = 'cu_consent=accepted.' + savedAt + '; Path=/; Secure';
       }).toString()})(${JSON.stringify({ seed, KEY, ttl })})` });
       await u.open();
