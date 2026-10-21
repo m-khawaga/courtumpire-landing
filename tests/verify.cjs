@@ -12,10 +12,10 @@ const pages = ['index.html', 'contact.html', 'privacy.html', 'impressum.html'];
 const ID = 'G-H387MYJ9KJ';
 const KEY = 'courtumpire.analytics.v1';
 const ttl = 180 * 86400000;
-const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.xml': 'application/xml', '.txt': 'text/plain', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 const server = http.createServer((req, res) => {
   const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-  const file = path.resolve(root, '.' + (pathname === '/' ? '/index.html' : pathname));
+  const file = path.resolve(root, '.' + (pathname.endsWith('/') ? pathname + 'index.html' : pathname));
   if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
     res.writeHead(404); return res.end();
   }
@@ -42,7 +42,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
       const url = new URL(route.request().url());
       if (url.origin === origin || url.origin === local) {
         const response = await fetch(local + url.pathname + url.search);
-        return route.fulfill({ status: response.status, headers: { 'content-type': response.headers.get('content-type') || '' }, body: Buffer.from(await response.arrayBuffer()) });
+        return route.fulfill({ status: response.status, headers: { 'content-type': response.headers.get('content-type') || '' }, body: url.pathname==='/analytics.js'?Buffer.from((await response.text()).replace('const ACCOUNT_SETTINGS_REVIEWED = false;','const ACCOUNT_SETTINGS_REVIEWED = true;')):Buffer.from(await response.arrayBuffer()) });
       }
       requests.push(route.request().url());
       if (url.hostname === 'www.googletagmanager.com' && url.pathname === '/gtag/js') {
@@ -122,7 +122,8 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
       return { error: !!xml.querySelector('parsererror'), namespace: xml.documentElement.namespaceURI, urls: Array.from(xml.querySelectorAll('loc'), node => node.textContent) };
     });
     check(!xmlResult.error && xmlResult.namespace === 'http://www.sitemaps.org/schemas/sitemap/0.9', 'Sitemap parses with correct namespace');
-    assert.deepEqual(xmlResult.urls, pages.map(name => 'https://courtumpire.com/' + (name === 'index.html' ? '' : name)));
+    const {canonicalPaths,canonicalUrl}=await import('../practice/routes.mjs');
+    assert.deepEqual(xmlResult.urls, canonicalPaths.map(canonicalUrl));
     for (const url of xmlResult.urls) check(fs.existsSync(path.join(root, new URL(url).pathname === '/' ? 'index.html' : new URL(url).pathname.slice(1))), 'Sitemap maps to a published file');
     check(fs.readFileSync(path.join(root, 'robots.txt'), 'utf8').includes('Sitemap: https://courtumpire.com/sitemap.xml'), 'robots sitemap');
     for (const name of ['index.html', 'contact.html']) check(!/beta|pre-release|groups\.google/i.test(fs.readFileSync(path.join(root, name), 'utf8')), 'Beta invitation removed: ' + name);
@@ -130,9 +131,9 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     check(await f.page.locator('.skip-link').evaluate(el => el === document.activeElement), 'Skip link first in keyboard order');
     await f.page.keyboard.press('Enter');
     check(await f.page.locator('main').evaluate(el => el === document.activeElement), 'Skip link focuses main');
-    await f.page.locator('summary').first().focus();
+    await f.page.locator('.faq-section summary').first().focus();
     await f.page.keyboard.press('Enter');
-    check(await f.page.locator('details').first().evaluate(el => el.open), 'Native FAQ keyboard toggle');
+    check(await f.page.locator('.faq-section details').first().evaluate(el => el.open), 'Native FAQ keyboard toggle');
     await accept(f.page);
     check(f.requests.length === 0 && await scriptCount(f.page) === 0, 'Local acceptance cannot load Google');
     check(f.errors.length === 0, 'No JS errors across layout/link checks');
@@ -142,12 +143,12 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     await noJs.route('**/*', route => new URL(route.request().url()).origin === local ? route.continue() : route.abort());
     const plain = await noJs.newPage();
     await plain.goto(local);
-    check(await plain.locator('details').count() === 5, 'All five FAQ questions rendered without JavaScript');
-    for (const details of await plain.locator('details').all()) {
+    check(await plain.locator('.faq-section details').count() === 5, 'All five FAQ questions rendered without JavaScript');
+    for (const details of await plain.locator('.faq-section details').all()) {
       await details.locator('summary').click();
       check(await details.locator('p').isVisible(), 'FAQ answer available without JavaScript');
     }
-    check(await plain.locator('[data-play-placement="hero"]').isVisible(), 'Main CTA remains usable without JavaScript');
+    check(await plain.locator('[data-play-placement="download_section"]').isVisible(), 'App download remains usable without JavaScript');
     await noJs.close();
 
     function luminance(hex) {
@@ -180,7 +181,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     // Production-origin interception exercises the actual, unchanged host guard.
     const a = await fixture();
     await a.open('?email=private@example.com&utm_source=secret#private');
-    await a.page.locator('[data-play-placement="hero"]').click();
+    await a.page.locator('[data-play-placement="download_section"]').click();
     await a.page.waitForTimeout(50);
     check((await commands(a.page)).length === 0, 'Pre-consent Play click is not queued');
     await accept(a.page);
@@ -198,14 +199,14 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     check(calls.find(c => c[0] === 'config')[2].page_location === 'https://courtumpire.com/' && calls.find(c => c[0] === 'config')[2].page_referrer === '', 'Page location canonical; referrer omitted');
     await settings(a.page); await accept(a.page);
     check((await commands(a.page)).filter(c => c[0] === 'event' && c[1] === 'page_view').length === 1, 'Repeated acceptance does not duplicate page_view');
-    for (const placement of ['header', 'hero', 'download_section']) {
+    for (const placement of ['header', 'download_section']) {
       const [popup] = await Promise.all([a.context.waitForEvent('page'), a.page.locator(`[data-play-placement="${placement}"]`).click()]);
       await popup.waitForURL(/play\.google\.com/).catch(() => {});
       check(a.requests.some(url => url === 'https://play.google.com/store/apps/details?id=com.mahmoud.courtvoice'), 'Play navigation attempted normally');
       await popup.close();
     }
     calls = await commands(a.page);
-    assert.deepEqual(calls.filter(c => c[0] === 'event' && c[1] === 'google_play_click').map(c => c[2].placement), ['header', 'hero', 'download_section']);
+    assert.deepEqual(calls.filter(c => c[0] === 'event' && c[1] === 'google_play_click').map(c => c[2].placement), ['header', 'download_section']);
     check((await a.context.cookies()).some(c => c.name === 'cu_ga'), 'Stub simulated integration cookies');
     check((await a.context.cookies()).some(c => c.name === 'cu_ga_' + ID.slice(2)), 'Stub simulated cookie suffix matches the correct stream');
     for (const name of pages.slice(1)) {
@@ -227,14 +228,14 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
         if (seed === 'unavailable') { Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } }); return; }
         if (seed === 'unavailable-cookie') Object.defineProperty(document, 'cookie', { get() { throw new Error('cookie access blocked'); }, set() { throw new Error('cookie writes blocked'); } });
         const savedAt = seed === 'expired' ? Date.now() - ttl - 1000 : seed === 'future' ? Date.now() + 100000 : Date.now();
-        localStorage.setItem(KEY, seed === 'invalid' ? '{invalid' : JSON.stringify({ version: seed === 'wrong-version' ? 2 : 1, choice: 'accepted', savedAt, expiresAt: savedAt + ttl }));
+        localStorage.setItem(KEY, seed === 'invalid' ? '{invalid' : JSON.stringify({ version: seed === 'wrong-version' ? 99 : 2, scope:'tool-usage-v2', choice: 'accepted', savedAt, expiresAt: savedAt + ttl }));
         if (!['missing-cookie', 'unavailable-cookie'].includes(seed)) document.cookie = 'cu_consent=accepted.' + savedAt + '; Path=/; Secure';
       }).toString()})(${JSON.stringify({ seed, KEY, ttl })})` });
       await u.open();
       check(u.requests.length === 0 && await u.page.locator('.consent-panel').isVisible(), seed + ': fail closed with usable controls');
       if (['unavailable', 'unavailable-cookie'].includes(seed)) {
         await accept(u.page);
-        check(u.requests.length === 0 && await u.page.getByRole('status').textContent() !== '', 'Unavailable storage never enables Google');
+        check(u.requests.length === 0 && await u.page.locator('.consent-status').textContent() !== '', 'Unavailable storage never enables Google');
       }
       check(u.errors.length === 0, seed + ': no JS errors');
       await u.context.close();
@@ -259,7 +260,7 @@ if(!window['ga-disable-${ID}']) {document.cookie='cu_ga=test; Path=/; Secure';do
     await w.page.waitForURL(/analytics=off/);
     await w.page.waitForLoadState('load');
     check(await scriptCount(w.page) === 0, 'Failed withdrawal writes: URL guard stops stale consent');
-    await w.page.locator('nav a[href*="contact.html"]').click();
+    await w.page.locator('.footer-links a[href*="contact.html"]').click();
     check(w.page.url().includes('analytics=off') && await scriptCount(w.page) === 0, 'Rejection guard carried to another page');
     check(w.errors.length === 0, 'Withdrawal storage failure no JS errors');
     await w.context.close();

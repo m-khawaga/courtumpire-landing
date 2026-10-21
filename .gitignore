@@ -1,0 +1,6 @@
+.local-review/
+node_modules/
+
+
+# Generated local review PDFs and runtime artifacts are not release source.
+output/

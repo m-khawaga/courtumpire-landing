@@ -1,0 +1,66 @@
+[
+  {
+    "original": "01-home-current.jpg",
+    "name": "01-home-current",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 224372,
+    "displayBytes": 58760
+  },
+  {
+    "original": "02-match-setup.jpg",
+    "name": "02-match-setup",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 110921,
+    "displayBytes": 27062
+  },
+  {
+    "original": "03-live-match-scoring.jpg",
+    "name": "03-live-match-scoring",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 182362,
+    "displayBytes": 48730
+  },
+  {
+    "original": "04-match-complete.jpg",
+    "name": "04-match-complete",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 158977,
+    "displayBytes": 39482
+  },
+  {
+    "original": "05-settings-features.jpg",
+    "name": "05-settings-features",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 145128,
+    "displayBytes": 38884
+  },
+  {
+    "original": "06-match-result-dialog.jpg",
+    "name": "06-match-result-dialog",
+    "width": 640,
+    "height": 1387,
+    "originalBytes": 304197,
+    "displayBytes": 71128
+  },
+  {
+    "original": "07-landscape-scoreboard.jpg",
+    "name": "07-landscape-scoreboard",
+    "width": 640,
+    "height": 295,
+    "originalBytes": 108935,
+    "displayBytes": 8938
+  },
+  {
+    "original": "watch-scoring-latest.png",
+    "name": "watch-scoring-latest",
+    "width": 454,
+    "height": 454,
+    "originalBytes": 34208,
+    "displayBytes": 13814
+  }
+]
