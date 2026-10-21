@@ -1,58 +1,41 @@
 # CourtUmpire website
 
-Plain HTML, CSS and JavaScript for [courtumpire.com](https://courtumpire.com/). This is the website repository, not the Android application. No build step or production dependencies are required. Product claims and FAQ answers are based on the existing website’s feature descriptions and actual screenshots; the Android source was not audited.
+The current candidate is covered by [the release-readiness audit](docs/RELEASE-READINESS.md), including accumulated website improvements and focused fixes. Dedicated draft review branch: `codex/release-readiness`. Production publishing from `main` remains a separate owner-approved step. Earlier local-only handoffs below describe their historical scope.
+
+## Current local website work
+
+The planner, 50 illustrated activities, working scoring tools and club resources are prepared for **local review only**. Advertising remains off; no shop is implemented. Start with [the 100-question/50-activity expansion and current review](docs/EXPANSION-REVIEW.md), [screenshots, PDFs and earlier verified limitations](docs/CURRENT-LOCAL-REVIEW.md), [the current checklists/formats/contact review](docs/CHECKLISTS-FORMATS-UPDATE.md), [email-based Contact review](docs/CONTACT.md), [usage analytics](docs/ANALYTICS-USAGE.md), [the focused corrections](docs/FOCUSED-CORRECTIONS.md), [the 21 October coordinated tools update](docs/CLUB-TOOLS-UPDATE.md), [the tools/SEO/indexing handoff](docs/TOOLS-SEO.md), [the architecture/PDF refinement guide](docs/REFINEMENT.md), [the hierarchy and roadmap](docs/ROADMAP.md), or [the practice/content guide](docs/PRACTICE.md). **Do not push or deploy this branch.** The publishing notes below describe the existing site, not authorization to publish this work.
+
+Plain HTML, CSS and JavaScript for [courtumpire.com](https://courtumpire.com/). This is the website repository, not the Android application. Run `npm run build` after editing shared routes, content or templates; generated HTML is committed. No installed production dependencies are required for the static website. Contact uses your own email app and a local copy-email action, without a submission backend. Product claims and FAQ answers are based on the existing website’s feature descriptions and actual screenshots; only the Android PDF generator/branding was inspected for report styling, not a full application audit.
 
 ## Publishing and page maintenance
 
 GitHub Pages settings verified on 17 October 2026: **Deploy from a branch → main → / (root)**, legacy Pages build, custom domain `courtumpire.com`, HTTPS enforced. Keep `CNAME` and this publishing source unchanged. There is no deployment workflow in this repository.
 
-The public HTML pages are `index.html`, `contact.html`, `privacy.html` and `impressum.html`. Each includes `analytics.js` once, a footer Analytics settings button, one absolute canonical, and matching Open Graph/Twitter metadata. The homepage canonical is `https://courtumpire.com/`.
+The original app/legal HTML pages are `index.html`, `contact.html`, `privacy.html` and `impressum.html`; the shared static generator adds practice, scoring, club and site-map pages. Each includes `analytics.js` once, a footer Analytics settings button, one absolute canonical, and matching Open Graph/Twitter metadata. The homepage canonical is `https://courtumpire.com/`.
 
 When adding or removing a public canonical page:
 
-1. Update root `sitemap.xml` with its absolute production canonical URL and ensure it maps to an actual published HTML file. Do not add `index.html` as a second homepage, anchors, assets or external URLs.
+1. Update `practice/routes.mjs` and the relevant content/template, then run `npm run build` to synchronize the HTML site map, root XML sitemap, breadcrumbs and analytics path allowlist. Ensure its absolute production canonical maps to an actual HTML file. Do not add `index.html` as a second homepage, anchors, assets or external URLs.
 2. Keep the standard sitemap namespace and UTF-8 encoding. Omit `lastmod` unless the date of a significant content modification is known. Do not add `priority` or `changefreq`.
 3. Keep `robots.txt` public and its sitemap reference intact. Preserve legitimate crawl directives if more are added later.
-4. Add matching metadata, navigation, consent controls and the shared script to the page. Update the explicit pathname allowlist in `analytics.js` and `pages` in `tests/verify.cjs`.
+4. Add matching metadata, navigation, consent controls and the shared script to the page. The build updates the explicit pathname allowlist in `analytics.js`; test the new content with `test:seo` and the relevant browser suite.
 
 Submit [https://courtumpire.com/sitemap.xml](https://courtumpire.com/sitemap.xml) in the verified domain’s Google Search Console Sitemaps report after deployment.
 
 ## Website consent and analytics
 
-`analytics.js` uses basic opt-in for **G-H387MYJ9KJ**. Until explicit acceptance, no Google script is inserted and no analytics requests or cookieless pings are sent. The site remains usable after rejection, with blocked scripts, and without JavaScript. Choices appear in a section in normal document flow, so content is never covered by an overlay. Footer settings reopen the controls and move focus to the choices; closing returns focus to the opener.
+See [the current event schema and owner checks](docs/ANALYTICS-USAGE.md). The single integration remains **G-H387MYJ9KJ**, basic opt-in, with advertising denied and no pre-consent queue. Consent version 2 (`tool-usage-v2`) retains the existing storage key/cookie and fixed 180-day lifetime. Old acceptance requires renewal for expanded usage purposes; old valid rejection remains rejected. Production delivery is deliberately blocked by `ACCOUNT_SETTINGS_REVIEWED = false` until the actual GA4 account is reviewed. No real Google delivery occurs during local testing.
 
-Explicit choices last **180 days from the choice**, without sliding renewal on navigation. Local storage key `courtumpire.analytics.v1` contains `{version: 1, choice: "accepted"|"rejected", savedAt, expiresAt}` with millisecond timestamps. Preference cookie `cu_consent` contains the choice and timestamp and uses `Path=/`, `SameSite=Lax`, and `Secure` on HTTPS. Both stores must confirm the same acceptance. Missing, malformed, future-dated, expired or unreadable choices never authorize tracking. Failed acceptance writes leave analytics off. The preference cookie is not an analytics identifier.
+Local-only `?analytics_debug=1`, after explicit acceptance, exposes a bounded in-memory categorical record list. Names, email, message contents, reminders, event details, logo/filename, full mailto URLs and raw errors are not permitted. Withdrawal clears debug records and disables delivery/cookies before any reload. Review Enhanced Measurement/history/automatic forms, data sharing, Signals/Ads, actual retention, contracts and privacy before any future activation. An app-link click is intent, print is a dialog request, and neither proves installation or PDF saving.
 
-Only HTTPS on the exact hostname `courtumpire.com` and the known public paths can start Google. Localhost, GitHub previews, alternate hosts and HTTP do not send production analytics even after acceptance. There is no testing override for this restriction.
+## Contact — email-based local review
 
-After acceptance, denied consent defaults and privacy configuration are queued before configuration/events. Only `analytics_storage` becomes granted. `ad_storage`, `ad_user_data` and `ad_personalization` remain denied; Google Signals, advertising personalization and URL passthrough are disabled. Automatic config pageviews are disabled; one explicit `page_view` is queued per document. Reopening/reaccepting does not duplicate it. Nothing backfills earlier interactions. Google may still generate standard session/engagement bookkeeping after consent; this is distinct from the explicit events below.
-
-The page URL is constructed from the allowlisted production path, mapping `index.html` to `/`, with no query or fragment. Referrer is always an empty string, including on the config and each explicit event. No arbitrary link URL, link text, email, match data, user ID or user property is sent. The script fetch uses `no-referrer`. Enhanced Measurement **must be disabled in the GA4 account before deployment**, as explained below, to prevent its automatic URL/event collection.
-
-| Event | Meaning | Parameters |
-| --- | --- | --- |
-| `page_view` | One page viewed after consent, per full page load | Fixed page URL/title, blank referrer, measurement ID |
-| `google_play_click` | One click on an existing Google Play link; **not an installation** | `placement`: `header`, `hero`, or `download_section`; fixed page URL, blank referrer, measurement ID |
-
-Clicks keep their normal new-tab behavior. No redirect delays or synthetic clicks are used. Before consent, clicks are neither measured nor queued.
-
-Withdrawal sets Google’s `ga-disable-G-H387MYJ9KJ` flag immediately, then updates consent to denied, deletes accessible integration cookies (`cu_ga*`, plus accessible legacy `_ga*` cookies at `/` on the host/production domain), saves rejection, and reloads if the script had started. GA cookie lifetime is configured to the remaining consent period and does not renew on page load. HTTP-only cookies cannot be cleared by JavaScript; this integration creates none. Missing/revoked consent is rechecked on storage events, focus, visibility changes, page restoration and clicks; an expiry timer also stops a long-lived page.
-
-If rejection cannot be verified in both stores, `analytics=off` is added to the reload URL and all internal links. It takes precedence over stale acceptance, retries saving rejection, and is removed only when rejection is saved successfully (or acceptance is explicitly saved again). This guard also covers browsers that fail both storage writes after a previous acceptance. It is excluded from analytics data.
-
-### Required owner checks before merging/deploying
-
-- Confirm the correct web stream and ID. In GA4 Admin → Data streams → web stream, **turn Enhanced Measurement off**. In particular disable history-based page views, outbound clicks, scrolls, site search, forms, video and file downloads. `send_page_view: false` alone does not stop history-triggered pageviews. Do not enable automatic/user-provided data collection, connected site tags, extra destinations or duplicate Google tags. Check for account event-creation rules that could duplicate these events.
-- Verify Google Signals is off and advertising personalization, Ads linking/remarketing and other advertising features are disabled. Code-level flags do not replace checking the account configuration.
-- Review actual event/user data retention and whether resets on activity are enabled; record the selected settings. No account retention period is asserted in the policy.
-- Review data-sharing settings, granular location/device settings, applicable Google Analytics terms/data processing terms, provider details, international transfer information, and the published privacy policy against the actual account. No specific agreement or legal compliance certification is claimed.
-- Optionally register `placement` as an event-scoped custom dimension for reporting. A click must not be named or presented as an app installation.
-
-Official references checked during implementation: [Google consent ordering](https://developers.google.com/tag-platform/security/guides/consent), [manual pageviews and history-event caveat](https://developers.google.com/analytics/devguides/collection/ga4/views), [privacy controls and disable flag](https://developers.google.com/tag-platform/security/guides/privacy), [configuration fields](https://developers.google.com/analytics/devguides/collection/ga4/reference/config), [Enhanced Measurement](https://support.google.com/analytics/answer/9216061?hl=en), [Analytics cookies](https://support.google.com/analytics/answer/11397207?hl=en), [regional data/privacy information](https://support.google.com/analytics/answer/12017362?hl=en), and [Google’s use of partner-site information](https://policies.google.com/technologies/partner-sites).
+Run `npm run preview`, then open `http://127.0.0.1:4173/contact.html`. General contact needs no topic selection; four accessible topic choices prepare an encoded email subject. The visible address and copy button remain available. `npm run test:contact` checks desktop/mobile layout, keyboard behavior, subjects, copy feedback, consent-gated intent and preserved metadata without external requests. See [Contact implementation and removal handoff](docs/CONTACT.md). No contact backend, uploads or new service is used. Stop any preview process you start with Ctrl+C.
 
 ## Images and accessibility
 
-Actual artwork and all original full-resolution assets are preserved. The displayed logo and hero use compressed WebP derivatives; screenshots retain their original readable files. Dimensions reserve image space. The hero is eager/high priority, and below-the-fold app images are lazy. The small 4,904-byte Play badge is unchanged. A JPEG of the existing logo provides social-card compatibility.
+Actual artwork and all original full-resolution assets are preserved. The displayed logo and hero use compressed WebP derivatives; screenshots have measured WebP gallery derivatives while all original full-resolution files remain intact. Dimensions reserve image space. The hero is eager/high priority, and below-the-fold app images are lazy. The small 4,904-byte Play badge is unchanged. A JPEG of the existing logo provides social-card compatibility.
 
 | Use | Original bytes | New bytes | Reduction |
 | --- | ---: | ---: | ---: |
@@ -70,8 +53,8 @@ The test starts its own local HTTP server. It checks all four pages at 360, 390,
 
 ### Production checks after deployment
 
-1. Confirm GitHub Pages deployment succeeded for the merge commit, then open all four HTTPS pages. Check mobile/desktop layout, screenshots, native FAQ, support email, legal details, privacy links, keyboard focus and Play destinations.
-2. Fetch `/sitemap.xml` and `/robots.txt`: both should return HTTP 200 with the intended content. Confirm all four sitemap URLs return the expected pages and canonical URLs, and CNAME/HTTPS still work.
+1. Confirm GitHub Pages deployment succeeded for the merge commit, then open the original app/legal pages and representative new HTTPS pages. Check mobile/desktop layout, screenshots, native FAQ, support email, legal details, privacy links, keyboard focus and Play destinations.
+2. Fetch `/sitemap.xml` and `/robots.txt`: both should return HTTP 200 with the intended content. Confirm all registered canonical sitemap URLs return the expected pages and canonical URLs, and CNAME/HTTPS still work.
 3. In a clean browser profile with extensions disabled, inspect Network and Application storage **before using Tag Assistant**. Before consent there must be no requests to Analytics/Tag Manager and no GA cookies. Reject, navigate and reload; repeat the checks.
 4. Use [Google Tag Assistant](https://tagassistant.google.com/) and GA4 Realtime (DebugView if enabled through debugging tools) to check an accepted production visit. Expect one `page_view` per full page load, with ID `G-H387MYJ9KJ`, a query-free canonical page location and blank referrer. Check that no search/hash/email values or unwanted automatic events appear. Debug tools can introduce their own requests, so do not use their traffic as proof of a clean pre-consent baseline.
 5. Click each Play placement and confirm one `google_play_click` with the fixed placement and working navigation. Check actual GA4 Realtime receipt separately from observing queued `gtag` calls.

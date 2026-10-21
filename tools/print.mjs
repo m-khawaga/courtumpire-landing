@@ -1,0 +1,12 @@
+import {escape as e} from '../practice/html.mjs';
+import {loadEvent} from './event.mjs';
+import {brand} from './brand.mjs';
+import {getClubLogo} from './club-logo.mjs';
+import {track} from './usage.mjs';
+export function brandedDocument(title,metadata,body,{landscape=false,event=null,clubLogo=getClubLogo()}={}){
+ const details=event?[event.name,[event.venue,event.date].filter(Boolean).join(' · '),[event.organizer&&`Organizer: ${event.organizer}`,event.contact].filter(Boolean).join(' · ')].filter(Boolean):[];
+ return `<div id="print-report" class="tool-report ${landscape?'report-landscape':''}"><header class="report-header"><div class="report-brand"><img src="${brand.logo}" width="46" height="46" alt="CourtUmpire logo"><p class="report-wordmark">Court<span>Umpire</span></p>${clubLogo?`<img class="report-club-logo" src="${e(clubLogo.src)}" width="120" height="48" alt="Club logo">`:""}</div><div class="report-qr"><img src="${brand.qr}" width="76" height="76" alt="QR code for ${brand.url}"><span>${brand.url}</span></div></header><div class="report-document-heading"><h1>${e(title)}</h1>${details.length?`<div class="report-event">${details.map(d=>`<p>${e(d)}</p>`).join('')}</div>`:''}<div class="report-metadata"><p>${e(metadata)}</p></div></div>${body}</div>`;
+}
+export function preparePrint(title,metadata,body,options={}){document.getElementById('print-report')?.remove();document.body.insertAdjacentHTML('beforeend',brandedDocument(title,metadata,body,options));document.documentElement.style.setProperty('--report-label',JSON.stringify(title));}
+export function documentPreview(title,metadata,body,options={}){return brandedDocument(title,metadata,body,options).replace('id="print-report"','data-document-paper').replaceAll('<h2','<h4').replaceAll('</h2>','</h4>').replaceAll('<h1','<h3').replaceAll('</h1>','</h3>');}
+export async function printDocument(title,metadata,body,options={}){if(!Object.hasOwn(options,'event')){try{options={...options,event:loadEvent(localStorage)};}catch{}}preparePrint(title,metadata,body,options);await Promise.all([...document.querySelectorAll('#print-report img')].map(i=>i.decode()));await document.fonts.ready;track('print_requested',{document_type:options.documentType||({'Tournament Rules & Information':'rules','Match Score Sheet':'score_sheet','Social Rotation Schedule':'rotation','Blank Rotation Worksheet':'rotation','Session checklist':'checklist','Organizer checklist':'checklist','Scoring & Tiebreak Reference':'scoring_reference'}[title]||'practice_plan')});window.print();}

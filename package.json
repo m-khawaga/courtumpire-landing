@@ -1,0 +1,24 @@
+{
+  "name": "courtumpire-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "node scripts/check.mjs",
+    "test": "node --test tests/planner.test.mjs tests/tools.test.mjs tests/club-update.test.mjs tests/focused-corrections.test.mjs tests/checklists-formats.test.mjs tests/expansion.test.mjs",
+    "preview": "node scripts/preview.cjs",
+    "test:browser": "node tests/practice.cjs",
+    "test:refinement": "node tests/refinement.cjs",
+    "test:tools": "node tests/tools-browser.cjs",
+    "test:existing": "node tests/verify.cjs",
+    "test:seo": "node tests/seo.cjs",
+    "test:performance": "node tests/performance.cjs",
+    "test:club-update": "node tests/club-update.cjs",
+    "test:result-variants": "node tests/result-variants.cjs",
+    "test:focused-corrections": "node tests/focused-corrections.cjs",
+    "test:checklists-formats": "node tests/checklists-formats.cjs",
+    "test:contact": "node tests/contact.cjs",
+    "test:expansion": "node tests/expansion.cjs",
+    "test:release": "node tests/release.cjs"
+  }
+}
