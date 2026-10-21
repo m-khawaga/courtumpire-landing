@@ -1,5 +1,5 @@
 /* Basic opt-in: no Google code or requests until a saved, explicit acceptance.
- * See README for the required GA4 Enhanced Measurement account settings.
+ * See docs/ANALYTICS-USAGE.md for the reviewed settings and activation checks.
  */
 (() => {
   'use strict';
@@ -8,8 +8,9 @@
 
   const ID = 'G-H387MYJ9KJ';
   const KEY = 'courtumpire.analytics.v1';
-  const CONSENT_VERSION = 2, SCOPE = 'tool-usage-v2';
-  // Fail closed until the owner verifies the existing GA4 stream settings (see docs/ANALYTICS-USAGE.md).
+  const CONSENT_VERSION = 3, SCOPE = 'website-engagement-v3';
+  // Keep delivery off until real-tag payload verification and the privacy acknowledgement are complete.
+  // Account review alone is not evidence that automatic events respect the intended data scope.
   const ACCOUNT_SETTINGS_REVIEWED = false;
   const debug = ['localhost','127.0.0.1','[::1]'].includes(location.hostname) && new URL(location.href).searchParams.get('analytics_debug') === '1';
   const COOKIE = 'cu_consent';
@@ -34,7 +35,7 @@
   function readChoice() {
     try {
       const value = JSON.parse(localStorage.getItem(KEY));
-      if (!value || ![1,CONSENT_VERSION].includes(value.version) || !['accepted', 'rejected'].includes(value.choice) ||
+      if (!value || ![1,2,CONSENT_VERSION].includes(value.version) || !['accepted', 'rejected'].includes(value.choice) ||
           !Number.isSafeInteger(value.savedAt) || !Number.isSafeInteger(value.expiresAt) ||
           value.savedAt > Date.now() || value.expiresAt - value.savedAt !== TTL || value.expiresAt <= Date.now()) return null;
       if (value.choice === 'accepted' && (value.version !== CONSENT_VERSION || value.scope !== SCOPE)) return null;
@@ -94,7 +95,7 @@
   panel.className = 'consent-panel';
   panel.setAttribute('aria-labelledby', 'consent-title');
   panel.innerHTML = '<div class="container consent-inner"><div><h2 id="consent-title">Optional website analytics</h2>' +
-    '<p>Allow Google Analytics to measure page visits, tool use, successful results, export generation, local quiz starts/results, score resets, contact intent and Google Play link clicks? Names, reminders, event details and logos stay out of these events. ' +
+    '<p>Allow Google Analytics to measure page visits, scrolling, outbound links, file-link clicks, supported video engagement, form interactions and tennis-tool use and outcomes? Our custom tool events exclude names, reminders, event details and logos. Analytics consent does not include advertising. ' +
     'Your choice lasts 180 days. <a href="/privacy.html#website-analytics">Privacy Policy</a></p>' +
     '<p class="consent-status" role="status"></p></div><div class="consent-actions">' +
     '<button type="button" class="consent-choice" data-choice="accepted">Accept analytics</button>' +
@@ -131,7 +132,9 @@
     const url = new URL(location.href);
     if (enabled) url.searchParams.set('analytics', 'off');
     else url.searchParams.delete('analytics');
-    history.replaceState(null, '', url);
+    // A repeated acceptance must not emit an automatic history page_view.
+    // Withdrawal still updates the URL when necessary, after GA has been disabled.
+    if (url.href !== location.href) history.replaceState(null, '', url);
     for (const link of document.querySelectorAll('a[href]')) {
       const target = new URL(link.href);
       if (target.origin !== location.origin) continue;
@@ -271,6 +274,6 @@
   } else {
     clearAnalyticsCookies();
     showChoices();
-    try { const previous=JSON.parse(localStorage.getItem(KEY));if(previous?.choice==='accepted'&&previous.version!==CONSENT_VERSION)status.textContent='Analytics now includes optional tool usage and outcomes. Please choose again for this expanded purpose.'; } catch {}
+    try { const previous=JSON.parse(localStorage.getItem(KEY));if(previous?.choice==='accepted'&&previous.version!==CONSENT_VERSION)status.textContent='Analytics now includes optional website engagement and tool outcomes. Please choose again for this expanded purpose.'; } catch {}
   }
 })();
