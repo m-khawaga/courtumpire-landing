@@ -201,8 +201,9 @@ figcaption span { color: var(--grey); font-size: .86rem; }
 #the-app .app-intro .section-heading > p:last-child { margin-bottom: 0; }
 #the-app .app-features { padding-top: 24px; padding-bottom: 32px; }
 #the-app .app-gallery-cta { display: flex; justify-content: center; margin: 0 0 36px; text-align: center; }
-#the-app .app-gallery-cta a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; color: var(--green); font-size: .9rem; line-height: 1.5; }
-#the-app .app-gallery-cta a:hover { color: #f0ff8a; }
+#the-app .app-gallery-cta a { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 48px; max-width: 100%; padding: 12px 20px; border: 1px solid #36516b; border-radius: 12px; background: #0c223d; color: var(--white); font-size: .9rem; line-height: 1.5; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 0, 0, .16); }
+#the-app .app-gallery-cta a span { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: var(--ink); font-size: 1rem; line-height: 1; }
+#the-app .app-gallery-cta a:hover { border-color: var(--green); background: #122e4c; }
 #the-app .app-features .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 14px; }
 #the-app .app-features .feature-card { min-height: 0; padding: 20px; border-radius: 18px; background: linear-gradient(145deg, #0a1c33, #061426); }
 #the-app .app-features .feature-card h3 { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 1.02rem; line-height: 1.4; }
