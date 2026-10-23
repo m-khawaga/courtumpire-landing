@@ -8,16 +8,7 @@ for(const group of groups){
 }
 document.addEventListener('click',event=>{if(!event.target.closest('.nav-group')||event.target.closest('.nav-group a')){groups.forEach(n=>n.open=false);syncMenus();}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){const open=groups.find(g=>g.open);if(open){open.open=false;syncMenus();open.querySelector('summary').focus();}}});syncMenus();
-for(const gallery of document.querySelectorAll('[data-gallery]')){
- const cards=[...gallery.querySelectorAll('.screenshot-card')],viewport=gallery.querySelector('.screenshot-grid'),prev=gallery.querySelector('[data-gallery-prev]'),next=gallery.querySelector('[data-gallery-next]'),status=gallery.querySelector('[data-gallery-status]');
- if(!cards.length)continue;
- gallery.querySelector('.gallery-controls').hidden=false;
- const step=()=>cards[0].getBoundingClientRect().width+22;
- function update(){const first=Math.round(viewport.scrollLeft/step()),visible=Math.max(1,Math.round(viewport.clientWidth/step()));status.textContent=`${first+1}–${Math.min(cards.length,first+visible)} of ${cards.length}`;prev.disabled=viewport.scrollLeft<2;next.disabled=viewport.scrollLeft>=viewport.scrollWidth-viewport.clientWidth-2;}
- function move(delta){viewport.scrollBy({left:delta*step(),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}
- prev.addEventListener('click',()=>move(-1));next.addEventListener('click',()=>move(1));viewport.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);
- viewport.addEventListener('keydown',event=>{if(event.target!==viewport)return;if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();if(event.key==='Home')viewport.scrollTo({left:0});else if(event.key==='End')viewport.scrollTo({left:viewport.scrollWidth});else move(event.key==='ArrowRight'?1:-1);}});update();
-}
+if(document.querySelector('[data-product-gallery]')) await import('../assets/gallery/gallery.mjs');
 const kind=document.body.dataset.page;
 if(['planner','library','activity','players'].includes(kind)){await import('./app.mjs');document.body.dataset.practiceReady='true';}
 if(['scoreboard','helper','result','quiz','rotation','checklist','kit','rules','score-sheet'].includes(kind))await import('../tools/app.mjs');
