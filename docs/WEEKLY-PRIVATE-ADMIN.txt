@@ -235,3 +235,16 @@ https://developers.cloudflare.com/d1/platform/pricing/
 https://developers.cloudflare.com/d1/reference/time-travel/
 https://developers.cloudflare.com/workers/platform/limits/
 
+
+BRANDING / SOURCE PRESERVATION — 28 OCTOBER 2026
+Deployed version 587c1e30-5f02-467b-b300-47a68e6c18a7, 100% traffic.
+Source commit 798ff65cd3b4f43d447e0a839f17c7212ad97f5c on
+codex/courtumpire-weekly is pushed. Title: CourtUmpire — Private Editor.
+The live refreshed owner session loads the public-site favicon byte-for-byte.
+Auth/MFA, both secret bindings and the existing DRAFTS database are preserved.
+Nine live unauthenticated boundary checks pass, including the favicon; alternative
+URLs remain disabled. Current focused local backend/private tests: 18/18 pass.
+Earlier test limitations remain valid. Actual Pages container audit: 204 output
+files, nine excluded private canaries, zero findings. Pages still serves main at
+a4abd3b60857149371499851ae9353f75c5e995b; no public deployment was triggered.
+Current remaining-activation handoff: docs/WEEKLY-ACTIVATION-HANDOFF.txt.

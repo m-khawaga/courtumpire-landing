@@ -154,3 +154,11 @@ I accept the documented outage-related deletion delay and daily health-check dut
 Stop before any charge. No real/rehearsal article, mail/DNSSEC/contact change or
 duplicate-account deletion is included.
 
+
+FINAL EVIDENCE UPDATE
+18/18 focused local backend/private-admin tests pass. Nine live unauthenticated
+private-editor boundary checks pass after branding. Fresh owner MFA -> live title
+and byte-identical public-site favicon confirmed. Source 798ff65 is pushed to
+codex/courtumpire-weekly, deployed private version 587c1e30-5f02-467b-b300-47a68e6c18a7.
+Public Pages latest build remains a4abd3b, 23 October; no public activation occurred.
+Final actual Pages audit: .weekly-private/pages-audit-e2f56701-3389-4e0e-8ae0-8dbf066a5b7d/report.json.
