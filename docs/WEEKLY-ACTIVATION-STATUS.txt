@@ -3,7 +3,7 @@ Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboa
 PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
 Frontend API config remains disabled and public Pages remains on a4abd3b.
 
-REPAIR DEPLOYED — OWNER SESSION VERIFICATION PENDING (28 OCTOBER, 20:31 BERLIN)
+REPAIR DEPLOYED — BOUNDED OWNER VERIFICATION COMPLETE (28 OCTOBER, 20:37 BERLIN)
 Owner explicitly approved commit 25b871f543735c36716ba349d2d65ae390e1c255.
 Captured active versions and nonsecret configuration before deployment; pushed
 that commit to codex/courtumpire-weekly. Pages verified to publish main only.
@@ -25,15 +25,32 @@ token rejection: Access handles private requests before the Worker, and the publ
 hostname fails the backend origin check. Existing local signed-token tests remain
 the evidence for those independent backend controls.
 
-The old owner session expired normally. Google sign-in reached a fresh TOTP
-challenge. Owner code entry is pending; authenticated editor/moderation verification
-and its response timings are NOT complete. No repair regression has been observed,
-but do not mark the reliability gate passed. No rollback has been needed yet.
-Continue bounded checks after private MFA completion; rollback to captured
+The old owner session expired normally. The owner completed a fresh TOTP challenge;
+the authenticated health response then opened. Twelve subsequent read-only health
+requests succeeded without a recurring authentication denial. Browser navigation
+plus observation times: 2304–4626 ms, median 2715 ms. These include automation
+overhead and are not server TTFB measurements. No retry-count telemetry was enabled;
+we cannot tell which successful calls used an internal retry.
+
+Editor owner identity and saved-draft listing initialized successfully, with no
+application error or console errors. One initial browser navigation wait timed out;
+on a bounded reload the owner-label selector wait also timed out, then initialization
+completed. Exact application-ready duration was not measured. Moderation navigation
+plus initial observation took 10223 ms with data still loading; it subsequently
+loaded zero comments and showed both submission controls closed. A Playwright
+button-role lookup did not match the native details summary; native AX interaction
+opened it successfully. That selector mismatch is tooling, not a UI/auth failure.
+
+No confirmed functional/security regression requiring rollback was observed.
+Keep the initialization delays as an unresolved timing limitation; these bounded
+successes do not prove permanent upstream reliability or authorize public release.
+No production failure injection, draft editing or new wrong-account login test was
+performed. Rollback remains available to captured
 private-admin c9476539-feec-43bd-aeae-4ab4122d8d4b and Weekly
 5ad020b6-4821-4762-9fa4-e73f0255a4dc if the repair causes regressions.
 Private evidence: .weekly-private/auth-investigation-2026-10-28/repair-before.json,
-repair-after.json and repair-boundaries.json. No secret values captured.
+repair-after.json, repair-boundaries.json, repair-owner-verification.json and
+repair-moderation.png. No secret values or draft content captured.
 See docs/WEEKLY-POLICY-REPAIR.txt for behavior and 30 passing local tests.
 Daily cleanup still awaits the owner's return after 29 October 04:05 Berlin.
 No overnight wait, schedule change, public release or article publication.
