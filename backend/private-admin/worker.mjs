@@ -1,4 +1,5 @@
 import {owner,csrf,signed,fail} from '../src/auth.mjs';
+import {authDiagnostic} from '../src/auth-diagnostic.mjs';
 import {validate,validateWorkingDraft} from '../../weekly-core/contract.mjs';
 const json=(v,status=200)=>new Response(JSON.stringify(v),{status,headers:{'content-type':'application/json; charset=utf-8'}});
 const uuid=v=>typeof v==='string'&&/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(v);
@@ -76,7 +77,7 @@ export function createPrivateHandler(deps={}){
     const text=asset.encoding==='base64'?Uint8Array.from(atob(asset.body),c=>c.charCodeAt(0)):key.endsWith('.html')?asset.body.replaceAll('__CSP_NONCE__',nonce):asset.body;
     response=new Response(request.method==='HEAD'?null:text,{headers:{'content-type':asset.type}});
    }else fail(405,'Method not allowed.');
-  }catch(e){response=json({error:e.status?e.message:'Private service unavailable. Your unsaved work remains in the editor.'},e.status||503);}
+  }catch(e){response=json({error:e.status?e.message:'Private service unavailable. Your unsaved work remains in the editor.',...authDiagnostic(e,'private-editor')},e.status||503);}
   response=new Response(response.body,response);
   response.headers.set('cache-control','private, no-store');
   response.headers.set('x-robots-tag','noindex, nofollow, noarchive');

@@ -1,4 +1,5 @@
 import {cleanup,scheduled} from './retention.mjs';
+import {authDiagnostic} from './auth-diagnostic.mjs';
 import {owner,browser,csrf,signed,digest,turnstile,fail} from './auth.mjs';
 import {adminHtml,adminJs} from './admin.mjs';
 const uuid=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
@@ -103,7 +104,7 @@ export function createHandler(deps={}){return async function handle(request,env)
         }else fail(404,'Not found.');
       }else fail(404,'Not found.');
     }
-  }catch(e){response=json({error:e.status?e.message:'Service temporarily unavailable. Please retry.'},e.status||503);}
+  }catch(e){response=json({error:e.status?e.message:'Service temporarily unavailable. Please retry.',...(admin?authDiagnostic(e,'weekly'):{})},e.status||503);}
   response.headers.set('cache-control','no-store');response.headers.set('x-content-type-options','nosniff');response.headers.set('referrer-policy','no-referrer');if(!admin&&origin===env.PUBLIC_ORIGIN){response.headers.set('access-control-allow-origin',origin);response.headers.set('vary','Origin');}return response;
 };}
 export default {fetch:createHandler(),scheduled};
