@@ -7,9 +7,10 @@ CREATED / CONFIGURED
 EU D1 courtumpire-weekly-production: c55230e5-f748-4c57-ba32-21e7de4a2f01.
 Three migrations applied and recorded in d1_migrations in order:
 0001_weekly.sql, 0002_comment_reactions.sql, 0003_retention_health.sql.
-Worker courtumpire-weekly: version 9fc3e502-53a5-48ef-809a-06b1dc153a80.
-Runtime source is the reviewed backend from feature source 798ff65/3d29a1b;
-only nonsecret deployment configuration was supplied during activation.
+Worker courtumpire-weekly: version 5ad020b6-4821-4762-9fa4-e73f0255a4dc.
+Runtime source is feature commit 2d52aa0: reviewed backend plus a focused repair
+to show FAILED when the first retention run fails, even without a prior success.
+The new regression test passes; authentication and retention rules are unchanged.
 API https://weekly-api.courtumpire.com. New Custom Domain only; original 12 DNS
 records unchanged, prior _domainconnect 3600 TTL preserved. DNSSEC untouched.
 Turnstile Managed widget sitekey 0x4AAAAAAFp6hX5OSlqZVaAA, courtumpire.com and its
@@ -18,7 +19,8 @@ Secrets SIGNING_SECRET, TURNSTILE_SECRET, ACCESS_POLICY_READ_TOKEN are server-on
 New policy-read credential: exact account, Access Apps and Policies READ only,
 expires 28 October 2027 13:00 UTC. Private renewal inventory and existing September
 2027 reminder now cover both private-editor and Weekly credentials. No values in Git.
-Private Worker version c656c80b-2488-4492-93d1-7bac91a2bd96 adds only WEEKLY service
+Private Worker version c9476539-feec-43bd-aeae-4ab4122d8d4b restores the original
+branded runtime after isolated tests, retaining only the production WEEKLY service
 binding. Runtime/editor/auth/DRAFTS remain unchanged. Prior rollback version:
 587c1e30-5f02-467b-b300-47a68e6c18a7. The EU private-drafts DB is untouched.
 Both Workers have workers.dev and preview URLs disabled; no local test auth deployed.
@@ -39,24 +41,59 @@ Build/lint pass. Wrangler nonsecret binding types generated successfully.
 Earlier 18/18 local backend/private tests and actual 204-file Pages exclusion
 build remain valid; they are not substitutes for unperformed live tests.
 
+OWNER SESSION CHECK — 28 OCTOBER, 18:18 UTC / 19:18 BERLIN
+After the owner completed MFA, the first moderation data request returned
+Authentication required. A normal page refresh succeeded without configuration
+changes: settings, all five zero-count status tabs, and cleanup health loaded.
+The initial failure's cause is not established. No validation was bypassed.
+The editor also reopened in the same authenticated session. Moderation shows
+Close comments and Disable reactions checked, and Registry: Not synchronized.
+Read-only D1 inspection confirmed zero articles/comments, both global closures,
+and no cleanup health rows yet. Both production cron definitions remain present.
+Private screenshot and timestamped evidence are excluded from Git/deployment.
+
+ISOLATED LIVE TESTS AND CLEANUP — COMPLETED 18:45 UTC
+Owner separately approved temporary EU D1/Worker courtumpire-weekly-activation-test
+and its short-lived account-scoped policy READ token. No public hostname or private
+draft DB access was added. Existing owner/MFA/JWT and CSRF checks protected the tests.
+32 browser assertions passed: real Turnstile session/comment/report, token replay,
+wrong action/hostname rejection, comment idempotency, pending/email privacy, private
+no-store review, approve/hide/reject/restore, genuine article/comment reaction totals,
+concurrent retries/conflicts/removal, reports and server closure controls.
+The final closure assertion initially failed during intermittent authentication
+failures; five targeted authenticated retries subsequently returned HTTP 409.
+An earlier run was interrupted by the deliberate cleanup failure fixture; it was
+separated from engagement before rerunning. Original failed evidence is retained.
+Rendered dummy HTML was inert in moderation (literal text; zero injected images).
+Real isolated cron events recorded hourly success and daily failure, then recovery
+after removal of the failure trigger. Old pending content/audit and short-lived
+fixture were deleted, approved text retained, old optional email cleared.
+The corrected FAILED notice and recovered success timestamps were verified in UI.
+These are isolated-admin-host tests, not a claim of public-host browser verification.
+The temporary Worker, EU database, both temporary schedules, secret bindings and
+account token 66077e525a0c587724c320d91cfd145b were removed/revoked. Inventory verified
+only the two production Workers/DBs remain; both original policy credentials active.
+The test service binding/routes/diagnostics were removed; authenticated test URL now
+returns Not found. Normal private editor and moderation reopened afterward.
+Provider retention of deleted-resource backups is separate from live deletion.
+
 OUTSTANDING GATES — DO NOT MERGE UNTIL RESOLVED
-Fresh owner MFA -> live moderation verification is pending the owner's private
-login. No codes or tokens may be collected in chat or logs.
-Successful real Turnstile submission, action/hostname validation and replay tests;
-real comment/reaction add/change/remove/idempotency and moderation on dummy data.
-Successful scheduled cleanup and live failure/recovery verification. The schedules
-were added at 17:59 UTC; no successful health row was present at 18:07 UTC.
+Production cron health has not yet recorded a run (last checked 18:45 UTC).
+The original production schedules were added at 17:59 UTC; isolated scheduled
+success proves the handler, but does not prove both production schedules have run.
 Cron propagation can take time; do not call a missing first run a code defect.
 The next hourly boundary is 19:00 UTC / 20:00 Europe/Berlin. The next daily boundary
 is 29 October 03:00 UTC / 04:00 Europe/Berlin. Check afterward, without a long wait.
-Automatic approval review rejected a persistent aborting trigger in the production
-D1 database for fault injection. It was NOT installed, and no fixture was inserted.
-Do not retry that production mutation or bypass the rejection. A separate temporary
-isolated test database/Worker behind existing Access is the safer proposed venue
-for disruptive failure testing; exact additional resources require owner approval.
+Automatic approval review rejected fault injection in production; no trigger or
+fixture was inserted there. The separately approved isolated test resolved that
+test requirement and has now been completely removed from active configuration.
 A real browser Turnstile token must come from its expected hostname. Never spoof
 success, accept localhost/admin as a production hostname, or bypass token checks.
-Any temporary test configuration must be isolated and removed before public release.
+Intermittent fail-closed authentication responses recovered on refresh/retry; their
+cause was not established. Retain this limitation and check normal administration
+reliability again before release. No authentication check or MFA was weakened.
+Public courtumpire.com browser connection checks remain a release verification step;
+current live origin/CORS rejection checks passed but are not a public-page browser test.
 Prior wrong-owner limitation remains: personal Gmail was rejected by Google
 org_internal, while independent wrong-email/issuer/audience/expiry tests are local.
 
@@ -73,7 +110,9 @@ data before reopening. Outage-related physical deletion delays are accepted.
 Published articles and private drafts/revisions never expire automatically.
 
 NEXT STEP
-Complete owner login and finish safe checks. Do not release public Weekly while
-any live gate remains pending. Preserve closed submissions and the private editor.
-The original activation authorization continues to cover release once gates pass;
-additional disruptive test infrastructure is not silently added to that scope.
+Check production hourly health after 28 October 20:05 Europe/Berlin and daily health
+after 29 October 04:05 Europe/Berlin. Check actual timestamps/status, not elapsed time.
+Recheck authenticated administration reliability. Keep submissions closed until gates
+pass, then configure/build/review/merge the zero-edition website and sync its exact
+live empty registry under the existing approval. No article publication is authorized.
+Do not recreate isolated resources or repeat successful tests without a new reason.
