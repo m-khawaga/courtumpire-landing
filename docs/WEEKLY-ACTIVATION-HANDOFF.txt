@@ -1,0 +1,156 @@
+COURTUMPIRE WEEKLY — REMAINING ACTIVATION, 28 OCTOBER 2026
+This is the current handoff; earlier readiness documents are historical.
+Public activation is NOT authorized yet. Private editor activation/branding is
+separately authorized and remains independent. No real edition is included.
+
+ACCOUNT AND PRESENT RESOURCES
+Use only a5646237c003a20af52d12c61b4bd0b7, zone
+d885d7e16db53e3914cbc1f278af7289. No duplicate account/zone creation.
+Existing: courtumpire-private-admin, admin.courtumpire.com, EU D1
+courtumpire-private-drafts (ae856293-8b0e-4a42-89dd-5d148bebd329), Google Access
+owner info@wynctec.com plus independent one-hour TOTP. Preserve all of these.
+Current resource inspection: no Weekly Worker/database or Turnstile widget.
+The dashboard Workers plans page shows Free, $0, Current plan. No paid upgrade.
+
+EXACT PROPOSED CHANGES, IN EXECUTION ORDER
+1. Reconfirm account Free status and current resource inventory; stop if payment
+   or a conflicting resource appears. Save current private Worker version/config.
+2. Create D1 courtumpire-weekly-production with jurisdiction eu (not merely a
+   geographic hint), distinct from DRAFTS. Bind it as DB in courtumpire-weekly.
+   Apply backend/migrations/0001_weekly.sql, 0002_comment_reactions.sql and
+   0003_retention_health.sql in that order.
+   No private-draft migration or article data import is required.
+3. Create one Managed Turnstile widget restricted to courtumpire.com. Server
+   verification checks hostname/action; place its site key in public config and
+   its secret only in the Weekly Worker. No analytics consent dependency.
+4. Prepare exact production config from backend/wrangler.jsonc with real D1 ID,
+   PUBLIC_ORIGIN=https://courtumpire.com, ADMIN_ORIGIN=https://admin.courtumpire.com,
+   existing issuer/AUD/app/owner policy/Google IdP and access-independent MFA.
+   Store independent strong SIGNING_SECRET, TURNSTILE_SECRET and a new
+   ACCESS_POLICY_READ_TOKEN server-side. The additional token needs only Access
+   Apps and Policies READ for this exact account, expiry 28 October 2027 13:00 UTC.
+   Existing private-editor token cannot be retrieved or copied from its binding;
+   keep it intact. Record new token ID privately and add it to renewal inventory.
+   Never store credentials in Git, browser, screenshots, output or logs.
+5. Upload courtumpire-weekly; workers.dev and preview URLs disabled, content logs
+   disabled. Add only its new Custom Domain weekly-api.courtumpire.com. Preserve
+   existing apex/www/mail/admin records, nameservers and DNSSEC. Add WEEKLY service
+   binding to existing private-admin Worker. Its /admin handler authenticates and
+   forwards to the backend, which independently validates the Access token/policy.
+   Public API admin paths fail closed; CORS is not authorization.
+6. Activate two reviewed Cron Triggers: 0 3 * * * (daily, UTC), 0 * * * * (hourly).
+   Verify successful health entries and a controlled failure/recovery using dummy
+   data; verify failure status and the private moderation warning. Remove test data.
+   No fictional article IDs may remain in the production registry.
+7. Gate website release on real backend checks below. Configure weekly-core/config.mjs
+   with the actual API origin and site key. Rebuild, package and audit actual Pages
+   output. Registry must contain zero published articles. No Home article teaser.
+8. Submit/review the feature PR, merge into main and verify legacy GitHub Pages
+   deployment succeeds. Pages still serves courtumpire.com at existing URLs.
+   No CI permissions, framework or hosting migration. Feature-branch push alone
+   does not deploy: Pages source is main, root directory, legacy Jekyll build.
+9. Fetch the exact live /weekly/registry.json and import it in authenticated
+   Moderation -> Advanced -> Published article registry -> Review & sync.
+   Confirm public unknown/draft IDs reject engagement, empty archive is truthful,
+   existing pages work and private paths remain absent. Keep the editor accessible.
+
+REAL ACTIVATION GATES (NOT CLAIMED PASSED IN ADVANCE)
+Owner Google + TOTP -> editor and moderation. Missing/forged identity -> Access
+or backend rejection; alternate host /admin and workers.dev/preview must not work.
+Local signed-token tests cover wrong email, issuer, AUD and expiry. Personal Gmail
+was rejected by Google org_internal, NOT proof of independent live wrong-owner
+rejection. No second internal identity is available; retain that limitation.
+Turnstile real valid token, invalid/expired/reused token, wrong action/hostname;
+server throttling, closures, public private-email non-disclosure and CSRF rejection.
+Exercise comment moderation/reactions with an isolated dummy registry/database
+before public availability, then clear it and sync only the empty real registry.
+Do not publish a test article. Confirm add/change/remove/idempotency against real
+D1, including comment reactions. Static articles remain readable during API failure.
+Confirm browser CORS from courtumpire.com and authenticated service-binding calls
+from admin.courtumpire.com; no cross-site admin cookies required by the public UI.
+Check real CPU/quota usage and health. Free runtime failure is a blocker, not an
+implicit authorization to upgrade. Restore public-disabled configuration if gates fail.
+
+RETENTION AND FAILURE LIMITATION REQUIRING EXPLICIT ACCEPTANCE AT ACTIVATION
+Articles and private drafts/revisions remain until explicit deletion. Approved/
+hidden comments and reactions remain until explicit deletion. Pending/rejected/
+spam comments and all optional commenter emails expire at next daily cleanup after
+30 days, normally within 31 days; audit metadata after 90, normally within 91 days.
+Rate counters expire logically in 10 minutes; retry records in 23 hours. Independent
+hourly cleanup removes expired records and anonymizes report network hashes after
+23 hours, normally within 24 hours, without waiting for daily cleanup.
+D1 does not provide automatic physical row TTL: provider outages/quota exhaustion
+can delay erasure. An unconditional 24-hour physical deletion guarantee is NOT
+implemented. Do not enable collection until the owner explicitly accepts this
+operational limitation; otherwise a stronger expiry design remains a blocker.
+Failed/overdue/missing cleanup is visible in private moderation; failures throw a
+generic invocation error without PII. There is no proactive email alert. Owner must
+check health daily and close submissions while recovery is pending. Restore then
+purge before reopening. No promise of compliance is made by these controls alone.
+Encrypted private exports expire after 30 days, managed manually by the owner.
+Provider-managed D1 Free Time Travel is separately limited to 7 days; it cannot
+be purged per-record. No automated encrypted export destination/job is activated.
+
+FREE LIMITS CHECKED ON 28 OCTOBER 2026
+Account dashboard: Workers Free, $0; 100,000 requests/day, 10 ms CPU/request;
+5 Cron Triggers/account (two proposed). D1 Free: 10 databases, 5 GB account storage,
+5 million rows read/day, 100,000 written/day. Turnstile Free: 20 widgets,
+10 hostnames/widget, unlimited challenges. Quotas can exhaust; no permanent-free
+promise or automatic paid fallback. Recheck at activation. Sources:
+https://developers.cloudflare.com/workers/platform/pricing/
+https://developers.cloudflare.com/d1/platform/pricing/
+https://developers.cloudflare.com/turnstile/plans/
+Billing API was unavailable to connector; the authenticated dashboard independently
+confirmed Workers Free. Existing Access Free setup remains unchanged.
+
+VALIDATION / PRIVACY
+Existing reviewed unit/browser/rehearsal tests are retained, not retrospectively
+claimed as live backend tests. Current actual official GitHub Pages container audit
+succeeded: 204 output files, 9 private canaries excluded, zero findings. Private
+source content, editor, backend, local test auth, notes and test fixtures are
+excluded from actual Pages output; no .nojekyll override. Package allowlist also
+passes. Local release evidence stays under ignored .weekly-private/.
+Historical rehearsal remains private: structurally valid does not mean publication
+ready. Its results coverage still has cutoff gaps. No rehearsal is in content/weekly.
+No analytics on admin/editor/private draft/comment content. Public reading works
+without scripts, analytics consent or backend availability.
+
+ROLLBACK
+Website: revert the release merge through the normal GitHub PR workflow, rebuild
+and redeploy Pages; retain the previous main revision and built artifact. Disable
+frontend API configuration if only engagement is affected. Do not delete articles.
+Backend: close submissions, disable the two crons if unsafe, roll back to saved
+Worker version and config. Remove only newly added WEEKLY binding if moderation
+must be disconnected; private editor and its DRAFTS binding stay untouched.
+Database: export encrypted backup before migration/restore; keep at most 30 days.
+Initial release migrations are additive. Never run destructive down migrations
+against live comments. Use D1 Time Travel within its recovery window or restore
+an encrypted export into a replacement EU database, verify schema/rows, purge
+expired records, reconcile registry, then rebind DB and reopen after verification.
+Data written after the recovery point may be lost: reconcile before reopening.
+DNS/mail/DNSSEC rollback is unnecessary for a Worker code failure. Keep website
+A/www DNS-only records and forwarding untouched. Preserve EU private drafts.
+
+EDITOR BUTTON GUIDE
+Create blank edition -> fill required fields. Save private draft -> stored in D1.
+Refresh saved drafts -> Open on the saved draft. Recover a saved revision loads
+an old copy; Save private draft creates a new revision, preserving history.
+Validate & preview -> exact article renderer, with errors to fix before export.
+Prepare for publication / export -> downloads validated JSON, does not publish.
+Then locally: npm run weekly:import -- create "C:\path\edition.json"
+For an existing source use update FILE --expected CURRENT_SHA256. Publication
+requires separate reviewed --approve-publication import, build, GitHub PR/merge,
+Pages success, then exact live registry sync. Corrections retain stable ID and
+original publishedAt, and use expected hash plus visible correction notes.
+See docs/WEEKLY-PRIVATE-ADMIN.txt for complete commands. Keep local editor fallback.
+
+BOUNDED NEXT APPROVAL
+Approve remaining Free Weekly activation in account a5646237c003a20af52d12c61b4bd0b7:
+the new EU D1/three migrations, Worker, Turnstile widget, specified server secrets
+and account-scoped policy READ credential, weekly-api Custom Domain, WEEKLY service
+binding, two cleanup schedules, real security/retention tests and empty registry;
+then the reviewed GitHub Pages release with zero editions only if gates pass.
+I accept the documented outage-related deletion delay and daily health-check duty.
+Stop before any charge. No real/rehearsal article, mail/DNSSEC/contact change or
+duplicate-account deletion is included.
+

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { canonicalUrl, canonicalPaths, ancestors, routeByPath } from '../practice/routes.mjs';
 import { navigation } from '../practice/site-config.mjs';
-const dirs = ['practice','tools','scripts','tests'];
+const dirs = ['practice','tools','scripts','tests','weekly','weekly-core','authoring','backend/src'];
 const files = ['analytics.js',...dirs.flatMap(dir=>fs.readdirSync(dir).filter(n=>/\.(mjs|cjs)$/.test(n)).map(n=>path.join(dir,n)))];
 for (const file of files) {
   const result = spawnSync(process.execPath,['--check',file],{ encoding:'utf8' });

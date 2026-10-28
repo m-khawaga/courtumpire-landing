@@ -1,0 +1,3 @@
+const mode=process.argv[2];if(!['status','seed','reset','remove'].includes(mode))throw Error('Use: node scripts/weekly-rehearsal-data.mjs status|seed|reset|remove');
+const base='http://127.0.0.1:8797';let options={};if(mode!=='status'){const session=await fetch(base+'/admin/api/session');if(!session.ok)throw Error('Start the local backend demo first');const {csrf}=await session.json();options={method:'POST',headers:{'content-type':'application/json','origin':base,'x-csrf-token':csrf},body:JSON.stringify({confirm:true})};}
+const response=await fetch(base+'/admin/api/rehearsal/'+mode,options),data=await response.json();if(!response.ok)throw Error(data.error||'Local rehearsal command failed');console.log(JSON.stringify(data,null,2));

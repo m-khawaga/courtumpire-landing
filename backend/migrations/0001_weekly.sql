@@ -1,0 +1,18 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE settings (id INTEGER PRIMARY KEY CHECK(id=1), registry_version TEXT NOT NULL DEFAULT '', comments_closed INTEGER NOT NULL DEFAULT 0, reactions_closed INTEGER NOT NULL DEFAULT 0);
+INSERT INTO settings(id) VALUES(1);
+CREATE TABLE articles (id TEXT PRIMARY KEY, path TEXT NOT NULL, comments_enabled INTEGER NOT NULL, reactions_enabled INTEGER NOT NULL, active INTEGER NOT NULL DEFAULT 1);
+CREATE TABLE overrides (article_id TEXT PRIMARY KEY, comments_closed INTEGER NOT NULL DEFAULT 0, reactions_closed INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE comments (id TEXT PRIMARY KEY, article_id TEXT NOT NULL, name TEXT NOT NULL, body TEXT NOT NULL, email TEXT, created_at TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected','spam','hidden')), suspected_spam INTEGER NOT NULL DEFAULT 0, submission_key TEXT NOT NULL UNIQUE);
+CREATE INDEX comments_public ON comments(article_id,status,created_at,id);
+CREATE INDEX comments_moderation ON comments(status,created_at);
+CREATE TABLE reports (comment_id TEXT NOT NULL, reporter TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(comment_id,reporter));
+CREATE INDEX reports_created ON reports(created_at);
+CREATE TABLE reactions (article_id TEXT NOT NULL, browser_id TEXT NOT NULL, value INTEGER CHECK(value IN (1,-1) OR value IS NULL), version INTEGER NOT NULL DEFAULT 0, last_key TEXT, updated_at TEXT NOT NULL, PRIMARY KEY(article_id,browser_id));
+CREATE INDEX reaction_totals ON reactions(article_id,value);
+CREATE TABLE reaction_ops (article_id TEXT NOT NULL, browser_id TEXT NOT NULL, request_key TEXT NOT NULL, applied INTEGER, expires INTEGER NOT NULL, PRIMARY KEY(article_id,browser_id,request_key));
+CREATE INDEX reaction_ops_expiry ON reaction_ops(expires);
+CREATE TABLE limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires INTEGER NOT NULL);
+CREATE INDEX limits_expiry ON limits(expires);
+CREATE TABLE audit (id TEXT PRIMARY KEY, actor TEXT NOT NULL, action TEXT NOT NULL, target TEXT NOT NULL, at TEXT NOT NULL);
+CREATE INDEX audit_expiry ON audit(at);

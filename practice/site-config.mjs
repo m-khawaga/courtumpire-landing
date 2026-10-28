@@ -24,6 +24,7 @@ export const navigation = [
     { label:'Match score sheet builder', href:href('score-sheet') },
     { label:'Checklists', href:href('checklist') }
   ] },
+  { label:'Weekly', href:'/weekly/' },
   { label:'Get the App', href:playUrl, app:true }
 ];
 export { playerPages } from './player-pages.mjs';

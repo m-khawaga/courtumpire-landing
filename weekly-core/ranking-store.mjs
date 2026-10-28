@@ -1,0 +1,5 @@
+import fs from 'node:fs';
+import {hash,published} from './store.mjs';
+import {snapshot,comparisonFor,rankingErrors} from './rankings.mjs';
+export function readHistory(){const h=JSON.parse(fs.readFileSync('weekly-core/ranking-history.json','utf8'));if(h.schemaVersion!==1||!h.snapshots||!h.comparisons)throw Error('Invalid ranking history.');for(const [key,value]of Object.entries(h.snapshots))if(hash(value)!==key)throw Error('Ranking history checksum mismatch; do not edit frozen snapshots.');for(const value of Object.values(h.comparisons))if(value!==null&&!Object.hasOwn(h.snapshots,value))throw Error('Missing pinned comparison snapshot. Restore the reviewed history before building.');return h;}
+export function prepareHistory(a,editions){const h=readHistory(),prev=comparisonFor(a,published(editions).map(snapshot),h),errors=rankingErrors(a,prev);if(errors.length)throw Error(errors.map(e=>e.path+': '+e.message).join('\n'));if(!Object.hasOwn(h.comparisons,a.id)){h.comparisons[a.id]=prev?hash(prev):null;if(prev)h.snapshots[hash(prev)]=prev;}const current=snapshot(a);h.snapshots[hash(current)]=current;return h;}

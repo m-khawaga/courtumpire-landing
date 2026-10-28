@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "courtumpire-weekly/v1",
+  "id": "",
+  "slug": "",
+  "editionNumber": null,
+  "status": "draft",
+  "title": "",
+  "deck": "",
+  "language": "en",
+  "timezone": "Europe/Berlin",
+  "issueDate": "",
+  "coverageStart": "",
+  "coverageEnd": "",
+  "plannedCutoff": "",
+  "factsCheckedAt": "",
+  "publishedAt": null,
+  "updatedAt": null,
+  "authorLabel": "CourtUmpire Editorial",
+  "aiAssisted": true,
+  "seoDescription": "",
+  "tags": [],
+  "commentsEnabled": true,
+  "reactionsEnabled": true,
+  "sources": [],
+  "sections": [
+    {
+      "id": "opening",
+      "heading": "A match can turn before the scoreboard moves.",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    },
+    {
+      "id": "at-a-glance",
+      "heading": "The week at a glance",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    },
+    {
+      "id": "results",
+      "heading": "Selected results",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    },
+    {
+      "id": "rankings",
+      "heading": "The ranking snapshot",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [
+        {
+          "id": "atp-top10",
+          "variant": "rankings",
+          "caption": "Selected Men — ATP singles top 10 — official snapshot unavailable",
+          "scope": "Men — ATP singles top 10 official world rankings",
+          "asOf": null,
+          "columns": [
+            {
+              "key": "rank",
+              "label": "Rank"
+            },
+            {
+              "key": "player",
+              "label": "Player"
+            },
+            {
+              "key": "points",
+              "label": "Points"
+            },
+            {
+              "key": "rank-change",
+              "label": "Rank change"
+            },
+            {
+              "key": "points-change",
+              "label": "Points change"
+            }
+          ],
+          "rows": [],
+          "sourceIds": [],
+          "note": "Ranking snapshot and previous published baseline are unavailable. Verify both before publication."
+        },
+        {
+          "id": "wta-top10",
+          "variant": "rankings",
+          "caption": "Selected Women — WTA singles top 10 — official snapshot unavailable",
+          "scope": "Women — WTA singles top 10 official world rankings",
+          "asOf": null,
+          "columns": [
+            {
+              "key": "rank",
+              "label": "Rank"
+            },
+            {
+              "key": "player",
+              "label": "Player"
+            },
+            {
+              "key": "points",
+              "label": "Points"
+            },
+            {
+              "key": "rank-change",
+              "label": "Rank change"
+            },
+            {
+              "key": "points-change",
+              "label": "Points change"
+            }
+          ],
+          "rows": [],
+          "sourceIds": [],
+          "note": "Ranking snapshot and previous published baseline are unavailable. Verify both before publication."
+        }
+      ],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    },
+    {
+      "id": "this-weekend",
+      "heading": "The weekend is still ahead",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    },
+    {
+      "id": "next-week",
+      "heading": "What to watch next",
+      "paragraphs": [
+        {
+          "text": "Evidence still needs to be gathered and verified for this section.",
+          "kind": "editorial",
+          "sourceIds": []
+        }
+      ],
+      "tables": [],
+      "timeline": [],
+      "reveal": null,
+      "videos": []
+    }
+  ],
+  "corrections": []
+}

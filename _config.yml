@@ -1,0 +1,20 @@
+# Existing GitHub Pages legacy build. These paths must never enter _site.
+exclude:
+  - content
+  - authoring
+  - weekly-core
+  - backend
+  - scripts
+  - tests
+  - docs
+  - node_modules
+  - package.json
+  - package-lock.json
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  - README.md
+  - dist
+  - output
+  - .weekly-private
+  - .local-review
+  - design-qa.md

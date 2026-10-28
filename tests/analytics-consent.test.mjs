@@ -6,6 +6,17 @@ import fs from 'node:fs';
 import {routeDefinitions} from '../practice/routes.mjs';
 const source = fs.readFileSync(new URL('../analytics.js', import.meta.url), 'utf8');
 const key = 'courtumpire.analytics.v1', ttl = 180 * 86400000;
+
+test('Weekly events require accepted consent and cannot carry names, emails or comment text',()=>{
+  const f=fixture();
+  for(const name of ['article_read','reaction_submit','comment_submit'])assert.equal(f.sandbox.CourtUmpireAnalytics.track(name,{}),false);
+  f.select('accepted');
+  for(const name of ['article_read','reaction_submit','comment_submit']){
+    assert.equal(f.sandbox.CourtUmpireAnalytics.track(name,{}),true);
+    for(const parameters of [{email:'private@example.invalid'},{name:'Visitor'},{body:'Private comment'},{article_id:'unknown-free-text'}])assert.equal(f.sandbox.CourtUmpireAnalytics.track(name,parameters),false);
+  }
+  assert.ok(!JSON.stringify(f.commands()).includes('private@example.invalid'));
+});
 test('local tool forms cannot inherit visitor query strings in automatic form destinations',()=>{
   let forms=0;
   for(const route of routeDefinitions){

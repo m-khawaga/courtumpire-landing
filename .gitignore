@@ -4,3 +4,18 @@ node_modules/
 
 # Generated local review PDFs and runtime artifacts are not release source.
 output/
+
+# Weekly private authoring and release artifacts
+.weekly-private/
+dist/
+weekly-editions/
+backend/.wrangler/
+backend/.dev.vars*
+backend/worker-configuration.d.ts
+backend/private-admin/assets.generated.mjs
+backend/private-admin/.dev.vars*
+
+worker-configuration.d.ts
+.wrangler/
+
+design-qa.md
