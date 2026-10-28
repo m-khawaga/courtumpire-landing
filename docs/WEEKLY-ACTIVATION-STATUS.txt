@@ -3,7 +3,40 @@ Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboa
 PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
 Frontend API config remains disabled and public Pages remains on a4abd3b.
 
-FOLLOW-UP — 28 OCTOBER, 19:59 EUROPE/BERLIN
+LATEST DIAGNOSIS — 28 OCTOBER, 20:07 EUROPE/BERLIN
+Owner explicitly approved diagnostic-only commit 89aa6ee on both existing Workers.
+Temporary versions: Weekly 057d3e61-bef0-4ad9-99e1-89f9e93be1dc;
+private-admin 49044a7c-82a3-476f-982c-a0da1b3032ee.
+At 19:05:52 UTC (20:05:52 Berlin), an authenticated, read-only health request
+returned Authentication required with the sanitized category
+private-editor / policy-unavailable-TimeoutError. This reproduces a real failure:
+the private gateway's live Access-policy lookup exceeded its five-second timeout.
+The request was denied before reaching Weekly. It was not an observed wrong-owner,
+JWT-signature or MFA-policy mismatch. The cause of the upstream delay is unknown;
+no claim is made that all earlier failures had this same cause. Sequential reads
+and a normal moderation-page load also succeeded, which is not reliability proof.
+No automatic retry, timeout extension, cached authorization, MFA bypass, policy
+change, secret logging or failure injection was introduced. The diagnostic test
+observed ordinary authenticated GET requests only; no production data was changed.
+The temporary diagnostics were removed immediately after capturing evidence:
+both Workers restored to the exact pre-investigation versions listed below,
+and all nonsecret bindings and secret binding names verified unchanged.
+Source diagnostic removal is commit 4395dee. Diagnostic versions remain inactive
+in provider version history; the active runtime has no diagnostic response fields.
+Sanitized observations and screenshot are retained privately in
+.weekly-private/auth-investigation-2026-10-28/; no tokens or content were captured.
+At 19:06:52 UTC, production retention_health confirmed hourly last_attempt and
+last_success 2026-10-28T19:00:42.505Z, failed=0 (20:00:42 Berlin). This is the
+scheduled handler's successful database completion record; independent platform
+event-log results were not inspected. Daily has no row and remains pending until
+29 October after 04:05 Berlin. Both cron expressions and modification times remain
+unchanged. Comments/reactions remain closed; registry is empty, zero articles.
+Administration reliability remains a release blocker. Next work is a focused,
+fail-closed policy-lookup resilience repair and tests, with a separate explicit
+production repair approval: this turn authorized diagnosis only. A retry succeeding
+must not be counted as proof of reliability or permission to publish the website.
+
+EARLIER FOLLOW-UP (SUPERSEDED ABOVE) — 28 OCTOBER, 19:59 EUROPE/BERLIN
 Read-only moderation load and cleanup-health request succeeded. This single
 bounded observation does not resolve the earlier intermittent authentication
 failures or prove reliability. No live cause has been established.
