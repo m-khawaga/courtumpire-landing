@@ -3,12 +3,40 @@ Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboa
 PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
 Frontend API config remains disabled and public Pages remains on a4abd3b.
 
-LOCAL REPAIR PREPARED — NOT DEPLOYED
-See docs/WEEKLY-POLICY-REPAIR.txt for the bounded one-retry policy-read proposal,
-no-cache/expiry/revocation rules, 30 passing targeted local checks and exact scope.
-Production still uses the baseline versions below. Both submission controls and
-public release remain held. Daily cleanup must be checked on the owner's return
-after 29 October 04:05 Berlin; no overnight wait or schedule change.
+REPAIR DEPLOYED — OWNER SESSION VERIFICATION PENDING (28 OCTOBER, 20:31 BERLIN)
+Owner explicitly approved commit 25b871f543735c36716ba349d2d65ae390e1c255.
+Captured active versions and nonsecret configuration before deployment; pushed
+that commit to codex/courtumpire-weekly. Pages verified to publish main only.
+New active private-admin version: 92efa518-dd7d-41c8-9ebc-86042d6d4db4.
+New active Weekly version: 248816d0-826d-44d5-87e4-9f94fcc1e650.
+Both bundles contain exactly the reviewed repair. Comparison confirms unchanged
+bindings/secret names, runtime configuration, domains, disabled alternative URLs,
+schedules (including modification timestamps), and closed submission settings.
+Google-only exact owner policy, audience and TOTP-only 1h MFA were re-read and
+confirmed unchanged; app/policy updated_at remains 2026-10-28T12:59:23Z.
+Zero registry articles; registry not yet synchronized. Public Pages still built
+from a4abd3b60857149371499851ae9353f75c5e995b, last updated 23 October 21:38:18 UTC.
+
+Eight live read-only boundary checks passed: four unauthenticated/forged private
+requests redirected to Access (302); public-host admin and forged-assertion requests
+denied (403); both workers.dev hosts denied (404). HTTP timing range 41–206 ms.
+These prove boundary rejection, not independent live cryptographic/wrong-owner
+token rejection: Access handles private requests before the Worker, and the public
+hostname fails the backend origin check. Existing local signed-token tests remain
+the evidence for those independent backend controls.
+
+The old owner session expired normally. Google sign-in reached a fresh TOTP
+challenge. Owner code entry is pending; authenticated editor/moderation verification
+and its response timings are NOT complete. No repair regression has been observed,
+but do not mark the reliability gate passed. No rollback has been needed yet.
+Continue bounded checks after private MFA completion; rollback to captured
+private-admin c9476539-feec-43bd-aeae-4ab4122d8d4b and Weekly
+5ad020b6-4821-4762-9fa4-e73f0255a4dc if the repair causes regressions.
+Private evidence: .weekly-private/auth-investigation-2026-10-28/repair-before.json,
+repair-after.json and repair-boundaries.json. No secret values captured.
+See docs/WEEKLY-POLICY-REPAIR.txt for behavior and 30 passing local tests.
+Daily cleanup still awaits the owner's return after 29 October 04:05 Berlin.
+No overnight wait, schedule change, public release or article publication.
 
 LATEST DIAGNOSIS — 28 OCTOBER, 20:07 EUROPE/BERLIN
 Owner explicitly approved diagnostic-only commit 89aa6ee on both existing Workers.

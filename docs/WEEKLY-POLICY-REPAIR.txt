@@ -1,4 +1,10 @@
-COURTUMPIRE ACCESS POLICY LOOKUP REPAIR — LOCAL PROPOSAL, 28 OCTOBER 2026
+COURTUMPIRE ACCESS POLICY LOOKUP REPAIR — REVIEWED PROPOSAL, 28 OCTOBER 2026
+
+DEPLOYMENT UPDATE
+Owner approved commit 25b871f; it is now pushed and deployed to the existing two
+Workers. See WEEKLY-ACTIVATION-STATUS.txt for exact versions and verification.
+The proposal/validation record below is preserved. Live boundary checks passed;
+fresh owner MFA is pending, so authenticated verification is not yet complete.
 
 STATUS
 Implemented and tested locally only. Production remains on the pre-diagnostic
