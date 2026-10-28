@@ -3,6 +3,13 @@ Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboa
 PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
 Frontend API config remains disabled and public Pages remains on a4abd3b.
 
+LOCAL REPAIR PREPARED — NOT DEPLOYED
+See docs/WEEKLY-POLICY-REPAIR.txt for the bounded one-retry policy-read proposal,
+no-cache/expiry/revocation rules, 30 passing targeted local checks and exact scope.
+Production still uses the baseline versions below. Both submission controls and
+public release remain held. Daily cleanup must be checked on the owner's return
+after 29 October 04:05 Berlin; no overnight wait or schedule change.
+
 LATEST DIAGNOSIS — 28 OCTOBER, 20:07 EUROPE/BERLIN
 Owner explicitly approved diagnostic-only commit 89aa6ee on both existing Workers.
 Temporary versions: Weekly 057d3e61-bef0-4ad9-99e1-89f9e93be1dc;
