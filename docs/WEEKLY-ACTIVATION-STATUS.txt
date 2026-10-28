@@ -3,6 +3,29 @@ Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboa
 PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
 Frontend API config remains disabled and public Pages remains on a4abd3b.
 
+FOLLOW-UP — 28 OCTOBER, 19:59 EUROPE/BERLIN
+Read-only moderation load and cleanup-health request succeeded. This single
+bounded observation does not resolve the earlier intermittent authentication
+failures or prove reliability. No live cause has been established.
+Source inspection found that backend authentication categories were discarded
+at both error-response boundaries. Local diagnostic-only commit 89aa6ee exposes
+bounded stage/category enums, without claims, tokens, exception text or logging.
+Three focused tests pass, including simulated policy timeout versus wrong-owner
+denial; both still fail closed. This is diagnostic coverage, not a live fix.
+Commit 89aa6ee is pushed on codex/courtumpire-weekly, but NOT deployed. Automatic
+approval review rejected its production Worker upload because the public release
+is held. Neither production Worker was changed by this investigation. Explicit
+approval of diagnostic-only updates to the existing two Workers is needed before
+that instrumentation can be used to identify a recurring live failure.
+At 18:59:12 UTC, production retention_health had no rows: no recorded attempt or
+successful scheduled run yet. Both configured crons are unchanged. The requested
+hourly verification is after 28 October 20:05 Berlin; daily verification is after
+29 October 04:05 Berlin. Both remain pending at this observation. No waiting loop,
+manual purge, accelerated schedule or recreated test resource was used.
+Production settings still close comments and reactions; zero registry articles.
+Recheck actual timestamps/results after the daily window and keep release held
+until both cleanup and authenticated-administration reliability gates pass.
+
 CREATED / CONFIGURED
 EU D1 courtumpire-weekly-production: c55230e5-f748-4c57-ba32-21e7de4a2f01.
 Three migrations applied and recorded in d1_migrations in order:
