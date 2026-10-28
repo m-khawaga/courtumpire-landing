@@ -28,7 +28,7 @@
     "test:weekly": "node --test tests/weekly*.test.mjs",
     "test:weekly:browser": "node tests/weekly-browser.cjs",
     "backend:dev": "wrangler dev --config backend/wrangler.jsonc --ip 127.0.0.1",
-    "backend:migrate": "wrangler d1 migrations apply weekly --local --config backend/wrangler.jsonc",
+    "backend:migrate": "wrangler d1 migrations apply courtumpire-weekly-production --local --config backend/wrangler.jsonc",
     "backend:test": "node --test tests/weekly-backend.test.mjs",
     "backend:demo": "node backend/local-demo.mjs",
     "admin:build": "node scripts/weekly-admin-build.mjs",

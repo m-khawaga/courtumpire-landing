@@ -1,3 +1,9 @@
+CURRENT STATUS — 28 OCTOBER 2026
+The owner approved the remaining Free activation and documented retention limitations.
+Backend infrastructure is staged; public release is held pending live gates.
+See docs/WEEKLY-ACTIVATION-STATUS.txt for the actual resources and outstanding checks.
+The preparation text below is preserved as the approved scope, not a new approval request.
+
 COURTUMPIRE WEEKLY — REMAINING ACTIVATION, 28 OCTOBER 2026
 This is the current handoff; earlier readiness documents are historical.
 Public activation is NOT authorized yet. Private editor activation/branding is

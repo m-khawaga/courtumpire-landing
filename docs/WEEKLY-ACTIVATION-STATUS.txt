@@ -1,0 +1,79 @@
+COURTUMPIRE WEEKLY ACTIVATION STATUS — 28 OCTOBER 2026
+Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboard.
+PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
+Frontend API config remains disabled and public Pages remains on a4abd3b.
+
+CREATED / CONFIGURED
+EU D1 courtumpire-weekly-production: c55230e5-f748-4c57-ba32-21e7de4a2f01.
+Three migrations applied and recorded in d1_migrations in order:
+0001_weekly.sql, 0002_comment_reactions.sql, 0003_retention_health.sql.
+Worker courtumpire-weekly: version 9fc3e502-53a5-48ef-809a-06b1dc153a80.
+Runtime source is the reviewed backend from feature source 798ff65/3d29a1b;
+only nonsecret deployment configuration was supplied during activation.
+API https://weekly-api.courtumpire.com. New Custom Domain only; original 12 DNS
+records unchanged, prior _domainconnect 3600 TTL preserved. DNSSEC untouched.
+Turnstile Managed widget sitekey 0x4AAAAAAFp6hX5OSlqZVaAA, courtumpire.com and its
+subdomains, no pre-clearance. Production siteverify accepts exactly courtumpire.com.
+Secrets SIGNING_SECRET, TURNSTILE_SECRET, ACCESS_POLICY_READ_TOKEN are server-only.
+New policy-read credential: exact account, Access Apps and Policies READ only,
+expires 28 October 2027 13:00 UTC. Private renewal inventory and existing September
+2027 reminder now cover both private-editor and Weekly credentials. No values in Git.
+Private Worker version c656c80b-2488-4492-93d1-7bac91a2bd96 adds only WEEKLY service
+binding. Runtime/editor/auth/DRAFTS remain unchanged. Prior rollback version:
+587c1e30-5f02-467b-b300-47a68e6c18a7. The EU private-drafts DB is untouched.
+Both Workers have workers.dev and preview URLs disabled; no local test auth deployed.
+Two production Cron Triggers configured: 0 * * * * and 0 3 * * *, UTC.
+Global settings comments_closed=1, reactions_closed=1. Zero article/comment records.
+No dummy registry was activated. Exact live empty registry sync awaits website release.
+
+VERIFIED THIS ACTIVATION
+Nine non-destructive public boundary cases passed: unknown ID 404, public admin
+403, forged admin assertion denied, wrong Origin denied, permitted CORS preflight
+204, rejected foreign preflight, unknown comment denied, oversized body 413,
+alternative workers.dev 404. Responses do not expose private content.
+Bounded 130-request read test: 119 unknown-ID responses and 11 rate-limit 429s,
+no network failures. The counters are short-lived and contain no raw IPs.
+Actual DB schema and migration history verified. Existing website/mail DNS and
+Google TXT comparison: no differences after normalizing API TXT quoting.
+Build/lint pass. Wrangler nonsecret binding types generated successfully.
+Earlier 18/18 local backend/private tests and actual 204-file Pages exclusion
+build remain valid; they are not substitutes for unperformed live tests.
+
+OUTSTANDING GATES — DO NOT MERGE UNTIL RESOLVED
+Fresh owner MFA -> live moderation verification is pending the owner's private
+login. No codes or tokens may be collected in chat or logs.
+Successful real Turnstile submission, action/hostname validation and replay tests;
+real comment/reaction add/change/remove/idempotency and moderation on dummy data.
+Successful scheduled cleanup and live failure/recovery verification. The schedules
+were added at 17:59 UTC; no successful health row was present at 18:07 UTC.
+Cron propagation can take time; do not call a missing first run a code defect.
+The next hourly boundary is 19:00 UTC / 20:00 Europe/Berlin. The next daily boundary
+is 29 October 03:00 UTC / 04:00 Europe/Berlin. Check afterward, without a long wait.
+Automatic approval review rejected a persistent aborting trigger in the production
+D1 database for fault injection. It was NOT installed, and no fixture was inserted.
+Do not retry that production mutation or bypass the rejection. A separate temporary
+isolated test database/Worker behind existing Access is the safer proposed venue
+for disruptive failure testing; exact additional resources require owner approval.
+A real browser Turnstile token must come from its expected hostname. Never spoof
+success, accept localhost/admin as a production hostname, or bypass token checks.
+Any temporary test configuration must be isolated and removed before public release.
+Prior wrong-owner limitation remains: personal Gmail was rejected by Google
+org_internal, while independent wrong-email/issuer/audience/expiry tests are local.
+
+DAILY HEALTH CHECK AFTER RELEASE
+Open https://admin.courtumpire.com/admin with Google + TOTP. Expand Advanced,
+Retention, click Check cleanup status. Both hourly and daily must have successful
+recent timestamps and no FAILED OR OVERDUE warning. On failure/unavailable status,
+keep/close submissions with global Close comments and Disable reactions controls.
+Inspect Worker scheduled-event status, repair, run approved recovery purge, verify
+health and expired-record removal before reopening. No proactive email alert exists.
+Encrypted private exports are owner-managed and deleted after 30 days. D1 Free
+provider recovery copies have a separate seven-day window; purge expired restored
+data before reopening. Outage-related physical deletion delays are accepted.
+Published articles and private drafts/revisions never expire automatically.
+
+NEXT STEP
+Complete owner login and finish safe checks. Do not release public Weekly while
+any live gate remains pending. Preserve closed submissions and the private editor.
+The original activation authorization continues to cover release once gates pass;
+additional disruptive test infrastructure is not silently added to that scope.

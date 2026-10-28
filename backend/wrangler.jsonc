@@ -14,8 +14,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "weekly",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_name": "courtumpire-weekly-production",
+      "database_id": "c55230e5-f748-4c57-ba32-21e7de4a2f01",
       "migrations_dir": "migrations"
     }
   ],
@@ -33,5 +33,17 @@
     "ACCESS_POLICY_ID": "f4229622-9b79-41a7-92ae-d9b18b1433ba",
     "ACCESS_GOOGLE_IDP_ID": "5209691f-d9e3-41e1-b4ad-f5887ae9e0ae"
   },
-  "account_id": "a5646237c003a20af52d12c61b4bd0b7"
+  "account_id": "a5646237c003a20af52d12c61b4bd0b7",
+  "routes": [
+    {
+      "pattern": "weekly-api.courtumpire.com",
+      "custom_domain": true
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 3 * * *",
+      "0 * * * *"
+    ]
+  }
 }
