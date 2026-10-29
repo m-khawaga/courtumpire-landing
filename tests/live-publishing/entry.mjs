@@ -24,20 +24,28 @@ export default {async fetch(request,bound){
   if(url.pathname==='/publishing-test/client.js')return new Response(client,{headers:{'content-type':'text/javascript','cache-control':'private, no-store'}});
   if(url.pathname==='/publishing-test/session')return call('/admin/api/session');
   if(url.pathname==='/publishing-test/status')return json({runs:(await env.DB.prepare('SELECT step,started,finished,passed,label FROM publishing_test_runs ORDER BY step').all()).results});
+  if(url.pathname==='/publishing-test/fixture'&&request.method==='GET'){
+   const step=Number(url.searchParams.get('step'));check(Number.isInteger(step)&&step>=0&&step<=23,'Step');
+   return json({article:fixtures.articles[step<15?Math.floor(step/5):0],cover:fixtures.cover});
+  }
   if(url.pathname!=='/publishing-test/step'||request.method!=='POST')return json({error:'Not found'},404);
   await csrf(request,env,actor);
-  const input=await request.text();check(input.length<100,'Body size');const {step}=JSON.parse(input);
+  const input=await request.text();check(new TextEncoder().encode(input).length<=800000,'Body size');const {step,article,cover}=JSON.parse(input);
   check(Number.isInteger(step)&&step>=0&&step<=23,'Step');
+  // Carry the full bounded article and cover through the admin gateway. This
+  // fixture-integrity check adds conservative test CPU; production validation
+  // still runs below. No client HTML or client validation is trusted.
+  check(JSON.stringify(article)===JSON.stringify(fixtures.articles[step<15?Math.floor(step/5):0])&&cover===fixtures.cover,'Fixture mismatch');
   const prior=(await env.DB.prepare('SELECT step,passed FROM publishing_test_runs ORDER BY step').all()).results;
   check(prior.length===step&&prior.every(r=>r.passed===1),'Previous result missing or failed; no automatic retry');
   const started=new Date().toISOString();await env.DB.prepare('INSERT INTO publishing_test_runs(step,started,label,passed) VALUES(?,?,?,0)').bind(step,started,'running').run();
   let label;
   try{
    const mutate=async body=>{const r=await call('/admin/api/publishing/mutate',body);check(r.ok,'Mutation HTTP '+r.status);return r.json();};
-   const proposal=async(a,action='publish',old=null)=>({key:crypto.randomUUID(),action,article:a,confirmId:a.id,expectedVersion:(await get('state')).version,expectedRevision:old?.revision??null,expectedHash:old?.hash??null,cover:fixtures.cover});
+   const proposal=async(a,action='publish',old=null)=>({key:crypto.randomUUID(),action,article:a,confirmId:a.id,expectedVersion:(await get('state')).version,expectedRevision:old?.revision??null,expectedHash:old?.hash??null,cover});
    const manage=async(id,action)=>{const e=await get('edition?id='+id),p=await proposal(e.article,action,e);delete p.article;p.id=id;return mutate(p);};
    if(step<15){
-    const group=Math.floor(step/5),phase=step%5;let a=structuredClone(fixtures.articles[group]),old=null;
+    const group=Math.floor(step/5),phase=step%5;let a=structuredClone(article),old=null;
     if(phase>=3){old=await get('edition?id='+a.id);a=structuredClone(old.article);a.title+=' · update '+(phase-2);}
     const state=await get('ranking-context?id='+a.id);calculateChanges(a,old?old.comparison:state.snapshots[0]||null);
     const p=await proposal(a,phase>=3?'update':'publish',old);
