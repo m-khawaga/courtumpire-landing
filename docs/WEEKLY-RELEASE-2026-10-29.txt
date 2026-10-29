@@ -1,0 +1,49 @@
+COURTUMPIRE WEEKLY — ZERO-EDITION RELEASE, 29 OCTOBER 2026
+
+The owner authorized this release after the authentication repair and actual
+production cleanup gates. This report supersedes the pending-cleanup status in
+WEEKLY-ACTIVATION-STATUS.txt; that historical evidence remains preserved.
+
+PRODUCTION GATES
+Read-only primary EU D1 query at approximately 17:01 UTC confirmed:
+daily last_attempt = last_success 2026-10-29T03:00:12.606Z (04:00:12 Berlin), failed=0;
+hourly last_attempt = last_success 2026-10-29T17:00:42.505Z (18:00:42 Berlin), failed=0.
+Both are recent and neither is overdue. These timestamps identify successful
+scheduled handler runs; the transactional success marker is written only with
+the cleanup batch. They are not independently inspected provider event logs or
+a complete history of every prior invocation. No manual purge was run.
+Both Cron Triggers and their modification timestamps remain unchanged.
+Authenticated moderation independently displays the same health results after
+the owner's fresh Google/TOTP login. No authentication denial was observed.
+Reuse the completed 30 local auth/backend tests, 12 bounded owner reads and
+isolated live engagement/security/retention tests documented in the status file.
+No new runtime/security change or additional test resource is required.
+Prior loading-time and independent-live-wrong-owner limitations remain valid;
+successful requests do not prove permanent upstream availability.
+
+RELEASE CONTENT
+Public Weekly landing/navigation, RSS, sitemap and participation/privacy text;
+zero eligible editions and no Home teaser. Landing says First edition coming soon.
+Production API origin and public Turnstile site key configured in source for
+future approved editions. Empty landing has no comment form or CAPTCHA.
+Private editor/Workers/databases/secrets, mail and DNSSEC are unchanged.
+Global comments/reactions remain closed, with zero registered articles.
+Do not reopen collection or publish an article as part of this zero-edition release.
+
+VALIDATION
+Build, lint and public allowlist packaging pass. Final Pages audit and live
+verification results are recorded in the private release evidence and final handoff.
+No credentials, private draft JSON, editor notes or rehearsal content is included
+in the public artifact. Existing private fixtures are retained locally.
+
+ROLLBACK / OPERATIONS
+Website previous main: a4abd3b60857149371499851ae9353f75c5e995b.
+Revert the release merge with a reviewed GitHub change and verify the Pages build.
+Keep submissions closed if engagement or cleanup health fails; do not delete D1.
+Worker repair versions remain private 92efa518-dd7d-41c8-9ebc-86042d6d4db4 and
+Weekly 248816d0-826d-44d5-87e4-9f94fcc1e650; no Worker redeploy in this release.
+Daily: moderation -> Advanced settings -> Check cleanup status. Check both recent
+success timestamps and absence of FAILED/OVERDUE/unavailable. On a problem, keep
+submissions closed and investigate/recover before accepting more submissions.
+No proactive email alert. Outages can delay physical deletion; private encrypted
+exports require owner-managed deletion after 30 days. Articles/drafts do not expire.
