@@ -20,7 +20,7 @@ export function page(env,title,description,path,body,extra=''){
 }
 function invalid(errors){const e=Object.assign(Error('Resolve validation errors before publication.'),{status:422,errors});throw e;}
 function checkArticle(a,comparison){const errors=validate(a);if(errors.length)invalid(errors);const ranking=rankingErrors(a,comparison);if(ranking.length)invalid(ranking);}
-async function prepare(env,b){
+async function prepare(env,b,{preview=false}={}){
  const s=await state(env);if(!s)fail(503,'Publishing migration is required.');
  if(b.expectedVersion!==s.version)fail(409,'Publication state changed. Refresh and preview again.');
  if(!validId(b.article?.id))fail(400,'Valid edition ID required.');
@@ -43,8 +43,10 @@ async function prepare(env,b){
  if(Date.parse(a.coverageEnd)>Date.now()||Date.parse(a.factsCheckedAt)>Date.now()||a.sources.some(x=>Date.parse(x.accessedAt)>Date.now()))fail(422,'Future facts or retrieval timestamps cannot be published.');
  const alias=await q(env,'SELECT edition_id FROM edition_slugs WHERE slug=?',a.slug).first();if(alias&&alias.edition_id!==a.id)fail(409,'Slug belongs to another edition, including its historical URLs.');
  const content=JSON.stringify(a);if(new TextEncoder().encode(content).length>500000)fail(413,'Article exceeds 500 KB.');
- const rendered=article(a,{comparison,config:config(env)});if(new TextEncoder().encode(rendered).length>1100000)fail(413,'Rendered edition exceeds 1.1 MB. Reduce the edition size.');
- return {s,old,a,at,comparison,content,rendered,hash:await sha(content),snapshot:JSON.stringify(snapshot(a))};
+ // Preview uses the same validated renderer once. Hash/snapshot are storage work;
+ // publish/update still recompute and validate everything before the transaction.
+ const rendered=article(a,{preview,comparison,...(preview?{}:{config:config(env)})});if(new TextEncoder().encode(rendered).length>1100000)fail(413,'Rendered edition exceeds 1.1 MB. Reduce the edition size.');
+ return {s,old,a,at,comparison,content,rendered,...(preview?{}:{hash:await sha(content),snapshot:JSON.stringify(snapshot(a))})};
 }
 function cover(value){
  if(typeof value!=='string'||value.length>240000||!/^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(value))fail(422,'A generated PNG cover is required. Preview again.');
@@ -67,7 +69,7 @@ export async function publishingApi(request,env,body){
   if(path==='/export'){const row=await edition(env,id);if(!row)fail(404,'Edition not found.');const total=await q(env,'SELECT count(*) n,COALESCE(sum(length(content)+length(cover)+length(snapshot)+length(comparison)),0) bytes FROM edition_revisions WHERE edition_id=?',id).first();if(total.n>500||total.bytes>12000000)fail(413,'History exceeds browser export limit. Use a protected full D1 backup.');const revisions=(await q(env,'SELECT content,snapshot,comparison,status,revision,hash,cover,changed_at FROM edition_revisions WHERE edition_id=? ORDER BY revision',id).all()).results;return json({format:'courtumpire-published-backup/v1',exportedAt:new Date().toISOString(),edition:record(row),revisions,slugs:(await q(env,'SELECT slug FROM edition_slugs WHERE edition_id=?',id).all()).results.map(r=>r.slug)});}
   fail(404,'Not found.');
  }
- if(path==='/preview'){const p=await prepare(env,body);return json({article:p.a,html:page(env,p.a.title,p.a.seoDescription,editionPath(p.a),article(p.a,{preview:true,comparison:p.comparison})),comparison:p.comparison,version:p.s.version});}
+ if(path==='/preview'){const p=await prepare(env,body,{preview:true});return json({article:p.a,html:page(env,p.a.title,p.a.seoDescription,editionPath(p.a),p.rendered),comparison:p.comparison,version:p.s.version});}
  if(path!=='/mutate')fail(404,'Not found.');
  const b=body;if(!b||Object.keys(b).some(k=>!['key','action','article','id','expectedRevision','expectedHash','expectedVersion','confirmId','cover'].includes(k)))fail(400,'Unknown publication field.');
  if(!/^[0-9a-f-]{36}$/.test(b.key||'')||!['publish','update','unpublish','trash','restore','purge'].includes(b.action))fail(400,'Valid operation key and action required.');
