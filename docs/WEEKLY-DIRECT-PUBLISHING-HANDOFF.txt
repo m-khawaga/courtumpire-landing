@@ -1,0 +1,182 @@
+COURTUMPIRE — DIRECT ADMIN PUBLISHING ACTIVATION HANDOFF
+Prepared locally 29 October 2026. This extension is NOT deployed.
+Account a5646237c003a20af52d12c61b4bd0b7 only.
+Zone d885d7e16db53e3914cbc1f278af7289; mail and DNSSEC unchanged.
+
+READY LOCALLY
+Import → Edit → Preview publication → Publish. No per-article developer, GitHub,
+build, deployment or registry sync. Private drafts stay in the existing private EU D1.
+Approved content, rendered HTML, covers, published revisions and frozen ranking
+baselines live in the existing Weekly EU D1. Every mutation uses one D1 batch
+transaction for article/revision/URL history/engagement registration/version/outcome.
+Repeated operations return their committed result. Global and per-edition checks
+reject races; an older saved draft also cannot silently overwrite a newer publication.
+Unknown fields, source/timestamp/ranking errors remain server-validated.
+
+Article list: Edit, Unpublish, Delete → Trash; Trash offers Restore and explicitly
+confirmed Permanently delete. Editing automatically saves a separate private working
+copy. Public content stays unchanged until the owner confirms Update published article.
+Restoration leaves content unpublished. Published history recovery creates a new
+revision. Unpublish/Trash retains comments and reactions but denies public access.
+Permanent article deletion removes article content and published history, retaining
+ID/number/URL tombstones and PRIVATE engagement. Engagement has a separate explicit
+moderation deletion. Separate drafts/exports and provider backups are not erased.
+See WEEKLY-DIRECT-PUBLISHING-GUIDE.txt for exact owner buttons and recovery commands.
+
+Dynamic output: complete HTML (including tables), newest-first paginated archive,
+direct refresh, canonical/BlogPosting metadata, branded PNG/SVG, RSS, sitemap shards,
+HTML site-map link and Home latest teaser. Publication updates appear on the next
+request. Dynamic responses use browser/CDN no-store; proposed cache bypass backs this
+up. Existing downloaded pages, screenshots and search/social caches cannot be recalled.
+Public reads only accept status=published. Withdrawn/historical URLs return 410;
+renamed published URLs redirect to the current slug. JS is unnecessary for reading.
+No unverified rehearsal facts are being promoted or newly verified by this work.
+
+REUSED / CHANGED RESOURCES
+No new Cloudflare account, zone, Worker, database, credential, Access app or schedule.
+1. Weekly Worker courtumpire-weekly: one code deployment using src/public-entry.mjs.
+   Reuse Weekly EU D1 c55230e5-f748-4c57-ba32-21e7de4a2f01 and current secrets.
+   Add migration 0004_direct_publishing.sql. Five new publication tables plus history
+   triggers; existing engagement tables/data/closure controls are preserved.
+2. Private Worker courtumpire-private-admin: one editor/code deployment, same owner,
+   issuer/audience, Google/independent MFA and policy checks; same WEEKLY binding.
+   Private EU D1 ae856293-8b0e-4a42-89dd-5d148bebd329 is unchanged.
+3. Both add DIRECT_PUBLISHING=true. Weekly adds PUBLISHING_WRITES_OPEN=false during
+   rollout, then true only after gates pass. This hold permits private previews and
+   denies Publish/Update. All new publishing endpoints require existing owner auth;
+   mutations require CSRF and exact-ID confirmation. workers.dev/previews stay off.
+4. Manual registry imports are rejected when DIRECT_PUBLISHING is enabled. No sync
+   operation is required for new articles, corrections, withdrawal or restoration.
+5. Existing weekly-api.courtumpire.com/admin.courtumpire.com domains and services,
+   Turnstile, two cleanup schedules, retention policies and secrets remain unchanged.
+   Comments and reactions remain globally CLOSED throughout this activation.
+
+EXACT MAIN-DOMAIN ROUTING PROPOSAL — REQUIRES APPROVAL
+Current read-only evidence: no zone Worker routes, no Page Rules, no cache entrypoint
+ruleset; four GitHub apex A records are DNS-only with TTL 14400; SSL mode is Full.
+GitHub origin HTTPS checked directly with courtumpire.com SNI at 185.199.108.153:
+200 OK, valid TLS. www HTTPS and apex HTTP both returned 301 to HTTPS apex /weekly/.
+These are PRE-PROXY checks; they do not prove the proposed proxy is already working.
+
+- Preserve the four A targets 185.199.108.153, .109.153, .110.153, .111.153, changing
+  only proxied=false→true and TTL 14400→Cloudflare Auto (required for proxy records).
+- Keep www CNAME m-khawaga.github.io DNS-only and unchanged. Preserve every MX/TXT,
+  Domain Connect, mail forwarding, Google verification, registrar and DNSSEC setting.
+- Set origin SSL Full→Full (strict); verify origin certificate before/after. Never
+  use Flexible or disable certificate checks. Keep GitHub Pages custom domain and
+  Enforce HTTPS. Monitor GitHub certificate renewal separately after proxying.
+- Add https://courtumpire.com/* → courtumpire-weekly. HTTPS only: HTTP continues to
+  use GitHub's HTTPS redirect. Worker modifies only Weekly, root/index, sitemap and
+  site-map; other requests fetch the existing GitHub Pages origin unchanged.
+- Add explicit no-Worker bypass routes from backend/direct-publishing-routes.proposed.json
+  for assets, practice, tennis-drills, play-score, clubs-coaches, tools, styles,
+  analytics, privacy/contact/legal/404, robots and /.well-known. These preserve origin
+  delivery and reduce Worker quota impact. Admin/API subdomains are not matched.
+  A single apex wildcard is necessary for the Home teaser on query-string URLs;
+  Cloudflare forbids query parameters in route patterns. The bypass list is explicit.
+- Add a Free cache-bypass rule for apex /weekly*, /, /index.html, /sitemap.xml and
+  /site-map/ using the exact expression in the proposed route manifest. No Cache
+  Everything rule, cache API writes, media proxying or external-origin rehosting.
+- Check active edge certificate covers apex; leave existing static caching otherwise.
+  Recheck HTTP→HTTPS, www→apex, origin HTTPS, deep links/query strings, existing tools
+  and privacy links. Do not publish until old DNS-only answers have drained: previous
+  advertised TTL was four hours; resolver evidence, not elapsed time alone, is the gate.
+
+FILES / BUILD
+backend/wrangler.direct-publishing.proposed.jsonc
+backend/private-admin/wrangler.direct-publishing.proposed.jsonc
+backend/direct-publishing-routes.proposed.json
+backend/migrations/0004_direct_publishing.sql
+npm run publishing:build builds the two asset bundles ONCE per code release.
+Current production wrangler configs remain unchanged; proposed configs are not active.
+The live base release is unchanged. Work is on codex/courtumpire-weekly, based on
+local commit eb2d791; extension is uncommitted/unpushed local work. The new source
+manifest records file hashes. Unrelated pnpm files were preserved and excluded.
+
+TEST RESULTS AND LIMITATIONS
+- Final focused run: 21 passed (6 publishing, 6 private-admin, 9 analytics consent).
+- Subsequent publishing gate check: 7 publishing scenarios (see final test log).
+- Existing engagement regression run: 12 passed, alongside the 6 private-admin tests.
+- Source check: 133 scripts, 78 routes; sitemap verified.
+- Both proposed production entrypoints bundle successfully; no dummy/test-auth markers.
+- Static allowlist artifact: 201 files, no authoring/backend/private-review paths.
+- Local browser: imported/published two fictional editions; newest publication first
+  even when its issue date is older; edited/saved privately with live version unchanged;
+  explicit update, direct refresh, Unpublish, Trash, Restore (still unavailable),
+  explicit republication; existing identity/date and engagement preserved.
+- Tests cover forged/missing/expired/wrong-owner tokens, issuer/audience/MFA (existing
+  auth tests), CSRF, wrong origin, unknown fields, stale private copies, concurrent
+  writes, key reuse, unavailable DB, failed-batch rollback, committed-but-lost response,
+  no public private revisions, withdrawn URLs/feeds/sitemaps, Trash/purge and recovery.
+- Export/restore command was actually exercised on a dummy backup into a NEW local D1:
+  restored revision 7, unpublished, registry active=0. No production restore was done.
+- Loopback browser identity is test-only. It is NOT a fresh production Access/MFA test.
+  Prior live MFA checks are reused; new endpoint and routing live gates remain below.
+- Real Cloudflare CPU/quotas, apex proxy behavior and post-proxy certificate renewal
+  cannot be established by local tests. No dummy article was published to the Internet.
+
+FREE LIMITS / STOP CONDITIONS (official docs checked 29 October 2026)
+Workers Free: 100,000 requests/day/account, 10 ms CPU/request, 128 MB memory.
+D1 Free: 5m rows read/day, 100k written/day, 5 GB total, 500 MB per database;
+Free Time Travel is seven days. Retained articles/revisions consume storage indefinitely
+unless explicitly deleted: indefinite retention is not a promise of unlimited free space.
+Archive queries are paginated; normal article HTML is pre-rendered at publication.
+Owner validation/publication can be more CPU-intensive. Representative PRIVATE preview
+must pass the real Free CPU gate; local timing is not equivalent. Quota exhaustion
+fails reads/writes honestly; it must not return a false success or auto-upgrade.
+The OAuth connector cannot read account subscriptions (Billing permission 403). Reuse
+owner-confirmed Free setup, but verify the current dashboard before rollout. No new
+billing credential is requested. Stop on any paid-plan requirement.
+https://developers.cloudflare.com/workers/platform/limits/
+https://developers.cloudflare.com/d1/platform/pricing/
+https://developers.cloudflare.com/d1/platform/limits/
+https://developers.cloudflare.com/workers/configuration/routing/routes/
+https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full-strict/
+https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https
+
+ORDERED ACTIVATION / GATES (NOT EXECUTED)
+A. Confirm Free plans, current configuration and DNS; capture both deployed versions,
+   routes/cache/SSL/DNS settings and protected DB backups. Review the exact source diff;
+   exclude private fixtures/backups/secrets/unrelated files. Save source on feature branch.
+B. Apply only additive migration 0004 to Weekly EU D1. Deploy both prepared Workers
+   preserving all secrets/bindings/domains/schedules. Keep publication paused and
+   engagement closed. No GitHub article source or real article is added.
+C. Fresh owner Google+MFA session: editor/drafts/moderation still work, direct publishing
+   APIs reject missing/forged/wrong-owner/expired credentials and invalid CSRF; alternate
+   URLs remain disabled. Run representative private Preview publication and measure
+   CPU/outcomes on Free. Preview does not persist an article or allocate an edition.
+   Local transaction tests remain the evidence for publish mutations; no production
+   dummy publication is authorized by this handoff.
+D. Stage bypass/cache routes, enable the apex Worker route and proxy A records with
+   strict TLS. Verify public zero-edition archive, old/static pages, redirects, HTTPS,
+   sitemap/RSS/analytics-consent behavior; recheck independent DNS after cache drain.
+   Test that no private source/assets/API can be read at the public host.
+E. Only when C/D pass set PUBLISHING_WRITES_OPEN=true. Verify editor shows ready state.
+   Review/merge the one-time source/privacy/docs release through existing GitHub Pages
+   workflow if approved. Subsequent articles use only admin; no per-article deployment.
+F. First REAL edition is separate: owner factual review, preview and explicit Publish.
+   Keep comments/reactions closed until article-bound live checks pass. No fabricated
+   engagement or real publication is included in activation approval.
+
+ROLLBACK
+Before any publication, pause writes, restore captured Worker versions/configuration,
+remove only the added route/cache entries, return the four apex records to DNS-only
+TTL14400 and previous SSL setting, verify GitHub HTTPS/redirects. Leave additive tables
+intact; never drop D1 or the drafts DB. Remember DNS caches take time to drain.
+After articles exist, preserve/export them first. Prefer rolling back only the defective
+code to a compatible dynamic-reader version. Reverting to the old static site makes
+D1 editions unavailable; it does not delete them. Do not silently restore stale static
+articles or resurrect withdrawn material. Database Time Travel/full restore needs a
+separate recovery decision because it can resurrect comments/deletions and overwrite
+newer writes. Reapply deletion/retention decisions before opening reads/submissions.
+The private editor can keep saving drafts even while publication is paused.
+
+NARROW CONSOLIDATED APPROVAL TEXT
+"Approve the free-only direct-publishing activation in this handoff for account
+ a5646237c003a20af52d12c61b4bd0b7: migration 0004, the two existing Worker updates,
+ existing bindings/secrets, the specified apex proxy/strict-TLS/routes/cache changes,
+ and the one-time reviewed source/privacy release. Keep publication paused until
+ authentication, Free CPU, HTTPS/routing and DNS-drain gates pass; then enable admin
+ publishing. Keep comments/reactions closed pending their live article-bound checks.
+ No new paid resources, real or dummy public articles, mail/DNSSEC changes, contact
+ form, duplicate-account deletion or credential changes. Roll back on a failed gate."

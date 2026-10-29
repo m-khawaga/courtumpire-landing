@@ -40,3 +40,5 @@ document.addEventListener('weekly-editor-change',()=>notice('Unsaved edits. Save
 try{const session=await api('/private/api/session');$('#private-identity').textContent='Authenticated owner: '+session.identity;await refresh();}
 catch(e){notice(e.message);}
 
+
+document.addEventListener('weekly-save-working-revision',()=>$('#draft-save').click());

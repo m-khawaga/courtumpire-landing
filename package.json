@@ -33,7 +33,10 @@
     "backend:demo": "node backend/local-demo.mjs",
     "admin:build": "node scripts/weekly-admin-build.mjs",
     "admin:demo": "node backend/private-admin/local-demo.mjs",
-    "admin:test": "node --test tests/weekly-private-admin.test.mjs"
+    "admin:test": "node --test tests/weekly-private-admin.test.mjs",
+    "publishing:build": "node scripts/weekly-admin-build.mjs && node scripts/weekly-public-build.mjs",
+    "publishing:demo": "node backend/direct-publishing-demo.mjs",
+    "publishing:test": "node --test tests/weekly-publishing.test.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

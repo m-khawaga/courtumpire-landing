@@ -1,0 +1,67 @@
+{
+  "accountId": "a5646237c003a20af52d12c61b4bd0b7",
+  "zoneId": "d885d7e16db53e3914cbc1f278af7289",
+  "bypassRoutes": [
+    {
+      "pattern": "https://courtumpire.com/assets/*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/practice*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/tennis-drills*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/play-score*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/clubs-coaches*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/tools/*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/styles.css*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/analytics.js*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/privacy.html*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/contact.html*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/impressum.html*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/404.html*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/robots.txt*",
+      "script": null
+    },
+    {
+      "pattern": "https://courtumpire.com/.well-known/*",
+      "script": null
+    }
+  ],
+  "workerRoute": {
+    "pattern": "https://courtumpire.com/*",
+    "script": "courtumpire-weekly"
+  },
+  "cacheBypassExpression": "http.host eq \"courtumpire.com\" and (starts_with(http.request.uri.path, \"/weekly\") or http.request.uri.path in {\"/\" \"/index.html\" \"/sitemap.xml\" \"/site-map/\"})"
+}

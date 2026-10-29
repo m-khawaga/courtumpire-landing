@@ -1,0 +1,55 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "courtumpire-weekly",
+  "main": "src/public-entry.mjs",
+  "compatibility_date": "2026-08-06",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "courtumpire-weekly-production",
+      "database_id": "c55230e5-f748-4c57-ba32-21e7de4a2f01",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "PUBLIC_ORIGIN": "https://courtumpire.com",
+    "ADMIN_ORIGIN": "https://admin.courtumpire.com",
+    "ACCESS_ISSUER": "https://courtumpire.cloudflareaccess.com",
+    "ACCESS_AUD": "fd274c26e10f8c09e63e1663cd5cde399bbf34a115d79cb1fe2ee7cb2daca772",
+    "OWNER_EMAILS": "info@wynctec.com",
+    "TURNSTILE_HOSTNAME": "courtumpire.com",
+    "REQUIRE_ACCESS_MFA": "true",
+    "ACCESS_MFA_MODE": "access-independent",
+    "ACCESS_ACCOUNT_ID": "a5646237c003a20af52d12c61b4bd0b7",
+    "ACCESS_APP_ID": "deb22f55-bb33-4c02-86e7-7f4fa3f59417",
+    "ACCESS_POLICY_ID": "f4229622-9b79-41a7-92ae-d9b18b1433ba",
+    "ACCESS_GOOGLE_IDP_ID": "5209691f-d9e3-41e1-b4ad-f5887ae9e0ae",
+    "DIRECT_PUBLISHING": "true",
+    "PUBLISHING_WRITES_OPEN": "false"
+  },
+  "account_id": "a5646237c003a20af52d12c61b4bd0b7",
+  "routes": [
+    {
+      "pattern": "weekly-api.courtumpire.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "https://courtumpire.com/*",
+      "zone_id": "d885d7e16db53e3914cbc1f278af7289"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 3 * * *",
+      "0 * * * *"
+    ]
+  }
+}

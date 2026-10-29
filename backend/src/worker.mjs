@@ -1,6 +1,7 @@
 import {cleanup,scheduled} from './retention.mjs';
 import {owner,browser,csrf,signed,digest,turnstile,fail} from './auth.mjs';
 import {adminHtml,adminJs} from './admin.mjs';
+import {publishingApi,publicPublication} from './publication.mjs';
 const uuid=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 const articleId=v=>typeof v==='string'&&/^cu-weekly-\d{4}-\d{2}-\d{2}$/.test(v);
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
@@ -19,9 +20,13 @@ async function audit(env,actor,action,target){return sql(env,'INSERT INTO audit(
 export function createHandler(deps={}){return async function handle(request,env){
   let response;const url=new URL(request.url),admin=url.pathname.startsWith('/admin'),origin=request.headers.get('origin');
   try{
-    if(admin){
+    if(env.DIRECT_PUBLISHING==='true'&&url.origin===env.PUBLIC_ORIGIN&&(url.pathname==='/weekly'||url.pathname.startsWith('/weekly/'))){
+      response=await publicPublication(request,env);
+      if(!response){const asset=env.PUBLIC_ASSETS?.[url.pathname];response=asset?new Response(request.method==='HEAD'?null:asset.body,{headers:{'content-type':asset.type,'cache-control':'no-store'}}):new Response('Not found',{status:404,headers:{'cache-control':'no-store'}});}
+    }else if(admin){
       const actor=await (deps.owner||owner)(request,env);
-      if(request.method==='GET'&&url.pathname==='/admin')response=new Response(adminHtml,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'"}});
+      if(url.pathname.startsWith('/admin/api/publishing/')){if(env.DIRECT_PUBLISHING!=='true')fail(503,'Direct publication is not activated.');if(request.method==='POST')await csrf(request,env,actor);response=await publishingApi(request,env,request.method==='POST'?await body(request,800000):null);}
+      else if(request.method==='GET'&&url.pathname==='/admin')response=new Response(env.DIRECT_PUBLISHING==='true'?adminHtml.replace('Only after unpublishing and registry sync.','Only after withdrawing the edition; publication updates its registry atomically.').replace(/<fieldset><legend>Published article registry<\/legend>[\s\S]*?<\/fieldset>/,'<fieldset hidden><legend>Published article registry</legend><p id="registry-version"></p><input type="file" id="registry"><button id="sync"></button></fieldset><p>Article registration is maintained automatically by direct publication. Manual registry imports are disabled.</p>'):adminHtml,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'"}});
       else if(request.method==='GET'&&url.pathname==='/admin/app.js')response=new Response(adminJs,{headers:{'content-type':'text/javascript; charset=utf-8'}});
       else if(request.method==='GET'&&url.pathname==='/admin/api/session')response=json({csrf:await signed(env,{purpose:'csrf'},actor,900)});
       else if(request.method==='GET'&&url.pathname==='/admin/api/retention-health'){response=json({runs:(await sql(env,'SELECT kind,last_attempt,last_success,failed FROM retention_health').all()).results});}
@@ -46,6 +51,7 @@ export function createHandler(deps={}){return async function handle(request,env)
           if(b.articleId===null)await env.DB.batch([sql(env,'UPDATE settings SET comments_closed=?,reactions_closed=? WHERE id=1',+b.commentsClosed,+b.reactionsClosed),await audit(env,actor,'global-controls','global')]);
           else{if(!articleId(b.articleId))fail(400,'Invalid edition ID.');await env.DB.batch([sql(env,'INSERT INTO overrides(article_id,comments_closed,reactions_closed) VALUES(?,?,?) ON CONFLICT(article_id) DO UPDATE SET comments_closed=excluded.comments_closed,reactions_closed=excluded.reactions_closed',b.articleId,+b.commentsClosed,+b.reactionsClosed),await audit(env,actor,'article-controls',b.articleId)]);}response=json({ok:true});
         }else if(url.pathname==='/admin/api/registry'){
+          if(env.DIRECT_PUBLISHING==='true')fail(409,'Manual registry sync is retired. Use direct publication.');
           // Registry is imported by the authenticated owner after public-site deployment.
           const r=b.registry;if(!r||![1,2].includes(r.schemaVersion)||!Array.isArray(r.articles)||r.articles.length>500||!/^[a-f0-9]{64}$/.test(r.version)||typeof b.expectedVersion!=='string')fail(400,'Invalid registry.');
           const ids=new Set();for(const a of r.articles){if(!articleId(a.id)||ids.has(a.id)||!/^\/weekly\/\d{4}-\d{2}-\d{2}-[a-z0-9-]+\/$/.test(a.path)||typeof a.commentsEnabled!=='boolean'||typeof a.reactionsEnabled!=='boolean'||Object.keys(a).sort().join(',')!==(r.schemaVersion===2?'commentsEnabled,id,path,reactionsEnabled,title':'commentsEnabled,id,path,reactionsEnabled')||(r.schemaVersion===2&&(typeof a.title!=='string'||!a.title.trim()||a.title.length>180)))fail(400,'Invalid registry entry.');ids.add(a.id);}
@@ -56,7 +62,7 @@ export function createHandler(deps={}){return async function handle(request,env)
           try{await env.DB.batch(queries);}catch{fail(409,'Registry changed or sync failed. Reload settings and retry.');}response=json({ok:true,version:r.version});
         }else if(url.pathname==='/admin/api/delete-edition-engagement'){
           if(!articleId(b.articleId)||b.confirmId!==b.articleId)fail(400,'Type the exact edition ID to confirm permanent engagement deletion.');
-          const edition=await sql(env,'SELECT active FROM articles WHERE id=?',b.articleId).first();if(!edition||edition.active)fail(409,'Withdraw the edition and synchronize its registry before deleting engagement.');
+          const edition=await sql(env,'SELECT active FROM articles WHERE id=?',b.articleId).first();if(!edition||edition.active)fail(409,'Withdraw the edition before deleting its engagement.');
           const idsQuery='SELECT id FROM comments WHERE article_id=?';
           try{await env.DB.batch([sql(env,'INSERT INTO settings(id) SELECT 1 WHERE EXISTS(SELECT 1 FROM articles WHERE id=? AND active=1)',b.articleId),sql(env,'DELETE FROM comment_reaction_ops WHERE comment_id IN ('+idsQuery+')',b.articleId),sql(env,'DELETE FROM comment_reactions WHERE comment_id IN ('+idsQuery+')',b.articleId),sql(env,'DELETE FROM reports WHERE comment_id IN ('+idsQuery+')',b.articleId),sql(env,'DELETE FROM comments WHERE article_id=?',b.articleId),sql(env,'DELETE FROM reaction_ops WHERE article_id=?',b.articleId),sql(env,'DELETE FROM reactions WHERE article_id=?',b.articleId),sql(env,'DELETE FROM overrides WHERE article_id=?',b.articleId),await audit(env,actor,'delete-edition-engagement',b.articleId)]);}catch{fail(409,'Edition state changed or deletion failed. Reload before retrying.');}response=json({ok:true});
         }else if(url.pathname==='/admin/api/purge'){
@@ -103,7 +109,7 @@ export function createHandler(deps={}){return async function handle(request,env)
         }else fail(404,'Not found.');
       }else fail(404,'Not found.');
     }
-  }catch(e){response=json({error:e.status?e.message:'Service temporarily unavailable. Please retry.'},e.status||503);}
+  }catch(e){response=json({error:e.status?e.message:'Service temporarily unavailable. Please retry.',...(e.status===422&&Array.isArray(e.errors)?{errors:e.errors}:{})},e.status||503);}
   response.headers.set('cache-control','no-store');response.headers.set('x-content-type-options','nosniff');response.headers.set('referrer-policy','no-referrer');if(!admin&&origin===env.PUBLIC_ORIGIN){response.headers.set('access-control-allow-origin',origin);response.headers.set('vary','Origin');}return response;
 };}
 export default {fetch:createHandler(),scheduled};

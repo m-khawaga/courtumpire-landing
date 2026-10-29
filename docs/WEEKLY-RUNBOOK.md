@@ -1,3 +1,5 @@
+> Direct publishing extension prepared 29 October 2026, not yet activated. Use [the current owner guide](WEEKLY-DIRECT-PUBLISHING-GUIDE.txt) and [activation handoff](WEEKLY-DIRECT-PUBLISHING-HANDOFF.txt). The per-article GitHub and registry procedures below are historical and must not be used once DIRECT_PUBLISHING is enabled. They remain here as recovery reference.
+
 # CourtUmpire Weekly: local review and manual publishing
 
 Owner: Mahmoud Khawaga. Website only. The Android/Wear app is unchanged.

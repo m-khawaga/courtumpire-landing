@@ -1,0 +1,3 @@
+import fs from 'node:fs';import {restoreSQL} from '../backend/src/publication-recovery.mjs';
+const [input,output]=process.argv.slice(2);if(!input||!output)throw Error('Usage: node scripts/weekly-restore-prepare.mjs PRIVATE-backup.json PRIVATE-restore-plan.json');
+const statements=restoreSQL(JSON.parse(fs.readFileSync(input,'utf8')));fs.writeFileSync(output,JSON.stringify({format:'courtumpire-recovery-plan/v1',statements},null,2),{flag:'wx'});console.log('Prepared parameterized recovery plan. No database changed. Restore first to an isolated LOCAL migrated database, then verify before any approved remote restore. The edition is restored unpublished.');
