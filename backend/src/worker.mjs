@@ -2,6 +2,7 @@ import {cleanup,scheduled} from './retention.mjs';
 import {owner,browser,csrf,signed,digest,turnstile,fail} from './auth.mjs';
 import {adminHtml,adminJs} from './admin.mjs';
 import {publishingApi,publicPublication} from './publication.mjs';
+import {publicationLimit} from './publication-limits.mjs';
 const uuid=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
 const articleId=v=>typeof v==='string'&&/^cu-weekly-\d{4}-\d{2}-\d{2}$/.test(v);
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
@@ -25,7 +26,7 @@ export function createHandler(deps={}){return async function handle(request,env)
       if(!response){const asset=env.PUBLIC_ASSETS?.[url.pathname];response=asset?new Response(request.method==='HEAD'?null:asset.body,{headers:{'content-type':asset.type,'cache-control':'no-store'}}):new Response('Not found',{status:404,headers:{'cache-control':'no-store'}});}
     }else if(admin){
       const actor=await (deps.owner||owner)(request,env);
-      if(url.pathname.startsWith('/admin/api/publishing/')){if(env.DIRECT_PUBLISHING!=='true')fail(503,'Direct publication is not activated.');if(request.method==='POST')await csrf(request,env,actor);response=await publishingApi(request,env,request.method==='POST'?await body(request,800000):null);}
+      if(url.pathname.startsWith('/admin/api/publishing/')){if(env.DIRECT_PUBLISHING!=='true')fail(503,'Direct publication is not activated.');if(request.method==='POST')await csrf(request,env,actor);const input=request.method==='POST'?await body(request,800000):null;await publicationLimit(env,actor,url.pathname,input?.action);response=await publishingApi(request,env,input);}
       else if(request.method==='GET'&&url.pathname==='/admin')response=new Response(env.DIRECT_PUBLISHING==='true'?adminHtml.replace('Only after unpublishing and registry sync.','Only after withdrawing the edition; publication updates its registry atomically.').replace(/<fieldset><legend>Published article registry<\/legend>[\s\S]*?<\/fieldset>/,'<fieldset hidden><legend>Published article registry</legend><p id="registry-version"></p><input type="file" id="registry"><button id="sync"></button></fieldset><p>Article registration is maintained automatically by direct publication. Manual registry imports are disabled.</p>'):adminHtml,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'"}});
       else if(request.method==='GET'&&url.pathname==='/admin/app.js')response=new Response(adminJs,{headers:{'content-type':'text/javascript; charset=utf-8'}});
       else if(request.method==='GET'&&url.pathname==='/admin/api/session')response=json({csrf:await signed(env,{purpose:'csrf'},actor,900)});

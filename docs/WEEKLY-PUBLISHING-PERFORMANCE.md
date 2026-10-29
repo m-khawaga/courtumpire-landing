@@ -1,5 +1,9 @@
 # Direct-publishing performance candidate — 29 October 2026
 
+Historical optimization evidence. The owner subsequently chose a Workers Paid
+trial; [the current handoff](WEEKLY-PAID-TRIAL-HANDOFF.txt) replaces the Free CPU gate.
+The optimization and full editorial scope remain; production activation is held.
+
 Status: local optimization only. Direct publishing remains held. No Worker upload,
 deployment, website merge, routing change or article publication accompanies this repair.
 Baseline source: `34c914bc253991e341acc4eb059b1a0fd7a224d1`.

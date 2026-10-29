@@ -60,7 +60,8 @@ A lost/corrupted DATABASE is disaster recovery, not routine article publishing:
   require a protected full D1 export/Time Travel recovery instead. No automatic purge.
 - A production database restore needs a deliberate recovery approval, reapplication of
   deletions/retention, engagement reconciliation, closed controls and verification.
-  Provider Time Travel is currently seven days on Free, not the private export policy.
+  Provider Time Travel is seven days on Free and 30 days on Paid; verify the active
+  subscription before relying on that window. This is not the private export policy.
 
 LOCAL FALLBACK
 Use the existing offline editor, validate and Prepare for publication / export.

@@ -1,4 +1,7 @@
 COURTUMPIRE — DIRECT ADMIN PUBLISHING ACTIVATION HANDOFF
+HISTORICAL PLAN: the 29 October Paid-trial decision and current deployment hold in
+WEEKLY-PAID-TRIAL-HANDOFF.txt supersede this file's Free-only gate and old resource
+state. Preserve the routing/security design; reconcile it against live state.
 Prepared locally 29 October 2026. This extension is NOT deployed.
 Account a5646237c003a20af52d12c61b4bd0b7 only.
 Zone d885d7e16db53e3914cbc1f278af7289; mail and DNSSEC unchanged.
