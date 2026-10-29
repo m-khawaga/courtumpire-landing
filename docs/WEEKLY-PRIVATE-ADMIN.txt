@@ -1,0 +1,250 @@
+COURTUMPIRE PRIVATE ADMINISTRATION — ACTIVATION HANDOFF, 28 OCTOBER 2026
+The private editor is activated under the owner's separate authorization.
+Public Weekly, moderation service and cleanup schedules are NOT activated.
+Current evidence: .weekly-private/private-editor-activation-2026-10-28/.
+Branch: codex/courtumpire-weekly. Base a4abd3b60857149371499851ae9353f75c5e995b.
+Working directory: C:\courtumpire-landing-pr5-test\.local-review\weekly-feature
+Private approval package: .weekly-private/private-editor-release-2026-10-28/
+Earlier release evidence is preserved, not overwritten.
+
+WHAT IS IMPLEMENTED
+The existing authoring page, full article JSON, validator, renderer, manual ranking
+import and export remain the same. The private Worker serves only an explicit
+static asset allowlist, after authenticating every request. D1 stores private
+working copies and complete revision snapshots, separate from public articles.
+Save accepts incomplete values in the contract's required shape. Export requires
+the existing full validator. Neither operation publishes or verifies the facts.
+500 KB maximum article; paged draft/revision lists (20 at a time).
+Expected revision + SHA-256 source hash prevent stale tabs overwriting newer work.
+History recovery loads an old copy; saving appends a new revision. Stable edition
+IDs cannot change after assignment. Original published metadata is preserved.
+No automatic expiration of articles, private drafts or their revisions.
+Explicit draft deletion currently requires an authorized maintenance operation;
+there is no new deletion button, and no scheduled job touches private drafts.
+
+LOCAL WALKTHROUGH
+npm run admin:build
+npm run admin:demo
+http://127.0.0.1:8798/ — private editor demonstration.
+This Node-only loopback harness has TEST authentication and isolated local D1.
+Import article JSON -> edit -> Save private draft -> reopen -> recover a revision
+-> Validate & preview -> Prepare for publication / export.
+The demonstration is not a Google login or proof of remote Access enforcement.
+http://127.0.0.1:8797/admin — existing fictional moderation demonstration.
+http://127.0.0.1:4187/authoring/ — unchanged local import/export fallback.
+The local source server is intentionally restricted; do not serve the checkout
+with a generic public file server or expose these ports through a tunnel.
+
+ONLINE PRIVATE EDITOR WORKFLOW
+Google sign-in as info@wynctec.com, plus verified Cloudflare Access MFA, at
+https://admin.courtumpire.com/. Save/reopen/edit/preview/export private drafts.
+Moderation will be https://admin.courtumpire.com/admin once the Weekly service
+binding is activated. Editor-only operation returns a clear unavailable message
+for moderation until then. No browser GitHub credential or Publish now button.
+Public article reading remains static GitHub Pages HTML.
+
+AFTER EXPORT: EXISTING IMPLEMENTED COMMANDS
+Run in the working directory, using the actual exported filename:
+npm run weekly:import -- create "C:\path\edition.json"
+This validates and places a draft under ignored .weekly-private/drafts.
+npm run weekly:preview
+Review using the local editor/rehearsal route. A draft does not appear in the
+public /weekly/ archive simply because a build was run.
+For changes to an already imported source:
+node scripts/weekly-hash.mjs ".weekly-private/drafts/cu-weekly-YYYY-MM-DD.json"
+npm run weekly:import -- update "C:\path\edition.json" --expected ACTUAL_HASH
+
+ONLY AFTER EXPLICIT PUBLICATION APPROVAL:
+npm run weekly:import -- update "C:\path\edition.json" --expected ACTUAL_HASH --approve-publication
+(Use create with --approve-publication only if it has never been imported.)
+The importer assigns the sequential edition number and original publishedAt once,
+writes eligible public JSON under content/weekly, preserves ranking history,
+and builds static pages. This is local preparation, not a GitHub upload.
+npm run build
+npm run weekly:package
+node scripts/weekly-pages-audit.mjs
+Review and commit only approved source/generated paths; push approved branch,
+PR into main, merge through the reviewed GitHub workflow, check Pages success.
+These Git actions remain manual/explicitly authorized; no CI permission changes.
+After deployment: download the exact live /weekly/registry.json, then authenticated
+Moderation -> Advanced -> Published article registry -> Review & sync.
+Sync is implemented, manual, atomic and guarded against stale registry versions.
+A failed sync leaves reading intact; unknown IDs cannot receive engagement.
+Corrections use update with the current published source hash and correction note;
+original publication metadata and engagement ID remain. Slug changes generate
+redirects. Use the existing explicit unpublish flow for withdrawal.
+Rebuild/redeploy private admin assets after each public edition to refresh the
+previous-published ranking baseline embedded in the private editor. Final local
+importer comparison validation remains authoritative if the online baseline lags.
+After publishing, reopen/import the canonical published JSON for a private working
+copy of that edition; there is no automatic GitHub-to-draft synchronization.
+
+AUTHORIZATION
+Both Workers validate RS256 Access signatures against the team's JWK endpoint,
+issuer, application audience, exp/iat/sub/email, exact owner allowlist and MFA
+evidence. Missing configuration fails closed. CSRF binds a signed short-lived
+token to the owner and exact Origin. Private responses are no-store.
+All private assets, draft APIs and moderation routes require authentication.
+workers.dev and preview URLs are disabled; origin checks reject alternate hosts.
+The public Worker rejects /admin on weekly-api.courtumpire.com. An authenticated
+admin Worker service binding forwards to the same protected moderation handler.
+The public site's CORS rules are not authentication.
+No analytics on private administration, drafts or comment text.
+Production entries do not import the Node demonstration harness or test identity.
+
+Google's enabled MFA is not by itself evidence that native Google Access login
+enforces MFA. Require independent Access MFA (TOTP/authenticator) for this app,
+no email-code fallback, no bypass/service-token policy, exact owner inclusion.
+The first real TOTP login succeeded at Access but the Worker denied it because
+independent Access TOTP does not populate the IdP AMR claim. The deployed repair
+retains RS256/issuer/audience/expiry/owner verification and pins independent MFA
+to the live Access application and its exact owner policy. Every request reads
+that policy using a server-only account-scoped Access Apps and Policies READ
+credential. No approval cache or fallback bypass is used. The app must require
+TOTP with at most a one-hour MFA/session duration, only the pinned Google IdP,
+and exactly the pinned owner Allow policy. Disabled MFA, widened policy, wrong
+domain/audience, API failure, missing credential or old pre-policy token denies
+access. Tokens must be application tokens, not launcher/organization tokens.
+Other configurations retain the original AMR requirement. No local auth is shipped.
+Cloudflare's API availability and rate limits now affect private-editor access;
+transient verification failures deny access safely and preserve unsaved work.
+Retry a transient failure; export unsaved JSON before reauthentication. A repeated
+failure needs policy/credential inspection, never disabling the checks.
+
+Access organization auth_domain: courtumpire.cloudflareaccess.com, in account
+a5646237c003a20af52d12c61b4bd0b7. The older calm-morning-a223 display name belongs
+to this same organization; it is not the backend issuer or OAuth callback host.
+Google callback: https://courtumpire.cloudflareaccess.com/cdn-cgi/access/callback.
+Private app: deb22f55-bb33-4c02-86e7-7f4fa3f59417.
+Owner policy: f4229622-9b79-41a7-92ae-d9b18b1433ba.
+Issuer, audience and policy IDs are in the private activation configuration.
+
+POLICY READ CREDENTIAL — SERVER SECRET ONLY
+Secret binding: ACCESS_POLICY_READ_TOKEN. Credential inventory stays private. Permission: Access Apps and Policies READ only,
+restricted to account a5646237c003a20af52d12c61b4bd0b7.
+Expires 28 October 2027 at 13:00 UTC (15:00 Europe/Berlin).
+An app reminder is scheduled for 28 September 2027 at 09:00 local time.
+This is a Codex reminder, not a Cloudflare cleanup schedule; delivery depends on
+the app being available. Keep an owner calendar reminder as a secondary safeguard.
+Renew before expiry: create a replacement with the same scope and a reviewed
+expiry; enter it privately as a versioned Worker secret. Verify the staged
+version retains SIGNING_SECRET, DRAFTS and the pinned Access configuration;
+deploy that private Worker version, then test owner login, save/reopen and
+unauthenticated denial. Only after success revoke the old token. Update this
+expiry record/reminder. Never put either secret in chat, Git, logs or the browser.
+If replacement fails, keep the old unexpired secret version and investigate.
+Revocation/expiry fails closed; it does not erase drafts or revisions.
+
+LIVE TEST EVIDENCE
+Owner TOTP success was reported by the owner; the resulting authenticated editor
+and exact owner identity were observed. A fictional dummy draft was saved,
+reopened and edited; recovery of revision 1 appended revision 3, retaining 1/2.
+A second stale tab was rejected without overwriting or replacing its working copy.
+Recovered export equals the original fixture JSON exactly; re-import validates
+and shows the production renderer. One transient authentication failure denied a
+save; retry reached the expected conflict denial without changing stored data.
+Owner confirmed a fresh Edge InPrivate login opens the editor. Personal Gmail
+was rejected by Google's org_internal restriction, BEFORE Access evaluation.
+That is not a live wrong-user test of the Access policy or Worker. Read-only
+inspection independently confirms the app's single exact-email Allow policy,
+with no domain-wide include, bypass or alternate provider. Cloudflare's policy
+tester evaluated its sole known user (the owner) successfully; no second internal
+identity exists in that test population. Do not broaden OAuth to manufacture a test.
+Signed local tests independently reject other@wynctec.com as well as an unrelated
+identity, even with a spoofed owner-email header, before any policy API lookup.
+Focused local tests: 6/6 pass, including cryptographically signed wrong-identity,
+wrong issuer/audience, expired tokens, missing MFA/policy, CSRF, stale writes and
+revision recovery. These local signed-token tests are not live owner-token tests.
+No real article was imported or published; the stored draft is clearly fictional.
+Final private Worker version: 1be57c6a-e671-4111-a02a-9cab846febf8 (100% traffic).
+Temporary authentication diagnostics removed. Both server secret bindings remain.
+Eight live edge tests passed after deployment: editor, session, draft list,
+private asset and moderation require Access; forged assertion/cookie do not gain
+access; workers.dev is 404 and preview URLs are disabled. No private draft leaked.
+The temporary deployment token was revoked and encrypted transport files removed.
+The persistent READ token is active with only the approved account/permission.
+TOTP enrollment alone is not proof: actual application challenge success, owner
+editor access and live required-TOTP policy were checked separately. Access may
+reuse a successful MFA session within the configured one-hour window.
+
+GITHUB PUBLISHING PERMISSIONS (READ-ONLY INSPECTION)
+Authenticated collaborator collection returned only m-khawaga, admin/push access.
+No deploy keys were returned. Actions default permissions are read; Actions cannot
+approve PR reviews. Active Protect main ruleset requires a PR, blocks deletion and
+non-fast-forward updates, and requires ZERO approving reviews. This is not a
+two-person publishing approval gate. Access identity is not GitHub publishing
+identity. User-owned tokens/installed-app authority were not exhaustively audited;
+do not claim that email allowlisting makes GitHub publication owner-only.
+
+RETENTION — OWNER-APPROVED POLICY, SCHEDULE NOT ACTIVATED
+Published articles: indefinitely, unless explicitly deleted.
+Private drafts/revisions: indefinitely, unless explicitly deleted.
+Approved/hidden comments and current reactions: until explicitly deleted.
+Pending/rejected/spam comments and optional email: next daily cleanup after 30
+days, normally within 31 days of submission. Email is removed even on retained
+approved comments. Audit metadata: next daily cleanup after 90 days, normally
+within 91 days. Changing moderation status does not reset submission age.
+Proposed crons: 0 3 * * * (03:00 UTC daily), 0 * * * * (hourly short-data cleanup).
+Abuse/retry data: short expiry (rate limits 10 minutes; retry keys 23 hours),
+hourly physical purge; report network hashes anonymized after 23 hours. This
+provides a 24-hour normal-operation maximum independent of daily cleanup.
+Cron alone is NOT a hard storage TTL: outages/quota exhaustion can delay deletion.
+Do not claim an unconditional 24-hour physical-erasure guarantee or activate
+collection until the owner accepts that operational limitation or a stronger
+expiry design is approved. No paid substitute is activated automatically.
+
+Cleanup health stores only kind, attempt/success timestamps and failed flag.
+Private moderation shows missing, failed or overdue hourly/daily runs and offers
+a health refresh. Failed scheduled events throw a generic error (no PII); Cloudflare
+invocation status must show failure. No email notifier is implemented or activated.
+At activation verify both crons, force a test failure using dummy data, inspect
+failed invocation + private warning, repair, run recovery purge and confirm counts.
+Check health after every moderation session; establish a free owner-visible
+failure alert if offered by the chosen plan. If unattended alerting is unavailable,
+record that operational gap rather than claiming proactive notification.
+D1 outage may also prevent updating its health row; overdue last_success detects it
+when storage returns. Close submissions while overdue; preserve existing reading.
+
+BACKUPS
+Encrypted private database exports: retain at most 30 days from export. This is
+separate from drafts that stay in the live database indefinitely. No export backup
+job, encryption key or external backup store was provisioned by this task. Choose
+an owner-controlled encrypted destination, record created/expires dates and verify
+deletion at the next backup check; do not call this automatically enforced.
+The ordinary article JSON export is a working file, not an encrypted backup.
+D1 Free currently offers a 7-day provider-managed Time Travel window, independent
+of our live SQL deletion and private-export retention. This does not promise all
+provider internal backup copies disappear at the same instant. Reapply deletions
+and retention before reopening any restored database.
+
+FIRST REAL EDITION
+Friday 30 October 2026: prepare noon/afternoon, finish factual checks at 16:00
+Europe/Berlin (CET +01:00), then review and approve publication. Preserve explicit
+coverage boundaries across the daylight-saving transition; never relabel earlier
+or current snapshots to fit. No future results were generated here.
+Use the accepted FINAL prompt/template/example in release-2026-10-27.
+Attach the previous actually published edition JSON if available; first edition
+has no comparison. Structural validation is not factual verification.
+
+Official references inspected 28 October 2026:
+https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/independent-mfa/
+https://developers.cloudflare.com/cloudflare-one/access-controls/policies/mfa-requirements/
+https://developers.cloudflare.com/d1/configuration/data-location/
+https://developers.cloudflare.com/d1/platform/limits/
+https://developers.cloudflare.com/d1/platform/pricing/
+https://developers.cloudflare.com/d1/reference/time-travel/
+https://developers.cloudflare.com/workers/platform/limits/
+
+
+BRANDING / SOURCE PRESERVATION — 28 OCTOBER 2026
+Deployed version 587c1e30-5f02-467b-b300-47a68e6c18a7, 100% traffic.
+Source commit 798ff65cd3b4f43d447e0a839f17c7212ad97f5c on
+codex/courtumpire-weekly is pushed. Title: CourtUmpire — Private Editor.
+The live refreshed owner session loads the public-site favicon byte-for-byte.
+Auth/MFA, both secret bindings and the existing DRAFTS database are preserved.
+Nine live unauthenticated boundary checks pass, including the favicon; alternative
+URLs remain disabled. Current focused local backend/private tests: 18/18 pass.
+Earlier test limitations remain valid. Actual Pages container audit: 204 output
+files, nine excluded private canaries, zero findings. Pages still serves main at
+a4abd3b60857149371499851ae9353f75c5e995b; no public deployment was triggered.
+Current remaining-activation handoff: docs/WEEKLY-ACTIVATION-HANDOFF.txt.

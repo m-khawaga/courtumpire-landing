@@ -1,8 +1,10 @@
+import {weeklyRoutes} from '../weekly/routes.mjs';
 import { activities } from './catalogue.mjs';
 import { playerPages } from './player-pages.mjs';
 export const productionOrigin = 'https://courtumpire.com';
 // Public identity, parentage and canonical policy in one source. No draft tool routes.
 export const routeDefinitions = [
+  ...weeklyRoutes,
   { id:'home', path:'/', title:'CourtUmpire — Tennis practice and scoring for Android', label:'Home', section:'home' },
   { path:'/contact.html', label:'Contact', section:'legal', parent:'/' },
   { path:'/privacy.html', label:'Privacy Policy', section:'legal', parent:'/' },

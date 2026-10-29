@@ -1,0 +1,26 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync,spawnSync} from 'node:child_process';
+import {createHash,randomUUID} from 'node:crypto';
+const root=process.cwd(),image='ghcr.io/actions/jekyll-build-pages@sha256:6791ebfd912185ed59bfb5fb102664fa872496b79f87ff8b9cfba292a7345041';
+const review=path.join(root,'.weekly-private','pages-audit-'+randomUUID()),source=path.join(review,'source'),destination=path.join(review,'_site');
+fs.mkdirSync(source,{recursive:true});
+const candidates=execFileSync('git',['ls-files','--cached','--others','--exclude-standard','-z'],{encoding:'utf8'}).split('\0').filter(Boolean);
+if(candidates.includes('.nojekyll'))throw Error('Root .nojekyll bypasses the required Jekyll exclusions.');
+for(const file of candidates){const input=path.resolve(root,file);if(!fs.existsSync(input))continue;if(!input.startsWith(root+path.sep)||fs.lstatSync(input).isSymbolicLink())throw Error('Unsafe source '+file);const target=path.join(source,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(input,target);}
+const marker='WEEKLY_PRIVATE_CANARY_'+randomUUID();
+for(const file of ['.weekly-private/drafts/fictional.json','.weekly-private/editor-notes.txt','.weekly-private/demo/engagement.html','content/weekly/fictional-draft.json','authoring/private-notes.txt','docs/editor-notes.txt','backend/.dev.vars','backend/local-auth-canary.mjs','tests/fictional-article.json']){const target=path.join(source,file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,marker);}
+// Same github-pages build command as the official entrypoint. Unset its empty token
+// (Ruby treats an empty environment token as supplied credentials). Public metadata GETs only.
+const args=['run','--rm','--mount','type=bind,source='+review+',target=/github/workspace','-e','JEKYLL_ENV=production','-e','PAGES_REPO_NWO=m-khawaga/courtumpire-landing','-e','PAGES_API_URL=https://api.github.com','-e','JEKYLL_BUILD_REVISION='+execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),'--entrypoint','/bin/bash',image,'-c','unset JEKYLL_GITHUB_TOKEN; cd /usr/local/bundle && exec /usr/local/bundle/bin/github-pages build --verbose --source /github/workspace/source --destination /github/workspace/_site'];
+const build=spawnSync('docker',args,{cwd:root,encoding:'utf8',maxBuffer:8*1024*1024});fs.writeFileSync(path.join(review,'build.log'),build.stdout+'\n'+build.stderr);if(build.status!==0){console.error(build.stdout,build.stderr);throw Error('Pages container build failed; see '+review);}
+const walk=dir=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);
+const files=walk(destination),errors=[];
+const rehearsalPath=path.join(root,'.weekly-private/rehearsal/article.json');
+const rehearsal=fs.existsSync(rehearsalPath)?JSON.parse(fs.readFileSync(rehearsalPath,'utf8')):null;
+for(const file of files){const relative=path.relative(destination,file).replaceAll('\\','/'),bytes=fs.readFileSync(file);if(/^(?:content|authoring|weekly-core|backend|scripts|tests|docs|node_modules|dist|output|\.weekly-private|\.local-review)(?:\/|$)/.test(relative))errors.push('Private/source path: '+relative);if(/(?:^|\/)(?:\.env(?:\..*)?|\.dev\.vars.*|Gemfile(?:\.lock)?|package(?:-lock)?\.json)$/.test(relative))errors.push('Configuration/runtime file: '+relative);if(rehearsal&&bytes.includes(Buffer.from(rehearsal.title)))errors.push('Unpublished rehearsal title leaked: '+relative);if(bytes.includes(Buffer.from(marker)))errors.push('Private canary: '+relative);if(/\.(?:html|mjs|js|json|xml|txt|css)$/i.test(relative)&&/local-demo|local test auth|admin\/api\/rehearsal|Sample Rally Robin|DUMMY_PRIVATE|WEEKLY_PRIVATE_CANARY_|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY/i.test(bytes.toString('utf8')))errors.push('Test authentication/private content marker: '+relative);}
+for(const route of ['index.html','weekly/index.html','weekly/privacy/index.html','weekly/feed.xml','weekly/registry.json','privacy.html','tennis-drills/serve-toss-and-catch/index.html'])if(!fs.existsSync(path.join(destination,route)))errors.push('Missing public page: '+route);
+const registry=JSON.parse(fs.readFileSync(path.join(destination,'weekly/registry.json'),'utf8'));if(registry.articles.length!==0)errors.push('Expected no approved articles in this review');
+const hashes=files.map(file=>({path:path.relative(destination,file).replaceAll('\\','/'),sha256:createHash('sha256').update(fs.readFileSync(file)).digest('hex')})).sort((a,b)=>a.path.localeCompare(b.path));
+const report={createdAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),branch:execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim(),builderImage:image,pagesGem:232,jekyll:'3.10.0',source,destination,fileCount:files.length,privateCanaries:9,errors,hashes};fs.writeFileSync(path.join(review,'report.json'),JSON.stringify(report,null,2));fs.writeFileSync(path.join(root,'.weekly-private/pages-audit-latest.json'),JSON.stringify({...report,hashes:undefined,report:path.join(review,'report.json')},null,2));
+console.log(JSON.stringify({destination,fileCount:files.length,privateCanaries:9,errors,report:path.join(review,'report.json')},null,2));if(errors.length)process.exitCode=1;

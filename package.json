@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/weekly-build.mjs",
     "lint": "node scripts/check.mjs",
     "test": "node --test tests/analytics-consent.test.mjs tests/planner.test.mjs tests/tools.test.mjs tests/club-update.test.mjs tests/focused-corrections.test.mjs tests/checklists-formats.test.mjs tests/expansion.test.mjs",
     "preview": "node scripts/preview.cjs",
@@ -20,6 +20,33 @@
     "test:checklists-formats": "node tests/checklists-formats.cjs",
     "test:contact": "node tests/contact.cjs",
     "test:expansion": "node tests/expansion.cjs",
-    "test:release": "node tests/release.cjs"
+    "test:release": "node tests/release.cjs",
+    "weekly:demo": "node scripts/weekly-demo.mjs",
+    "weekly:import": "node scripts/weekly-import.mjs",
+    "weekly:preview": "node scripts/weekly-preview.mjs",
+    "weekly:package": "node scripts/weekly-package.mjs",
+    "test:weekly": "node --test tests/weekly*.test.mjs",
+    "test:weekly:browser": "node tests/weekly-browser.cjs",
+    "backend:dev": "wrangler dev --config backend/wrangler.jsonc --ip 127.0.0.1",
+    "backend:migrate": "wrangler d1 migrations apply courtumpire-weekly-production --local --config backend/wrangler.jsonc",
+    "backend:test": "node --test tests/weekly-backend.test.mjs",
+    "backend:demo": "node backend/local-demo.mjs",
+    "admin:build": "node scripts/weekly-admin-build.mjs",
+    "admin:demo": "node backend/private-admin/local-demo.mjs",
+    "admin:test": "node --test tests/weekly-private-admin.test.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@cloudflare/workers-types": "latest",
+    "@resvg/resvg-js": "^2.6.2",
+    "ajv": "^8.17.1",
+    "jose": "^6.1.0",
+    "miniflare": "^4.0.0",
+    "playwright": "^1.56.0",
+    "wrangler": "^4.0.0"
+  },
+  "overrides": {
+    "undici": "^7.30.1",
+    "sharp": "^0.35.5"
   }
 }

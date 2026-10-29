@@ -1,0 +1,8 @@
+import fs from 'node:fs';
+import {fixture,blank} from '../tests/weekly-fixture.mjs';
+import {assertValid,schema} from '../weekly-core/contract.mjs';
+import {article,social} from '../weekly-core/render.mjs';
+fs.mkdirSync('.weekly-private/demo',{recursive:true});fs.mkdirSync('authoring',{recursive:true});
+const a=assertValid(fixture());fs.writeFileSync('.weekly-private/demo/fixture.json',JSON.stringify(a,null,2));fs.writeFileSync('authoring/template.json',JSON.stringify(blank(),null,2)+'\n');fs.writeFileSync('authoring/schema.json',JSON.stringify(schema,null,2)+'\n');
+const home=fs.readFileSync('index.html','utf8'),header=home.match(/<header class="site-header">[\s\S]*?<\/header>/)[0].replaceAll('src="assets/','src="/assets/'),footer=home.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)[0];
+fs.writeFileSync('.weekly-private/demo/index.html',`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Fictional Weekly preview</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/practice/practice.css"><link rel="stylesheet" href="/weekly/weekly.css"><script type="module" src="/practice/site.mjs"></script><script type="module" src="/weekly/weekly.mjs"></script></head><body><a class="skip-link" href="#main-content">Skip to content</a>${header}<main class="container weekly-page" id="main-content" tabindex="-1">${article(a,{preview:true})}</main>${footer}</body></html>`);fs.writeFileSync('.weekly-private/demo/social.svg',social(a));console.log('Fictional preview generated only in ignored .weekly-private/demo. Run npm run weekly:preview.');

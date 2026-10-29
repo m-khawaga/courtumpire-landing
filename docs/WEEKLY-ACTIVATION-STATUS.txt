@@ -1,0 +1,226 @@
+COURTUMPIRE WEEKLY ACTIVATION STATUS — 28 OCTOBER 2026
+Account a5646237c003a20af52d12c61b4bd0b7 only. Workers Free rechecked in dashboard.
+PUBLIC RELEASE HELD. No PR merge, public deployment, or article publication.
+Frontend API config remains disabled and public Pages remains on a4abd3b.
+
+REPAIR DEPLOYED — BOUNDED OWNER VERIFICATION COMPLETE (28 OCTOBER, 20:37 BERLIN)
+Owner explicitly approved commit 25b871f543735c36716ba349d2d65ae390e1c255.
+Captured active versions and nonsecret configuration before deployment; pushed
+that commit to codex/courtumpire-weekly. Pages verified to publish main only.
+New active private-admin version: 92efa518-dd7d-41c8-9ebc-86042d6d4db4.
+New active Weekly version: 248816d0-826d-44d5-87e4-9f94fcc1e650.
+Both bundles contain exactly the reviewed repair. Comparison confirms unchanged
+bindings/secret names, runtime configuration, domains, disabled alternative URLs,
+schedules (including modification timestamps), and closed submission settings.
+Google-only exact owner policy, audience and TOTP-only 1h MFA were re-read and
+confirmed unchanged; app/policy updated_at remains 2026-10-28T12:59:23Z.
+Zero registry articles; registry not yet synchronized. Public Pages still built
+from a4abd3b60857149371499851ae9353f75c5e995b, last updated 23 October 21:38:18 UTC.
+
+Eight live read-only boundary checks passed: four unauthenticated/forged private
+requests redirected to Access (302); public-host admin and forged-assertion requests
+denied (403); both workers.dev hosts denied (404). HTTP timing range 41–206 ms.
+These prove boundary rejection, not independent live cryptographic/wrong-owner
+token rejection: Access handles private requests before the Worker, and the public
+hostname fails the backend origin check. Existing local signed-token tests remain
+the evidence for those independent backend controls.
+
+The old owner session expired normally. The owner completed a fresh TOTP challenge;
+the authenticated health response then opened. Twelve subsequent read-only health
+requests succeeded without a recurring authentication denial. Browser navigation
+plus observation times: 2304–4626 ms, median 2715 ms. These include automation
+overhead and are not server TTFB measurements. No retry-count telemetry was enabled;
+we cannot tell which successful calls used an internal retry.
+
+Editor owner identity and saved-draft listing initialized successfully, with no
+application error or console errors. One initial browser navigation wait timed out;
+on a bounded reload the owner-label selector wait also timed out, then initialization
+completed. Exact application-ready duration was not measured. Moderation navigation
+plus initial observation took 10223 ms with data still loading; it subsequently
+loaded zero comments and showed both submission controls closed. A Playwright
+button-role lookup did not match the native details summary; native AX interaction
+opened it successfully. That selector mismatch is tooling, not a UI/auth failure.
+
+No confirmed functional/security regression requiring rollback was observed.
+Keep the initialization delays as an unresolved timing limitation; these bounded
+successes do not prove permanent upstream reliability or authorize public release.
+No production failure injection, draft editing or new wrong-account login test was
+performed. Rollback remains available to captured
+private-admin c9476539-feec-43bd-aeae-4ab4122d8d4b and Weekly
+5ad020b6-4821-4762-9fa4-e73f0255a4dc if the repair causes regressions.
+Private evidence: .weekly-private/auth-investigation-2026-10-28/repair-before.json,
+repair-after.json, repair-boundaries.json, repair-owner-verification.json and
+repair-moderation.png. No secret values or draft content captured.
+See docs/WEEKLY-POLICY-REPAIR.txt for behavior and 30 passing local tests.
+Daily cleanup still awaits the owner's return after 29 October 04:05 Berlin.
+No overnight wait, schedule change, public release or article publication.
+
+LATEST DIAGNOSIS — 28 OCTOBER, 20:07 EUROPE/BERLIN
+Owner explicitly approved diagnostic-only commit 89aa6ee on both existing Workers.
+Temporary versions: Weekly 057d3e61-bef0-4ad9-99e1-89f9e93be1dc;
+private-admin 49044a7c-82a3-476f-982c-a0da1b3032ee.
+At 19:05:52 UTC (20:05:52 Berlin), an authenticated, read-only health request
+returned Authentication required with the sanitized category
+private-editor / policy-unavailable-TimeoutError. This reproduces a real failure:
+the private gateway's live Access-policy lookup exceeded its five-second timeout.
+The request was denied before reaching Weekly. It was not an observed wrong-owner,
+JWT-signature or MFA-policy mismatch. The cause of the upstream delay is unknown;
+no claim is made that all earlier failures had this same cause. Sequential reads
+and a normal moderation-page load also succeeded, which is not reliability proof.
+No automatic retry, timeout extension, cached authorization, MFA bypass, policy
+change, secret logging or failure injection was introduced. The diagnostic test
+observed ordinary authenticated GET requests only; no production data was changed.
+The temporary diagnostics were removed immediately after capturing evidence:
+both Workers restored to the exact pre-investigation versions listed below,
+and all nonsecret bindings and secret binding names verified unchanged.
+Source diagnostic removal is commit 4395dee. Diagnostic versions remain inactive
+in provider version history; the active runtime has no diagnostic response fields.
+Sanitized observations and screenshot are retained privately in
+.weekly-private/auth-investigation-2026-10-28/; no tokens or content were captured.
+At 19:06:52 UTC, production retention_health confirmed hourly last_attempt and
+last_success 2026-10-28T19:00:42.505Z, failed=0 (20:00:42 Berlin). This is the
+scheduled handler's successful database completion record; independent platform
+event-log results were not inspected. Daily has no row and remains pending until
+29 October after 04:05 Berlin. Both cron expressions and modification times remain
+unchanged. Comments/reactions remain closed; registry is empty, zero articles.
+Administration reliability remains a release blocker. Next work is a focused,
+fail-closed policy-lookup resilience repair and tests, with a separate explicit
+production repair approval: this turn authorized diagnosis only. A retry succeeding
+must not be counted as proof of reliability or permission to publish the website.
+
+EARLIER FOLLOW-UP (SUPERSEDED ABOVE) — 28 OCTOBER, 19:59 EUROPE/BERLIN
+Read-only moderation load and cleanup-health request succeeded. This single
+bounded observation does not resolve the earlier intermittent authentication
+failures or prove reliability. No live cause has been established.
+Source inspection found that backend authentication categories were discarded
+at both error-response boundaries. Local diagnostic-only commit 89aa6ee exposes
+bounded stage/category enums, without claims, tokens, exception text or logging.
+Three focused tests pass, including simulated policy timeout versus wrong-owner
+denial; both still fail closed. This is diagnostic coverage, not a live fix.
+Commit 89aa6ee is pushed on codex/courtumpire-weekly, but NOT deployed. Automatic
+approval review rejected its production Worker upload because the public release
+is held. Neither production Worker was changed by this investigation. Explicit
+approval of diagnostic-only updates to the existing two Workers is needed before
+that instrumentation can be used to identify a recurring live failure.
+At 18:59:12 UTC, production retention_health had no rows: no recorded attempt or
+successful scheduled run yet. Both configured crons are unchanged. The requested
+hourly verification is after 28 October 20:05 Berlin; daily verification is after
+29 October 04:05 Berlin. Both remain pending at this observation. No waiting loop,
+manual purge, accelerated schedule or recreated test resource was used.
+Production settings still close comments and reactions; zero registry articles.
+Recheck actual timestamps/results after the daily window and keep release held
+until both cleanup and authenticated-administration reliability gates pass.
+
+CREATED / CONFIGURED
+EU D1 courtumpire-weekly-production: c55230e5-f748-4c57-ba32-21e7de4a2f01.
+Three migrations applied and recorded in d1_migrations in order:
+0001_weekly.sql, 0002_comment_reactions.sql, 0003_retention_health.sql.
+Worker courtumpire-weekly: version 5ad020b6-4821-4762-9fa4-e73f0255a4dc.
+Runtime source is feature commit 2d52aa0: reviewed backend plus a focused repair
+to show FAILED when the first retention run fails, even without a prior success.
+The new regression test passes; authentication and retention rules are unchanged.
+API https://weekly-api.courtumpire.com. New Custom Domain only; original 12 DNS
+records unchanged, prior _domainconnect 3600 TTL preserved. DNSSEC untouched.
+Turnstile Managed widget sitekey 0x4AAAAAAFp6hX5OSlqZVaAA, courtumpire.com and its
+subdomains, no pre-clearance. Production siteverify accepts exactly courtumpire.com.
+Secrets SIGNING_SECRET, TURNSTILE_SECRET, ACCESS_POLICY_READ_TOKEN are server-only.
+New policy-read credential: exact account, Access Apps and Policies READ only,
+expires 28 October 2027 13:00 UTC. Private renewal inventory and existing September
+2027 reminder now cover both private-editor and Weekly credentials. No values in Git.
+Private Worker version c9476539-feec-43bd-aeae-4ab4122d8d4b restores the original
+branded runtime after isolated tests, retaining only the production WEEKLY service
+binding. Runtime/editor/auth/DRAFTS remain unchanged. Prior rollback version:
+587c1e30-5f02-467b-b300-47a68e6c18a7. The EU private-drafts DB is untouched.
+Both Workers have workers.dev and preview URLs disabled; no local test auth deployed.
+Two production Cron Triggers configured: 0 * * * * and 0 3 * * *, UTC.
+Global settings comments_closed=1, reactions_closed=1. Zero article/comment records.
+No dummy registry was activated. Exact live empty registry sync awaits website release.
+
+VERIFIED THIS ACTIVATION
+Nine non-destructive public boundary cases passed: unknown ID 404, public admin
+403, forged admin assertion denied, wrong Origin denied, permitted CORS preflight
+204, rejected foreign preflight, unknown comment denied, oversized body 413,
+alternative workers.dev 404. Responses do not expose private content.
+Bounded 130-request read test: 119 unknown-ID responses and 11 rate-limit 429s,
+no network failures. The counters are short-lived and contain no raw IPs.
+Actual DB schema and migration history verified. Existing website/mail DNS and
+Google TXT comparison: no differences after normalizing API TXT quoting.
+Build/lint pass. Wrangler nonsecret binding types generated successfully.
+Earlier 18/18 local backend/private tests and actual 204-file Pages exclusion
+build remain valid; they are not substitutes for unperformed live tests.
+
+OWNER SESSION CHECK — 28 OCTOBER, 18:18 UTC / 19:18 BERLIN
+After the owner completed MFA, the first moderation data request returned
+Authentication required. A normal page refresh succeeded without configuration
+changes: settings, all five zero-count status tabs, and cleanup health loaded.
+The initial failure's cause is not established. No validation was bypassed.
+The editor also reopened in the same authenticated session. Moderation shows
+Close comments and Disable reactions checked, and Registry: Not synchronized.
+Read-only D1 inspection confirmed zero articles/comments, both global closures,
+and no cleanup health rows yet. Both production cron definitions remain present.
+Private screenshot and timestamped evidence are excluded from Git/deployment.
+
+ISOLATED LIVE TESTS AND CLEANUP — COMPLETED 18:45 UTC
+Owner separately approved temporary EU D1/Worker courtumpire-weekly-activation-test
+and its short-lived account-scoped policy READ token. No public hostname or private
+draft DB access was added. Existing owner/MFA/JWT and CSRF checks protected the tests.
+32 browser assertions passed: real Turnstile session/comment/report, token replay,
+wrong action/hostname rejection, comment idempotency, pending/email privacy, private
+no-store review, approve/hide/reject/restore, genuine article/comment reaction totals,
+concurrent retries/conflicts/removal, reports and server closure controls.
+The final closure assertion initially failed during intermittent authentication
+failures; five targeted authenticated retries subsequently returned HTTP 409.
+An earlier run was interrupted by the deliberate cleanup failure fixture; it was
+separated from engagement before rerunning. Original failed evidence is retained.
+Rendered dummy HTML was inert in moderation (literal text; zero injected images).
+Real isolated cron events recorded hourly success and daily failure, then recovery
+after removal of the failure trigger. Old pending content/audit and short-lived
+fixture were deleted, approved text retained, old optional email cleared.
+The corrected FAILED notice and recovered success timestamps were verified in UI.
+These are isolated-admin-host tests, not a claim of public-host browser verification.
+The temporary Worker, EU database, both temporary schedules, secret bindings and
+account token 66077e525a0c587724c320d91cfd145b were removed/revoked. Inventory verified
+only the two production Workers/DBs remain; both original policy credentials active.
+The test service binding/routes/diagnostics were removed; authenticated test URL now
+returns Not found. Normal private editor and moderation reopened afterward.
+Provider retention of deleted-resource backups is separate from live deletion.
+
+OUTSTANDING GATES — DO NOT MERGE UNTIL RESOLVED
+Production cron health has not yet recorded a run (last checked 18:45 UTC).
+The original production schedules were added at 17:59 UTC; isolated scheduled
+success proves the handler, but does not prove both production schedules have run.
+Cron propagation can take time; do not call a missing first run a code defect.
+The next hourly boundary is 19:00 UTC / 20:00 Europe/Berlin. The next daily boundary
+is 29 October 03:00 UTC / 04:00 Europe/Berlin. Check afterward, without a long wait.
+Automatic approval review rejected fault injection in production; no trigger or
+fixture was inserted there. The separately approved isolated test resolved that
+test requirement and has now been completely removed from active configuration.
+A real browser Turnstile token must come from its expected hostname. Never spoof
+success, accept localhost/admin as a production hostname, or bypass token checks.
+Intermittent fail-closed authentication responses recovered on refresh/retry; their
+cause was not established. Retain this limitation and check normal administration
+reliability again before release. No authentication check or MFA was weakened.
+Public courtumpire.com browser connection checks remain a release verification step;
+current live origin/CORS rejection checks passed but are not a public-page browser test.
+Prior wrong-owner limitation remains: personal Gmail was rejected by Google
+org_internal, while independent wrong-email/issuer/audience/expiry tests are local.
+
+DAILY HEALTH CHECK AFTER RELEASE
+Open https://admin.courtumpire.com/admin with Google + TOTP. Expand Advanced,
+Retention, click Check cleanup status. Both hourly and daily must have successful
+recent timestamps and no FAILED OR OVERDUE warning. On failure/unavailable status,
+keep/close submissions with global Close comments and Disable reactions controls.
+Inspect Worker scheduled-event status, repair, run approved recovery purge, verify
+health and expired-record removal before reopening. No proactive email alert exists.
+Encrypted private exports are owner-managed and deleted after 30 days. D1 Free
+provider recovery copies have a separate seven-day window; purge expired restored
+data before reopening. Outage-related physical deletion delays are accepted.
+Published articles and private drafts/revisions never expire automatically.
+
+NEXT STEP
+Check production hourly health after 28 October 20:05 Europe/Berlin and daily health
+after 29 October 04:05 Europe/Berlin. Check actual timestamps/status, not elapsed time.
+Recheck authenticated administration reliability. Keep submissions closed until gates
+pass, then configure/build/review/merge the zero-edition website and sync its exact
+live empty registry under the existing approval. No article publication is authorized.
+Do not recreate isolated resources or repeat successful tests without a new reason.

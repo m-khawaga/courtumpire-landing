@@ -1,0 +1,144 @@
+COURTUMPIRE ACCESS POLICY LOOKUP REPAIR — REVIEWED PROPOSAL, 28 OCTOBER 2026
+
+DEPLOYMENT UPDATE
+Owner approved commit 25b871f; it is now pushed and deployed to the existing two
+Workers. See WEEKLY-ACTIVATION-STATUS.txt for exact versions and verification.
+The proposal/validation record below is preserved. Eight live boundary checks,
+fresh owner MFA, editor/draft listing, moderation and twelve authenticated reads
+passed. Browser initialization wait limits and delayed data loading are recorded;
+do not infer permanent upstream reliability. Public release remains held.
+
+ORIGINAL PRE-DEPLOYMENT PROPOSAL STATUS (SUPERSEDED BY UPDATE ABOVE)
+Implemented and tested locally only. Production remains on the pre-diagnostic
+versions below. Public Weekly release is held; comments and reactions stay closed.
+No cloud mutation, schedule change, new resource, database migration or paid plan
+is required for this repair. Private drafts and unrelated work are untouched.
+
+EVIDENCE AND CHOICE
+On 28 October at 19:05:52 UTC, the private-admin gateway returned the sanitized
+category policy-unavailable-TimeoutError during an ordinary authenticated GET.
+Its Access application/policy GET exceeded the existing five-second deadline.
+The upstream reason is unknown; this does not establish the cause of every prior
+failure. The diagnostic deployment was removed and is not part of this repair.
+
+The smallest chosen change is one retry of the idempotent policy GET after a
+transient failure. A second fresh request can recover an isolated timeout without
+retaining authorization after revocation. The five-second per-attempt limit is
+unchanged. Increasing a single timeout would merely wait longer on the same
+stalled request. A positive policy cache would introduce an avoidable revocation
+window, shared state and invalidation rules; none is added. No SDK/dependency,
+binding or architectural change is needed. This is not a guarantee of availability.
+
+EXACT BEHAVIOR
+- Healthy lookup: one GET, same full policy validation as before.
+- Retry once only for TimeoutError, transport TypeError, or HTTP 502/503/504
+  without Retry-After. Pause 250–500 milliseconds with jitter before the retry.
+- No retry for 401/403/404, redirects, 429, HTTP 500, a Retry-After response,
+  invalid JSON, success:false, mismatched/changed policy, or invalid identity.
+  A repeated transient failure denies access. There is no automatic UI retry.
+- Each attempt includes response-body reading within the five-second deadline.
+  Late completed evidence is rejected even if an underlying reader ignores abort.
+- Overall policy authorization budget per Worker: 10.5 seconds, shortened to the
+  JWT expiry when earlier. No new attempt starts after that deadline. The token's
+  expiry is checked again after waiting. Scheduler/network delays can make a denial
+  arrive later, but cannot extend the evidence or token validity used to allow it.
+- Only the policy GET is retried, never a draft save, moderation write or other
+  operation. Failed policy verification does not forward into Weekly or access
+  private storage. Error responses stay generic/private/no-store, without tokens,
+  exception details, personal data or diagnostic fields. No new logging.
+- JWT signature, issuer, audience, required claims, owner identity, pinned app,
+  Google identity provider, exact owner policy, TOTP requirement/session length,
+  policy-change timestamp checks and CSRF remain enforced.
+
+VALIDITY, REVOCATION AND OUTAGES
+Application authorization-cache lifetime: zero; no response or successful grant
+is reused between requests, including concurrent requests. Fetch requests use
+cache:no-store. Evidence is accepted only for the current verification, completed
+inside the five-second attempt window and 10.5-second overall budget, before JWT
+expiry. A failed first attempt supplies no usable evidence for the second.
+
+There is no added cross-request cache revocation delay. A changed/revoked response
+is denied immediately without another try; later requests must read policy again.
+A change concurrent with a GET can still race the response, and Cloudflare API
+propagation is outside this code's control. Do not promise instantaneous global
+revocation. Each accepted read window is at most five seconds; an already admitted
+operation cannot be retroactively cancelled. Existing session-predates-policy
+checks are preserved. During a sustained outage both reads fail and access remains
+denied, even when a previous request succeeded. There is no stale-if-error mode.
+
+REQUEST BUDGET AND LIMITS
+Maximum policy API calls per authentication check: two (normally one).
+A private-editor request crosses one such check. A moderation request crosses
+both the private gateway and Weekly, each independently verified: normally two
+policy GETs, at most four. If both layers need a retry, their policy portions can
+consume up to 21 seconds altogether, plus unchanged JWT-key retrieval and normal
+application work. A page loading multiple protected assets/APIs has multiple checks.
+Existing JWKS verification is unchanged and is not retried by this repair.
+
+Cloudflare currently documents 1,200 API requests per five minutes per user/account
+token and 200 per second per IP; the user limit is shared with other API/dashboard
+activity. Four policy calls per moderation request would consume that entire
+1,200 budget after 300 such requests without other activity; this is NOT a reserved
+capacity or promised allowance. 429/Retry-After is denied without retry, preventing
+this repair from repeatedly retrying a known quota block. There is no new global
+throttle or cache, and repeated owner requests during an outage still consume
+their bounded per-request attempts. Stop refreshing during a sustained outage.
+
+LOCAL VALIDATION
+node --test tests/weekly-policy-resilience.test.mjs
+12/12 passed, including a real five-second abort/recovery and a real two-attempt
+timeout outage, slow/late responses and bodies, persistent outage, no-cache
+behavior, explicit denials/rate limits, changed/revoked policy after timeout,
+expiry/total budget, identity rejection before policy I/O and both handler boundaries.
+
+node --test tests/weekly-private-admin.test.mjs tests/weekly-backend.test.mjs
+18/18 passed: real local JWT cryptography, MFA and owner restrictions, CSRF,
+private drafts/conflicts/revision recovery, moderation and engagement invariants.
+The initial sandbox run could not connect to Miniflare loopback (EACCES); rerunning
+with loopback access succeeded. These tests used only isolated local dummy data.
+Both existing Worker entry points bundled successfully with esbuild. Current
+Workers type declarations 5.20261028.1 confirm the used APIs. Dependencies unchanged.
+
+LIMITATIONS
+No repaired code has run in production. Tests prove bounded retry/denial behavior
+under controlled conditions, not Cloudflare availability or an end-to-end SLA.
+Live owner login and normal editor/moderation requests still require verification
+after an explicitly approved deployment. A successful retry alone is not proof
+that the reliability gate is resolved. Prior live wrong-account rejection was at
+Google's org boundary; independent backend identity rejection remains locally
+tested, not a newly performed real wrong-account production test.
+
+EXACT PROPOSED DEPLOYMENT (SEPARATE APPROVAL REQUIRED)
+Account: a5646237c003a20af52d12c61b4bd0b7 only.
+Upload/deploy the existing courtumpire-private-admin and courtumpire-weekly Workers
+with the shared backend/src/access-policy.mjs repair. Preserve all existing code,
+static editor assets, secrets, bindings, EU databases, Access configuration,
+disabled workers.dev/preview URLs, domains, schedules and submission controls.
+No new credential, permissions, DNS record, resource or payment. No website merge
+or deployment, registry sync, public release or article publication.
+
+After approval: capture active versions/configuration; deploy the two bundles;
+confirm bindings/secret names and closed settings unchanged; privately verify owner
+MFA/editor/moderation and a bounded read sequence; check missing/forged-token and
+alternative-URL denials without modifying policy or injecting production outages.
+Do not use production draft/comment content as test fixtures. Preserve local test
+evidence and report any live limitation. Hold public release if any gate fails.
+
+Rollback: restore the captured pre-repair deployment versions, preserving secrets
+and bindings; no database restore or migration rollback is needed. Current baseline:
+courtumpire-private-admin c9476539-feec-43bd-aeae-4ab4122d8d4b
+courtumpire-weekly 5ad020b6-4821-4762-9fa4-e73f0255a4dc
+Reconfirm the active baseline immediately before any approved deployment.
+
+OTHER GATES
+Hourly cleanup's last verified success: 2026-10-28T19:00:42.505Z (20:00:42 Berlin).
+Daily cleanup remains pending. On the owner's return after 29 October 04:05 Berlin,
+read actual production daily timestamps/failure state and scheduled-event evidence;
+do not infer success from elapsed time. No overnight wait, scheduled poll or cron
+change is part of this task. Public release and submissions remain held.
+
+REVIEWED PRIMARY REFERENCES (28 OCTOBER 2026)
+https://developers.cloudflare.com/workers/runtime-apis/fetch/
+https://developers.cloudflare.com/workers/runtime-apis/web-standards/
+https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
+https://developers.cloudflare.com/fundamentals/api/reference/limits/
