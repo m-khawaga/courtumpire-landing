@@ -7,6 +7,8 @@ import {isolation} from './isolation.mjs';
 import fixtures from '../../.weekly-private/paid-trial/live-fixtures.generated.mjs';
 import client from './client.js.txt';
 const handler=createHandler();
+// Owner waived only the larger live stress sequence, not a production size cap.
+const steps=[0,1,2,3,4,5,6,7,8,9,15,16,17,18,19,20,21,22,23];
 const json=(v,status=200)=>Response.json(v,{status,headers:{'cache-control':'private, no-store','x-robots-tag':'noindex, nofollow'}});
 const check=(ok,label)=>{if(!ok)throw Error(label);};
 export default {async fetch(request,bound){
@@ -23,21 +25,21 @@ export default {async fetch(request,bound){
   if(url.pathname==='/publishing-test/')return new Response('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Private publication tests</title></head><body><h1>Isolated Paid-plan publication tests</h1><p>Dummy data only. No public website writes. Stop after each operation for CPU review.</p><button id="next">Run next isolated operation</button><pre id="result" role="status"></pre><script src="/publishing-test/client.js"></script></body></html>',{headers:{'content-type':'text/html','cache-control':'private, no-store','x-robots-tag':'noindex','content-security-policy':"default-src 'none'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"}});
   if(url.pathname==='/publishing-test/client.js')return new Response(client,{headers:{'content-type':'text/javascript','cache-control':'private, no-store'}});
   if(url.pathname==='/publishing-test/session')return call('/admin/api/session');
-  if(url.pathname==='/publishing-test/status')return json({runs:(await env.DB.prepare('SELECT step,started,finished,passed,label FROM publishing_test_runs ORDER BY step').all()).results});
+  if(url.pathname==='/publishing-test/status'){const runs=(await env.DB.prepare('SELECT step,started,finished,passed,label FROM publishing_test_runs ORDER BY step').all()).results;return json({runs,nextStep:steps[runs.length]??null,skipped:[10,11,12,13,14]});}
   if(url.pathname==='/publishing-test/fixture'&&request.method==='GET'){
-   const step=Number(url.searchParams.get('step'));check(Number.isInteger(step)&&step>=0&&step<=23,'Step');
+   const step=Number(url.searchParams.get('step'));check(steps.includes(step),'Step');
    return json({article:fixtures.articles[step<15?Math.floor(step/5):0],cover:fixtures.cover});
   }
   if(url.pathname!=='/publishing-test/step'||request.method!=='POST')return json({error:'Not found'},404);
   await csrf(request,env,actor);
   const input=await request.text();check(new TextEncoder().encode(input).length<=800000,'Body size');const {step,article,cover}=JSON.parse(input);
-  check(Number.isInteger(step)&&step>=0&&step<=23,'Step');
+  check(steps.includes(step),'Step');
   // Carry the full bounded article and cover through the admin gateway. This
   // fixture-integrity check adds conservative test CPU; production validation
   // still runs below. No client HTML or client validation is trusted.
   check(JSON.stringify(article)===JSON.stringify(fixtures.articles[step<15?Math.floor(step/5):0])&&cover===fixtures.cover,'Fixture mismatch');
   const prior=(await env.DB.prepare('SELECT step,passed FROM publishing_test_runs ORDER BY step').all()).results;
-  check(prior.length===step&&prior.every(r=>r.passed===1),'Previous result missing or failed; no automatic retry');
+  check(steps[prior.length]===step&&prior.every((r,i)=>r.step===steps[i]&&r.passed===1),'Previous result missing or failed; no automatic retry');
   const started=new Date().toISOString();await env.DB.prepare('INSERT INTO publishing_test_runs(step,started,label,passed) VALUES(?,?,?,0)').bind(step,started,'running').run();
   let label;
   try{
@@ -55,7 +57,7 @@ export default {async fetch(request,bound){
      const r=await read('/weekly/'+a.slug+'/');check(r.status===200&&r.headers.get('cache-control')==='no-store','Direct read');check((await r.text()).includes(a.title.replaceAll('&','&amp;')),'Latest HTML');}
    }else{
     const id=fixtures.articles[0].id,slug=fixtures.articles[0].slug;
-    if(step===15){label='Newest-first archive, feed, sitemap and private edit';const html=await(await read('/weekly/')).text();const ids=[...fixtures.articles].reverse().map(a=>html.indexOf(a.slug));check(ids.every(n=>n>=0)&&ids[0]<ids[1]&&ids[1]<ids[2],'Newest first');for(const path of ['/weekly/feed.xml','/weekly/sitemap-1.xml'])check((await(await read(path)).text()).includes(slug),'Feed/sitemap');const e=await get('edition?id='+id),a={...e.article,title:'PRIVATE EDIT NOT LIVE'},p=await proposal(a,'update',e);check((await call('/admin/api/publishing/preview',p)).ok,'Private edit preview');check(!(await(await read('/weekly/'+slug+'/')).text()).includes(a.title),'Edit changed public');}
+    if(step===15){label='Newest-first archive, feed, sitemap and private edit';const html=await(await read('/weekly/')).text();const ids=fixtures.articles.slice(0,2).reverse().map(a=>html.indexOf(a.slug));check(ids.every(n=>n>=0)&&ids[0]<ids[1],'Newest first');for(const path of ['/weekly/feed.xml','/weekly/sitemap-1.xml'])check((await(await read(path)).text()).includes(slug),'Feed/sitemap');const e=await get('edition?id='+id),a={...e.article,title:'PRIVATE EDIT NOT LIVE'},p=await proposal(a,'update',e);check((await call('/admin/api/publishing/preview',p)).ok,'Private edit preview');check(!(await(await read('/weekly/'+slug+'/')).text()).includes(a.title),'Edit changed public');}
     if(step===16){label='Unpublish retains engagement and withdraws direct links';await env.DB.prepare('INSERT INTO reactions(article_id,browser_id,value,updated_at) VALUES(?,?,1,?)').bind(id,'isolated-dummy',new Date().toISOString()).run();await manage(id,'unpublish');check((await read('/weekly/'+slug+'/')).status===410,'Unpublish direct');for(const path of ['/weekly/','/weekly/feed.xml','/weekly/sitemap-1.xml'])check(!(await(await read(path)).text()).includes(slug),'Unpublish index');check((await env.DB.prepare('SELECT count(*) n FROM reactions WHERE article_id=?').bind(id).first()).n===1,'Engagement removed');}
     if(step===17){label='Trash and Restore stay private';await manage(id,'trash');await manage(id,'restore');check((await get('edition?id='+id)).status==='unpublished','Restore state');check((await read('/weekly/'+slug+'/')).status===410,'Restore exposed');}
     if(step===18){label='Republish, idempotent retry and stale conflict';const e=await get('edition?id='+id),p=await proposal({...e.article,title:e.article.title+' · restored'},'update',e),r=await mutate(p);check(JSON.stringify(await mutate(p))===JSON.stringify(r),'Replay differs');check((await call('/admin/api/publishing/mutate',{...p,key:crypto.randomUUID()})).status===409,'Stale edit accepted');check((await read('/weekly/'+slug+'/')).status===200,'Republish');}

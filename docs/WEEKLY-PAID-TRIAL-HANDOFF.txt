@@ -1,5 +1,14 @@
 COURTUMPIRE — WORKERS PAID TRIAL / DIRECT PUBLISHING
-Prepared 29 October 2026. Payment and live Paid-plan tests are PENDING.
+Updated 29 October 2026. Workers Paid is VERIFIED ACTIVE; live gates are IN PROGRESS.
+The owner completed payment. Dashboard shows Workers Paid, $5/month plus usage,
+and renewal on 28 November 2026. Renewal time/timezone, checkout tax and invoice
+total were not inspected. Do not repeat checkout or assume taxes are zero.
+The execution notes below distinguish the original plan from verified progress.
+Owner update, 29 October: omit the five 510-result live stress operations. Accept
+the completed 102/306-result evidence; larger editions remain unverified. This is
+a test-scope change only, not a match-count cap or relaxation of server validation.
+Complete the nine original management/security checks, then remove the temporary
+gateway/binding/test resources before authorized production activation.
 This replaces the Free-only CPU gate, not the editorial or security requirements.
 Keep the optimized b7498f5 implementation. No reduced-results prompt, 50-match cap,
 resumable preparation redesign, real article or public dummy publication.
@@ -18,7 +27,7 @@ ae856293-8b0e-4a42-89dd-5d148bebd329. Migration 0004 was applied previously:
 inspect its migration record/schema rather than blindly recreating it or the DBs.
 Preserve credentials, Access owner/MFA checks, bindings and cleanup schedules.
 
-OWNER PAYMENT — ONLY THIS STEP NOW
+OWNER PAYMENT — COMPLETED; REFERENCE ONLY
 https://dash.cloudflare.com/a5646237c003a20af52d12c61b4bd0b7/workers/plans
 Select Workers Paid in this account's Workers & Pages / Plans page. Review the
 monthly US$5 base, usage pricing and checkout taxes. Complete payment privately.
@@ -49,10 +58,11 @@ Taxes depend on the checkout billing jurisdiction/tax treatment; do not infer th
 from Europe/Berlin. The actual tax amount, invoice currency and renewal date must
 be recorded from checkout/subscription after owner payment, never guessed.
 
-Trial register to complete after payment:
-  Subscription active: NOT YET VERIFIED
-  Start / monthly renewal date and timezone: PENDING CHECKOUT
-  Base / checkout tax / total: $5 base; tax and total PENDING CHECKOUT
+Trial register:
+  Subscription active: VERIFIED in the exact account dashboard on 29 October 2026
+  Monthly renewal: 28 November 2026; time/timezone not displayed
+  Exact subscription start: not inspected
+  Base / checkout tax / total: $5 base; checkout tax and total not inspected
   Monthly review: before each actual renewal; decision after up to three months
   Automatic cancellation: NONE; subscription renews unless owner cancels
 At each review inspect Workers requests/CPU, D1 reads/writes/storage, estimated
@@ -104,14 +114,35 @@ The latter covers two editions/order, preview, transaction/registry consistency,
 stale edits/idempotency, immutable metadata, frozen comparisons, aliases, unpublish,
 Trash/Restore/permanent deletion, retained engagement, ambiguous result recovery,
 failed batch atomicity, export/restore, public routing/RSS/sitemap and write hold.
-These are local functional tests; no Paid live write or lifecycle gate has passed.
+These are local functional tests. Live progress is recorded separately below;
+it does not replace the remaining CPU, lifecycle or activation gates.
 Preserve earlier successful real owner/MFA/security evidence and its limitations.
 
-ISOLATED LIVE TEST RESOURCES — IDENTIFIED, NOT CREATED
-After payment verification, proposed temporary resources in the SAME account:
+ISOLATED LIVE TEST RESOURCES — CREATED WITH APPROVAL; TEMPORARY
+After payment verification, these temporary resources were created in the SAME account:
   Worker: courtumpire-weekly-publishing-test
   EU D1: courtumpire-weekly-publishing-test (schema 0001–0004, dummy data only)
   Temporary protected admin service binding to the test Worker
+Test D1 ID: 719b9a9c-1e07-407e-ab9f-88fdc5c4ecad (EU/EEUR).
+No new credential was created. Existing authorization evidence and a derived,
+test-scoped signing key travel only through the protected internal service binding.
+All 24 harness operations passed locally, including production-binding rejection.
+Live first 102-result preview passed: 166.693 ms test CPU / 5.344 ms admin CPU.
+That initial request carried only a step number, so it did not establish full-body
+admin transport cost. Source 075bab4 corrects the test harness, without changing
+the approved admin gateway. The second preview carried 91,900 bytes and passed:
+140.925 ms test CPU / 5.177 ms admin CPU. The first isolated publish also passed
+functionally and created matching edition/registry records: 110.744 ms test CPU /
+5.687 ms admin CPU. Two 102-result updates passed at 122.383/5.913 ms and
+132.090/4.067 ms respectively, preserving immutable metadata and snapshots.
+Production still has zero editions and zero registry articles. Public dummy URL
+returned 404. Comments and reactions remain closed. No rollout routing changed.
+Metrics report the new test Worker name as __unknown__; scriptVersion matches
+the captured deployment and identifies the samples. Each quoted group contains
+one request and zero errors. Harness costs include extra checks and are a
+conservative test measurement, not a component-level production trace.
+Live test gateway remains temporary while the serialized checks continue.
+Do not treat these early results as completion of the Paid activation gates.
 No public custom domain, route, workers.dev/preview URL, schedule or private-drafts
 database binding for the test Worker. Reuse server-side authorization configuration;
 no new credential. Any required copy of an existing secret stays server-side and is
@@ -122,7 +153,7 @@ the production IDs. Keep all harness URLs behind the existing owner/MFA protecti
 and validate auth again in the test Worker. Public ingress cannot reach the harness.
 Do not reuse a production registry or temporarily insert dummy rows into production.
 
-After validating isolation, serialize first/repeated 102-, 306- and 510-result
+Original matrix (510-result portion explicitly waived above): first/repeated 102-, 306- and 510-result
 full-content preview/publish/update operations, with 10+10 ranking rows, real
 renderer/validator and realistic PNG covers. Use only clearly labelled dummy facts.
 Bound the matrix to two previews, one publish and two updates per size (15 expensive
