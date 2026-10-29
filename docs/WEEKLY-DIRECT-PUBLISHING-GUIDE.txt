@@ -1,5 +1,6 @@
 COURTUMPIRE DIRECT PUBLISHING — OWNER GUIDE
-Local implementation prepared 29 October 2026; NOT activated online yet.
+Online implementation deployed 29 October 2026; publication writes remain PAUSED
+pending the final DNS-drain/release check. See WEEKLY-DIRECT-ACTIVATION-2026-10-29.txt.
 After activation this supersedes the old per-article GitHub/import/registry workflow.
 
 1. Sign in at https://admin.courtumpire.com with info@wynctec.com and MFA.

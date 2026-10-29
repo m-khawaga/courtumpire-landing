@@ -1,0 +1,134 @@
+COURTUMPIRE DIRECT PUBLISHING — ACTIVATION RECORD, 29 OCTOBER 2026
+Status: production candidate/routing deployed; publication writes PAUSED.
+Zero production editions. Comments and reactions remain globally closed.
+The existing zero-edition Weekly site remains readable. No real or dummy article
+was published to the production database or website.
+
+LIVE LINKS
+Editor: https://admin.courtumpire.com/
+Moderation: https://admin.courtumpire.com/admin
+Archive: https://courtumpire.com/weekly/ — First edition coming soon
+
+SOURCE AND ACTIVE VERSIONS
+Branch: codex/courtumpire-weekly
+Reviewed source/repair: 2f71576f2d837eea9f0a880bf6cd5d67795ab490 (pushed).
+Private admin version: 6da6dc36-8bad-4edb-9bba-7129294c74cc
+Private bundle SHA256: f0771b8b03eee08613b01e5a4cd9ce18e451a771ee71d0b0840adb565e23d0b1
+Weekly version: 42cf718e-f367-4f0f-a3fa-6b561e4df613
+Weekly bundle SHA256: 0b67d06aa55e9e5629d49f51969f5548dccda08cbb2113cd41ecb979d6280886
+Admin runtime code is unchanged from b16936e; 2f71576 only adds the existing public
+navigation module to the Weekly asset allowlist plus its regression test.
+DIRECT_PUBLISHING=true; PUBLISHING_WRITES_OPEN=false.
+Weekly CPU limit 1000 ms; admin 250 ms. No new production credentials/resources.
+Existing EU databases, secrets, Google/owner/TOTP checks and schedules preserved.
+Account a5646237c003a20af52d12c61b4bd0b7 only.
+
+TEST RESULTS / LIMITATIONS
+18 actual isolated live steps passed: 0–9 and 15–22. Five 510-result operations
+(10–14) were explicitly waived. Larger editions remain unverified; no match cap.
+102/306 results: two previews, publication, two updates per size; realistic covers,
+complete ranking tables and full payloads. Step 0 had a small incoming gateway
+payload; step 1 onward corrected that and sent 91,900 / 146,052 bytes as applicable.
+Maximum measured accepted Weekly CPU: 224.809 ms; admin: 7.180 ms. Both below the
+agreed 500/125 ms investigation thresholds. Not a permanent reliability guarantee,
+not guaranteed cold-isolate measurements, and not a promise about larger editions.
+Some wall times were 4–18 seconds because of authentication/network/database work.
+One lifecycle admin sample (step 17) was unavailable; unchanged gateway evidence
+was reused, not invented. CPU attribution used version/time-window metrics.
+
+Lifecycle: newest-first archive/feed/sitemap, private edit/public stability,
+unpublish/direct withdrawal, Trash/Restore stays private, republish, same-key replay,
+stale conflict, revision recovery, export hash integrity, permanent deletion with
+engagement retained separately, missing/forged assertion, wrong origin, CSRF, hold.
+Retained valid local export/restore and retention tests; no new production restore.
+Original step 23 retention check reused prior valid evidence and fresh real cleanup
+health instead of repeating it. It is not recorded as a new isolated live pass.
+Signed wrong-owner/expired backend JWT rejection remains local-test evidence.
+Real owner Google/TOTP evidence reused; refreshed authenticated editor/moderation
+opened successfully. Personal Gmail rejection was Google's organization boundary,
+not independent proof of Cloudflare/backend exact-owner rejection.
+Eight production boundary checks passed again: Access redirects, public API origin
+rejection and disabled workers.dev URLs. No weakened authentication or test login.
+
+TEMPORARY CLEANUP
+Temporary courtumpire-weekly-publishing-test Worker and EU database
+719b9a9c-1e07-407e-ab9f-88fdc5c4ecad deleted; both re-read as 404.
+Active AND latest production configurations have no PUBLISHING_TEST binding or
+test DB binding. Authenticated /publishing-test/ returns 404. No new persistent
+test credentials were created. Historical inactive versions must not be used as
+rollback targets if they contain the gateway. Provider backup expiry is separate
+from live deletion; no claim that provider-held copies were immediately erased.
+Local fixtures, private evidence and protected backups remain ignored and private.
+
+PRODUCTION HEALTH, 29 OCTOBER 21:35 UTC / 22:35 BERLIN
+Hourly successful 21:00:42.505 UTC / 22:00:42.505 Berlin; failed=0.
+Daily successful 03:00:12.606 UTC / 04:00:12.606 Berlin; failed=0.
+Attempts equal successes; neither overdue at inspection. These are successful
+transactional application health records, not an independent provider event-log audit.
+Schedules unchanged: 0 * * * * and 0 3 * * * (UTC).
+Production editions=0, engagement registry articles=0; both global closures=1.
+
+ROUTING AND FAILURE REPAIR
+Four original GitHub apex A targets preserved; only proxied=true and TTL=Auto.
+Full (strict) TLS, 14 original bypass routes, one Weekly catch-all route and exact
+dynamic cache-bypass expression applied. www remains DNS-only. All other 10 DNS
+records and DNSSEC configuration compare unchanged. Both Google/Cloudflare DNS
+resolvers return proxy addresses and intact MX/SPF/Google/DMARC/DKIM/NS; no DS and
+no validation error. DNSSEC remains in its prior pending state; not modified here.
+HTTP->HTTPS and www->apex redirects passed. GitHub origin TLS passed on all four IPs.
+
+Initial public browser gate found /weekly/routes.mjs missing from Worker assets,
+breaking the practice planner import. The catch-all route was immediately removed.
+Repair 2f71576 adds only that existing public navigation file to the public allowlist.
+Focused GET/HEAD/MIME/content regression passed locally, repaired Weekly deployed,
+route restored, planner module chain then loaded successfully. No article processing
+or authentication change, so expensive successful CPU tests were not repeated.
+Final 20 focused public browser checks passed: 390/768/1440 layouts, keyboard focus,
+no-JS archive, representative existing tools, no JS errors, no analytics/media
+requests without consent. Existing deeper tool-interaction tests were reused.
+Public HTTPS checks passed for archive/query URLs, Home, tools, privacy, sitemap/RSS;
+dynamic responses are no-store; nonexistent article/private paths remain unavailable.
+
+REMAINING GATES — DO NOT ENABLE WRITES YET
+Proxy cutover completed 29 October 21:29:36.668 UTC / 22:29:36.668 Berlin.
+Previous DNS-only TTL was 14,400 seconds. Earliest final drain check:
+30 October 01:29:36.668 UTC / 02:29:36.668 Europe/Berlin (return after 02:30).
+Independent resolvers already show proxy addresses, but that does not prove all
+previously cached origin answers expired. No overnight blocking wait is running.
+Then recheck independent DNS/public routing, current active versions, closures and
+health. Review/merge the one-time source/privacy/docs PR and verify Pages deployment
+and exclusions. Only after these gates pass set PUBLISHING_WRITES_OPEN=true using
+the captured current configuration. Leave comments/reactions closed. No article.
+The final source passed the pinned GitHub Pages/Jekyll container audit: 204 files,
+nine private canaries, no errors. Draft/editor/backend/test paths were excluded.
+The new remote post-merge artifact has not yet been produced or audited.
+
+ROLLBACK
+While zero editions exist: pause writes, remove only the new catch-all/bypass/cache
+entries, restore four apex A records to DNS-only TTL14400 and SSL full if needed,
+verify GitHub HTTPS/tools/redirects, restore captured private version
+92efa518-dd7d-41c8-9ebc-86042d6d4db4 and Weekly version
+248816d0-826d-44d5-87e4-9f94fcc1e650 if Worker rollback is necessary.
+Do not drop migration0004 or databases, overwrite drafts, alter mail/DNSSEC, or
+restore database backups over new data. Current cache rules/route IDs and exact
+before/after configurations are saved privately. A source merge can be reverted
+without deleting D1 content. Once articles exist, use the content-preserving
+fallback in WEEKLY-PAID-TRIAL-HANDOFF.txt; old Workers alone would hide live content.
+
+FIRST PUBLICATION — ONLY AFTER ACTIVATION CONFIRMED
+Import article JSON -> Edit -> Save private draft -> Calculate ranking changes ->
+Validate & preview -> Preview publication -> review full facts/sources/cover ->
+Publish and type the immutable edition ID. Verify live link/archive/feed/sitemap.
+For ambiguous timeouts use Check publication outcome before retrying.
+Export published article & history; use only canonical published JSON for the next
+edition, never private history/moderation data. Updates use Update published article.
+Saving/exporting alone never publishes. The first production publication/update/
+withdrawal write remains unperformed; isolated tests are not a production article.
+
+COST / DAILY CHECK
+Workers Paid active, renewal 28 November 2026; review usage/cost before renewal.
+$1/$5 usage alerts enabled; not hard spending caps; delivery not tested.
+Check Moderation > Advanced settings > cleanup health daily, and Workers CPU/errors
+and D1 usage. No proactive cleanup email alert. Daily deletion after30/90 thresholds
+normally31/91 days; outages can delay it. Encrypted exports manually expire after
+30 days; provider Time Travel follows the Paid recovery window separately.

@@ -1,5 +1,12 @@
 COURTUMPIRE — WORKERS PAID TRIAL / DIRECT PUBLISHING
-Updated 29 October 2026. Workers Paid is VERIFIED ACTIVE; live gates are IN PROGRESS.
+Updated 29 October 2026. Workers Paid is VERIFIED ACTIVE; writes remain PAUSED.
+Current results/versions/rollback: WEEKLY-DIRECT-ACTIVATION-2026-10-29.txt.
+Isolated 102/306 and management tests are complete; temporary resources removed.
+Public routing is deployed and verified after a missing navigation-module repair.
+Final DNS drain check is no earlier than 30 October 02:30 Europe/Berlin, followed
+by the held one-time source release and enabling writes only if all gates pass.
+The detailed preparation and earlier progress below are historical context;
+the dated activation record takes precedence for actual state and limitations.
 The owner completed payment. Dashboard shows Workers Paid, $5/month plus usage,
 and renewal on 28 November 2026. Renewal time/timezone, checkout tax and invoice
 total were not inspected. Do not repeat checkout or assume taxes are zero.
