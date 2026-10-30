@@ -1,0 +1,71 @@
+COURTUMPIRE DIRECT PUBLISHING — OWNER GUIDE
+Online implementation deployed 29 October 2026; publication writes remain PAUSED
+pending the final DNS-drain/release check. See WEEKLY-DIRECT-ACTIVATION-2026-10-29.txt.
+After activation this supersedes the old per-article GitHub/import/registry workflow.
+
+1. Sign in at https://admin.courtumpire.com with info@wynctec.com and MFA.
+2. Import article JSON, or Create blank edition. A blank draft needs its ID/Friday date,
+   coverage/cutoff/check timestamps, headline/deck/description, required sections,
+   verified sources and both rankings tables (honest unavailable states are allowed).
+3. Edit the normal fields or Advanced · complete JSON. Save private draft persists
+   an incomplete working copy. Open its title in Private drafts to resume.
+4. Calculate ranking changes uses the previous published edition's frozen snapshot.
+   Verify facts yourself; passing structural validation is not factual verification.
+5. Validate & preview checks the draft. Preview publication then shows the actual
+   publication rendering and branded cover. Publish requires typing the edition ID.
+6. Only a confirmed successful transaction means published. Open live article after
+   success. No GitHub commit, Codex action, build, deployment or registry sync occurs.
+
+ARTICLES AND PRIVATE TRASH
+Edit creates a separately saved private working copy. Edits and Save private draft
+leave the public version untouched. Preview publication and Update published article
+explicitly replace it. ID, edition number, original publication date and engagement
+stay fixed. URL is unchanged unless you deliberately edit the slug; old URLs redirect.
+A stale private copy is rejected if a newer publication exists. Reopen the latest
+published version and merge your changes deliberately; do not alter timestamps to
+bypass the warning. Existing correction notes must be retained.
+Unpublish withdraws HTML, archive, Home teaser, RSS, sitemap, social image and public
+engagement. It retains content, published revisions, comments and reactions privately.
+Delete → Trash has the same withdrawal effect and adds Restore/Permanently delete.
+Restore returns an UNPUBLISHED edition. Preview and Update published article republish
+it with its original identity/date/number and engagement.
+Recover revision loads historical content privately; publishing it creates a NEW
+revision. Existing correction notes remain; resolve any missing source references.
+Permanently delete is separate, requires typing the ID, removes the edition content,
+rendered HTML, cover and all published revisions. An ID/number/URL tombstone prevents
+accidental reuse. Comments/reactions remain private, explicitly NOT silently deleted.
+Use Moderation > Advanced settings > Delete withdrawn edition engagement separately
+if you also want those removed. Independently saved private drafts and local exports
+are separate copies. Provider backups may retain earlier content until their expiry.
+
+UNCERTAIN RESULTS
+A timeout is not proof of failure. Check publication outcome, then Retry same operation
+while the original request remains in memory. The same key cannot publish twice.
+After a reload, the operation key is retained, not the private article body. Check its
+outcome and reopen the latest edition before clearing the local pending marker. A late
+original request cannot bypass the server's global/per-edition version checks.
+
+EXPORT / RECOVERY
+Export published article & history downloads canonical article JSON and a PRIVATE
+history backup. Attach only the canonical published JSON to next week's generation
+chat. Never attach the history backup or moderation exports. Store private exports
+encrypted and manually delete them after 30 days as agreed; downloading is not encryption.
+Recover a saved revision and Trash > Restore cover routine recovery entirely online.
+A lost/corrupted DATABASE is disaster recovery, not routine article publishing:
+- Keep public reads/submissions closed; preserve a fresh protected full D1 export.
+- Validate a bounded per-edition backup in a new LOCAL DB:
+  node scripts/weekly-restore-local.mjs PRIVATE_BACKUP.json .weekly-private/new-recovery
+- This verifies hashes/metadata, re-renders trusted JSON, restores URL/revision history
+  and registers the edition INACTIVE in a transaction. Existing IDs cannot be overwritten.
+- The convenience recovery is bounded to 35 revisions/48 statements; large histories
+  require a protected full D1 export/Time Travel recovery instead. No automatic purge.
+- A production database restore needs a deliberate recovery approval, reapplication of
+  deletions/retention, engagement reconciliation, closed controls and verification.
+  Provider Time Travel is seven days on Free and 30 days on Paid; verify the active
+  subscription before relying on that window. This is not the private export policy.
+
+LOCAL FALLBACK
+Use the existing offline editor, validate and Prepare for publication / export.
+Import that JSON into the online editor to publish. Offline export alone is never live.
+The previous CLI publication tools are retained for historical recovery only; do not run
+static promotion or manual registry sync for editions managed by direct publishing.

@@ -1,5 +1,37 @@
 COURTUMPIRE WEEKLY — ZERO-EDITION RELEASE, 29 OCTOBER 2026
 
+COMPLETED
+PR https://github.com/m-khawaga/courtumpire-landing/pull/12 merged at 17:06:38 UTC.
+Release head fd39d1ee6a60ca9307a0d5fed2e99da4bf00fa89;
+production merge 37952f47c5610b4356457cc47c4e33a9282b8065.
+Legacy Pages build completed successfully at 17:07:55 UTC. Live Weekly:
+https://courtumpire.com/weekly/ — First edition coming soon.
+The exact live registry was downloaded, compared with the reviewed local registry,
+and synchronized through owner/MFA moderation. UI confirmed Registry synchronized;
+read-only primary D1 verification confirmed version
+4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945,
+zero articles, zero comments, comments_closed=1 and reactions_closed=1.
+Public-host browser check passed: correct empty page/navigation, no console errors,
+reading after rejecting analytics, and mobile layout with no horizontal overflow.
+Eleven public HTTPS routes passed, seven excluded private/demo paths returned 404,
+unknown article API returned 404 with the exact public-origin CORS header and
+public-origin preflight returned 204. This HTTP Origin test is not a live browser
+article-form submission: zero editions means no public form is available. Reuse
+the completed isolated real Turnstile/engagement tests; a first real article needs
+its separately approved publication and public form smoke check before opening.
+
+Final local official Pages audit: 204 files, nine private canaries excluded, no
+findings. Actual GitHub build artifact was downloaded and independently scanned:
+204 files, no private/source/test-auth exposure. Byte comparison initially found
+Windows CRLF versus Git LF differences in 139 files and expected Jekyll deployment
+URL/revision metadata in assets/index.html; after checking precisely those
+differences, there were no unexplained content differences. No audit result is
+claimed from the two earlier failed attempts before Docker was available/accessible.
+Private evidence: .weekly-private/release-2026-10-29/ (HTTP checks, actual artifact,
+comparison report, live registry and screenshots). Existing private drafts/fixtures
+remain local. No Worker deployment, schedule change, mail/DNSSEC change or paid
+activation occurred. Both existing Worker deployment versions remain unchanged.
+
 The owner authorized this release after the authentication repair and actual
 production cleanup gates. This report supersedes the pending-cleanup status in
 WEEKLY-ACTIVATION-STATUS.txt; that historical evidence remains preserved.

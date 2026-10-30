@@ -19,7 +19,10 @@ export function createPrivateHandler(deps={}){
    // Origin binding and signature validation apply to every route, including assets and service forwarding.
    const actor=await (deps.owner||owner)(request,env);
    if(url.origin!==env.ADMIN_ORIGIN)fail(403,'Admin origin rejected.');
-   if(url.pathname==='/admin'||url.pathname.startsWith('/admin/')){
+   if(env.DIRECT_PUBLISHING==='true'&&url.pathname==='/authoring/ranking-context.json'){
+    if(!env.WEEKLY)fail(503,'Publication storage unavailable.');
+    const target=new URL(request.url);target.pathname='/admin/api/publishing/ranking-context';response=await env.WEEKLY.fetch(new Request(target,request));
+   }else if(url.pathname==='/admin'||url.pathname.startsWith('/admin/')){
     if(!env.WEEKLY)fail(503,'Moderation is not activated. Private drafts remain available.');
     response=await env.WEEKLY.fetch(request);
    }else if(url.pathname==='/private/api/session'&&request.method==='GET'){
@@ -67,7 +70,7 @@ export function createPrivateHandler(deps={}){
        }
       }
       const row=await q('SELECT * FROM drafts WHERE id=?',savedId).first();
-      response=json({...rowJSON(row),validation:validate(b.article),publication:'Private working copy only. Export and GitHub review are required.'},b.id===null?201:200);
+      response=json({...rowJSON(row),validation:validate(b.article),publication:env.DIRECT_PUBLISHING==='true'?'Private working copy only. Preview publication and confirm Publish or Update in the admin.':'Private working copy only. Export and GitHub review are required.'},b.id===null?201:200);
      }
     }else fail(404,'Not found.');
    }else if(['GET','HEAD'].includes(request.method)){

@@ -16,6 +16,7 @@ backend/private-admin/assets.generated.mjs
 backend/private-admin/.dev.vars*
 
 worker-configuration.d.ts
+backend/src/public-assets.generated.mjs
 .wrangler/
 
 design-qa.md

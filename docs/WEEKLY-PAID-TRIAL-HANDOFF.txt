@@ -1,0 +1,256 @@
+COURTUMPIRE — WORKERS PAID TRIAL / DIRECT PUBLISHING
+Updated 29 October 2026. Workers Paid is VERIFIED ACTIVE; writes remain PAUSED.
+Current results/versions/rollback: WEEKLY-DIRECT-ACTIVATION-2026-10-29.txt.
+Isolated 102/306 and management tests are complete; temporary resources removed.
+Public routing is deployed and verified after a missing navigation-module repair.
+Final DNS drain check is no earlier than 30 October 02:30 Europe/Berlin, followed
+by the held one-time source release and enabling writes only if all gates pass.
+The detailed preparation and earlier progress below are historical context;
+the dated activation record takes precedence for actual state and limitations.
+The owner completed payment. Dashboard shows Workers Paid, $5/month plus usage,
+and renewal on 28 November 2026. Renewal time/timezone, checkout tax and invoice
+total were not inspected. Do not repeat checkout or assume taxes are zero.
+The execution notes below distinguish the original plan from verified progress.
+Owner update, 29 October: omit the five 510-result live stress operations. Accept
+the completed 102/306-result evidence; larger editions remain unverified. This is
+a test-scope change only, not a match-count cap or relaxation of server validation.
+Complete the nine original management/security checks, then remove the temporary
+gateway/binding/test resources before authorized production activation.
+This replaces the Free-only CPU gate, not the editorial or security requirements.
+Keep the optimized b7498f5 implementation. No reduced-results prompt, 50-match cap,
+resumable preparation redesign, real article or public dummy publication.
+
+ACCOUNT AND CURRENT HOLD
+Use account a5646237c003a20af52d12c61b4bd0b7 only; existing zone
+d885d7e16db53e3914cbc1f278af7289. Existing editor: https://admin.courtumpire.com
+Fresh read-only deployment check retained the restored versions:
+  courtumpire-private-admin 92efa518-dd7d-41c8-9ebc-86042d6d4db4
+  courtumpire-weekly        248816d0-826d-44d5-87e4-9f94fcc1e650
+Do NOT deploy the latest uploaded version by default. Capture active versions,
+configuration, routes, cache rules and protected backups again before activation.
+Publishing remains held; comments/reactions remain globally closed.
+Reuse Weekly EU DB c55230e5-f748-4c57-ba32-21e7de4a2f01 and private EU drafts DB
+ae856293-8b0e-4a42-89dd-5d148bebd329. Migration 0004 was applied previously:
+inspect its migration record/schema rather than blindly recreating it or the DBs.
+Preserve credentials, Access owner/MFA checks, bindings and cleanup schedules.
+
+OWNER PAYMENT — COMPLETED; REFERENCE ONLY
+https://dash.cloudflare.com/a5646237c003a20af52d12c61b4bd0b7/workers/plans
+Select Workers Paid in this account's Workers & Pages / Plans page. Review the
+monthly US$5 base, usage pricing and checkout taxes. Complete payment privately.
+Do not choose a domain Pro plan, annual commitment, trial of another product,
+Browser Run, Email Routing or additional services. Stop if checkout differs.
+Tell Codex that Workers Paid is active; do not share card data or payment tokens.
+Then verify the subscription in the account dashboard before any Paid deployment.
+The connector's subscriptions endpoint currently returns 403. The account setting
+default_usage_model=standard is NOT proof that a paid subscription is active.
+No new billing credential is needed: use the authenticated dashboard if necessary.
+
+CURRENT PRICING AND TRIAL REGISTER
+Workers Paid: minimum US$5/month/account; 10 million requests and 30 million CPU
+milliseconds/month included. Overage: $0.30/million requests and $0.02/million CPU
+milliseconds. Both Workers and other existing account usage share the allowances.
+No separate Worker egress charge. A service-binding request does not make its CPU
+free. Check actual billing categories, not just the number of browser requests.
+D1 on Paid: 25 billion rows read/month, 50 million rows written/month and 5 GB
+storage included; overage $0.001/million rows read, $1/million rows written and
+$0.75/GB-month. This affects BOTH existing databases; no migration of region is
+required. Maximum database size changes from 500 MB Free to 10 GB Paid. Time Travel
+is 30 days Paid versus 7 days Free; it is not the manual private-export policy.
+Other Workers-platform products have their own metered allowances. Do not enable
+them. Observability logging remains disabled; existing CPU metrics are sufficient
+for the bounded tests. If logs are later enabled, review their separate pricing,
+including announced changes during this trial, and prevent private content logging.
+Taxes depend on the checkout billing jurisdiction/tax treatment; do not infer them
+from Europe/Berlin. The actual tax amount, invoice currency and renewal date must
+be recorded from checkout/subscription after owner payment, never guessed.
+
+Trial register:
+  Subscription active: VERIFIED in the exact account dashboard on 29 October 2026
+  Monthly renewal: 28 November 2026; time/timezone not displayed
+  Exact subscription start: not inspected
+  Base / checkout tax / total: $5 base; checkout tax and total not inspected
+  Monthly review: before each actual renewal; decision after up to three months
+  Automatic cancellation: NONE; subscription renews unless owner cancels
+At each review inspect Workers requests/CPU, D1 reads/writes/storage, estimated
+account charges, invoice and error/CPU-limit rates. Compare with the previous month
+and the published-edition volume. Check both Workers and both DBs, not just Weekly.
+Record keep/downgrade decision. Before cancellation follow the fallback below.
+
+ALERTS — ALREADY CONFIGURED, NOT A SPENDING CAP
+Two enabled billing_budget_alert policies were created and re-read for this account:
+  USD 1 usage: 165b88c8e8ce498691205a3feeb388b0
+  USD 5 usage: 0e96e2bae8b047e1bf29c76e6106594c
+Recipient: info@wynctec.com. Delivery itself has not been tested.
+These thresholds concern usage charges, excluding the $5 base subscription.
+Budget evaluation uses prior-day usage; alerts may arrive after spend has occurred.
+They do not stop traffic, CPU or billing. After upgrade inspect any default alerts
+and avoid duplicates. There is no promised account-wide hard dollar cap. Per-request
+CPU limits and authenticated write limits reduce exposure but do not cap public
+request volume or total D1 storage. Review usage daily during the initial trial.
+
+LOCAL SAFEGUARDS / MEASURED PAID GATE
+Proposed CPU limits: Weekly 1000 ms/request; private admin 250 ms/request.
+Investigation/stop threshold: Weekly >=500 ms or private admin >=125 ms on any
+bounded live sample, any CPU-limit error, or any failed/security-invalid operation.
+These thresholds preserve at least 50% headroom to the configured hard limits.
+They are provisional budgets, not measured Paid results. The old 8 ms Free gate
+is superseded. Do not silently raise a threshold after a failed sample.
+The prior optimized 102-result preview flow reached 53.861 ms on Weekly and
+6.987 ms on private admin. Those are flow-correlated samples, not component traces
+or proof of publication/update CPU. Local timings are not Cloudflare CPU evidence.
+
+New server-side owner limits use shared D1 atomic counters after auth and CSRF:
+  Preview: 20 attempts / fixed 10 minutes
+  Publish/update: 30 attempts / fixed 10 minutes
+  Unpublish/Trash/Restore/permanent deletion: separate 60 / fixed 10 minutes
+  History export: 6 / fixed 10 minutes
+Counters use keyed owner hashes, not email/IP storage. Requests at a window boundary
+can use two adjacent allowances. Outcome checks remain available; retries count as
+attempts but cannot duplicate a committed operation. Counter failure denies work.
+Existing engagement limits stay unchanged. Limits do not weaken validation or MFA.
+Existing bounds remain: 800 KB request, 500 KB canonical article, 1.1 MB rendered
+article, 240 KB cover data URL (1200x630 PNG), 1.9 MB stored-row budget. Schema has
+bounded sources/tables/rows. No artificial match-count reduction is introduced;
+an over-size edition needs a clear error/review, never silent truncation.
+
+TESTS COMPLETED LOCALLY
+10/10 focused tests passed: shared rate limits/concurrency/reset/privacy, auth/CSRF
+before rate consumption, outage fail-closed, and the existing publication suite.
+The latter covers two editions/order, preview, transaction/registry consistency,
+stale edits/idempotency, immutable metadata, frozen comparisons, aliases, unpublish,
+Trash/Restore/permanent deletion, retained engagement, ambiguous result recovery,
+failed batch atomicity, export/restore, public routing/RSS/sitemap and write hold.
+These are local functional tests. Live progress is recorded separately below;
+it does not replace the remaining CPU, lifecycle or activation gates.
+Preserve earlier successful real owner/MFA/security evidence and its limitations.
+
+ISOLATED LIVE TEST RESOURCES — CREATED WITH APPROVAL; TEMPORARY
+After payment verification, these temporary resources were created in the SAME account:
+  Worker: courtumpire-weekly-publishing-test
+  EU D1: courtumpire-weekly-publishing-test (schema 0001–0004, dummy data only)
+  Temporary protected admin service binding to the test Worker
+Test D1 ID: 719b9a9c-1e07-407e-ab9f-88fdc5c4ecad (EU/EEUR).
+No new credential was created. Existing authorization evidence and a derived,
+test-scoped signing key travel only through the protected internal service binding.
+All 24 harness operations passed locally, including production-binding rejection.
+Live first 102-result preview passed: 166.693 ms test CPU / 5.344 ms admin CPU.
+That initial request carried only a step number, so it did not establish full-body
+admin transport cost. Source 075bab4 corrects the test harness, without changing
+the approved admin gateway. The second preview carried 91,900 bytes and passed:
+140.925 ms test CPU / 5.177 ms admin CPU. The first isolated publish also passed
+functionally and created matching edition/registry records: 110.744 ms test CPU /
+5.687 ms admin CPU. Two 102-result updates passed at 122.383/5.913 ms and
+132.090/4.067 ms respectively, preserving immutable metadata and snapshots.
+Production still has zero editions and zero registry articles. Public dummy URL
+returned 404. Comments and reactions remain closed. No rollout routing changed.
+Metrics report the new test Worker name as __unknown__; scriptVersion matches
+the captured deployment and identifies the samples. Each quoted group contains
+one request and zero errors. Harness costs include extra checks and are a
+conservative test measurement, not a component-level production trace.
+Live test gateway remains temporary while the serialized checks continue.
+Do not treat these early results as completion of the Paid activation gates.
+No public custom domain, route, workers.dev/preview URL, schedule or private-drafts
+database binding for the test Worker. Reuse server-side authorization configuration;
+no new credential. Any required copy of an existing secret stays server-side and is
+removed with the test Worker. Do not alter the original production secret.
+Before creation enumerate these names to the owner. Before test deployment require
+an explicit non-production DB ID and a test marker checked by the harness. Reject
+the production IDs. Keep all harness URLs behind the existing owner/MFA protection
+and validate auth again in the test Worker. Public ingress cannot reach the harness.
+Do not reuse a production registry or temporarily insert dummy rows into production.
+
+Original matrix (510-result portion explicitly waived above): first/repeated 102-, 306- and 510-result
+full-content preview/publish/update operations, with 10+10 ranking rows, real
+renderer/validator and realistic PNG covers. Use only clearly labelled dummy facts.
+Bound the matrix to two previews, one publish and two updates per size (15 expensive
+operations), plus one two-edition lifecycle/recovery scenario. Respect rate windows;
+do not bypass the production limiter for the test. Stop on the budgets above.
+Measure actual CPU for BOTH Workers with identifiable request/time windows; include
+first requests after deployment and subsequent requests. Do not claim a guaranteed
+cold isolate. Record wall time separately. If telemetry cannot isolate operations,
+the CPU gate is inconclusive regardless of HTTP success. Do not repeat speculatively.
+Exercise update, private edit/public stability, ID/date/URL retention, newest-first,
+RSS/sitemap, aliases, unpublish/direct-URL withdrawal, Trash/Restore, separate purge,
+retained engagement, stale conflict, repeated click, uncertain outcome and recovery.
+Check real-public-host dummy URLs remain unavailable. Test unauthorized/expired/
+invalid-token, CSRF and alternative-ingress rejection without weakening Access.
+Export/restore dummy history in isolation and verify hashes/identity/revisions.
+Exercise retention against isolated expired dummy records with the candidate limits;
+check actual production hourly/daily health and overdue/failure status separately.
+Do not alter schedules to accelerate a gate or infer success from elapsed time.
+Delete only the temporary test Worker/DB/binding after recording sanitized results;
+provider-managed backup expiry is separate. Confirm no test secret/binding remains.
+
+PRODUCTION ACTIVATION AFTER GATES
+Capture current baseline/settings and encrypted backups, verify source/bundle hashes,
+then deploy only the reviewed new bundles, with DIRECT_PUBLISHING=true and writes
+false. Merge settings into current configuration; do not apply stale proposed config
+wholesale. Preserve production secrets, database IDs, domains and scheduled events.
+Recheck fresh owner/MFA/editor/moderation and unauthorized publishing endpoints.
+After isolated CPU/write/lifecycle and real public/private separation gates pass,
+reconcile the already-approved apex proxy, Full (strict), route/bypass/cache rules
+in the original handoff against ACTUAL current state. Apply only missing authorized
+changes. Preserve GitHub Pages origin, www, mail, TXT records and DNSSEC.
+Review/merge the one-time website/privacy/docs source release only after those gates.
+Verify origin and public HTTPS/redirects, existing tools/pages, analytics consent,
+empty archive, feeds/sitemap, cache headers and DNS transition. Keep zero editions.
+Then enable PUBLISHING_WRITES_OPEN. Comments/reactions remain globally closed until
+their separate live gates pass. This task never publishes a real article.
+Report operations tested on the isolated deployment separately from the FIRST real
+production publication, which remains unperformed until the owner chooses it.
+
+ROLLBACK / RETURN TO FREE
+On activation failure keep writes held and submissions closed. Restore the captured
+active versions/configuration and only the routing/cache/proxy settings changed in
+this rollout. Do not remove additive migration 0004, delete DBs or restore an old DB
+over newly saved data. Preserve a protected export before any data recovery.
+Once live articles exist, an old pre-direct-publishing Worker alone is NOT a safe
+rollback: it would hide those articles. Use the content-preserving fallback below.
+
+Before an elective Free downgrade:
+1. Pause publishing; export both D1 databases securely and verify a local restore.
+   Export canonical published articles, immutable metadata, snapshots, alias map,
+   covers and history separately. Keep drafts/engagement/backups private.
+2. Materialize only status=published articles into an isolated static build using
+   the reviewed renderer and preserved original ID/editionNumber/publishedAt/slug.
+   Do NOT run the draft-create CLI and reassign publication metadata. Reproduce
+   archive, canonical/direct links, redirects, cover files, RSS and sitemap. Keep
+   unpublished/trashed/deleted content absent and historical withdrawals unavailable.
+   Run actual packaging/privacy and link tests. Compare with the published registry.
+3. Deploy and verify that static GitHub Pages snapshot before removing dynamic
+   publication routing. Reconcile engagement registration to the same IDs. Preserve
+   D1 data and test the original editor/moderation/reader backend under Free CPU and
+   daily D1 quotas. Disable operations that do not fit; do not just lower their limit.
+4. Full server-side previews/publish/update already exceed Free's 10 ms allowance.
+   They must be disabled on Free unless a later independently tested change fits.
+   Offline validation/edit/export and the reviewed static build/deployment workflow
+   become the publishing fallback. Routine online publishing is then unavailable.
+5. Check BOTH DBs <=500 MB each, account storage <=5 GB, daily rows/requests and
+   scheduled cleanup CPU/quotas. Free exhaustion can interrupt moderation/draft
+   saving/engagement. Keep encrypted private archives; never prune owner content
+   silently to meet quotas. Resolve any storage blocker BEFORE billing downgrade.
+6. Only after public URLs/content and private recovery are verified, owner changes
+   the subscription to Free. Verify effective date, limits and Time Travel window.
+   Preserve articles, drafts, engagement and mail/DNSSEC. No automatic cancellation.
+This is a prepared recovery sequence using existing render/export/restore tools,
+not a deployed one-click downgrade or a claim that a billing-only change is safe.
+
+FIRST ARTICLE — AFTER ACTIVATION IS CONFIRMED
+Sign in with owner/MFA; Import article JSON; Edit; Save private draft; Validate &
+preview; Calculate ranking changes using the previous published edition if any;
+Preview publication; inspect full results/rankings/sources/cover and confirm Publish
+with the edition ID. Open live article and verify archive/RSS/sitemap. A timeout
+requires Check publication outcome before retrying. Export the published JSON for
+the next edition's comparison. Future edits use Edit then Update published article;
+saving alone does not publish. Structural validity never proves factual accuracy.
+
+OFFICIAL REFERENCES (checked 29 October 2026; recheck at checkout)
+https://developers.cloudflare.com/workers/platform/pricing/
+https://developers.cloudflare.com/workers/platform/limits/
+https://developers.cloudflare.com/d1/platform/pricing/
+https://developers.cloudflare.com/d1/platform/limits/
+https://developers.cloudflare.com/billing/manage/budget-alerts/
+https://developers.cloudflare.com/changelog/post/2026-06-15-budget-alerts-default-on/
+https://developers.cloudflare.com/billing/understand/sales-tax/
+https://developers.cloudflare.com/billing/understand/billing-policy/
