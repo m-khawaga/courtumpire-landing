@@ -7,7 +7,7 @@ const destination=path.resolve('dist');if(destination!==path.join(process.cwd(),
 fs.rmSync(destination,{recursive:true,force:true});fs.mkdirSync(destination,{recursive:true});
 function copy(file){const source=path.resolve(file),target=path.join(destination,file);if(!source.startsWith(process.cwd()+path.sep)||fs.lstatSync(source).isSymbolicLink())throw Error('Unsafe asset '+file);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(source,target);}
 for(const route of publicPaths)copy(route==='/'?'index.html':route.slice(1)+(route.endsWith('/')?'index.html':''));
-for(const file of ['styles.css','analytics.js','robots.txt','sitemap.xml','CNAME','weekly/weekly.css','weekly/weekly.mjs','weekly/engagement.mjs','weekly/dates.mjs','assets/weekly/LICENSE.txt','weekly/feed.xml','weekly/registry.json'])copy(file);
+for(const file of ['styles.css','analytics.js','robots.txt','sitemap.xml','CNAME','weekly/weekly.css','weekly/weekly.mjs','weekly/engagement.mjs','weekly/dates.mjs','weekly/embedded.mjs','weekly/embedded.css','assets/weekly/LICENSE.txt','weekly/feed.xml','weekly/registry.json'])copy(file);
 function assets(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name);if(entry.isDirectory())assets(file);else if(/\.(png|jpe?g|webp|svg|ico|woff2?|mp4|webm|vtt|css|mjs|js|json)$/i.test(file)&&!/(?:^|[\\/])(routes|site-config)\.mjs$/.test(file))copy(file);}}
 for(const dir of ['assets','practice','tools'])assets(dir);
 // Browser-side practice rendering still imports the public navigation registry.
