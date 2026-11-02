@@ -1,0 +1,74 @@
+/* Every rule is opt-in. Ordinary website navigation and print layouts are unchanged. */
+@media screen {
+html[data-cu-app="1"] {
+  --ink:#05111b; --navy:#101f2d; --navy-light:#1a2938; --card:#101f2d;
+  --white:#f7f9fc; --grey:#b8c0d0; --line:#304354; --green:#dfff00;
+  --cu-action:#78adff; --cu-button:#0062e6; --cu-selected:#172e49;
+  --weekly-muted:var(--grey); --weekly-border:var(--line);
+  color-scheme:dark; scroll-padding-top:16px; scrollbar-gutter:auto;
+}
+html[data-cu-app="1"][data-cu-theme="light"] {
+  --ink:#fafbfd; --navy:#edf1f6; --navy-light:#e7ebf1; --card:#edf1f6;
+  --white:#080d18; --grey:#555c70; --line:#cfd6e1; --green:#548417;
+  --cu-action:#0062e6; --cu-selected:#e4eeff; color-scheme:light;
+}
+html[data-cu-app="1"] body {background:var(--ink);color:var(--white);line-height:1.65;font-family:Roboto,Arial,sans-serif}
+html[data-cu-app="1"] :is(.site-header,.breadcrumbs,.app-invite,.weekly-teaser,.ad-slot,.footer-columns,.site-footer .footer-links>a[href="/site-map/"],body[data-page="scoreboard"] #match-setup,body[data-page="scoreboard"] #scoreboard,.cu-native-score-link,.task-card:has(.cu-native-score-link)) {display:none!important}
+html[data-cu-app="1"] .site-footer {background:var(--ink);padding:12px 0;border-color:var(--line)}
+html[data-cu-app="1"] .footer-bottom {padding:12px 0;border:0}
+html[data-cu-app="1"] .footer-links {gap:12px 20px;justify-content:center}
+html[data-cu-app="1"] .container {width:100%;max-width:820px;padding-inline:20px}
+html[data-cu-app="1"] :is(.practice-page,.weekly-page) {padding-top:16px;padding-bottom:24px;overflow-wrap:anywhere}
+html[data-cu-app="1"] :is(.practice-intro,.weekly-masthead) {padding-top:0;margin-top:0}
+html[data-cu-app="1"] :is(h1,h2,h3,h4,strong,summary) {color:var(--white)}
+html[data-cu-app="1"] h1 {font-size:clamp(2rem,7vw,3.4rem);line-height:1.12;letter-spacing:-.035em;margin-block:16px}
+html[data-cu-app="1"] h2 {font-size:1.5rem;line-height:1.25;margin-block:18px 12px}
+html[data-cu-app="1"] :is(p,.lead,.muted,.rule-source,.weekly-note,.weekly-byline,.weekly-meta,.weekly-paragraph,.tool-form p,.tags,.activity-card p,.activity-card .meta,.activity-requirements dd,.weekly-sources li p) {color:var(--grey)}
+html[data-cu-app="1"] :is(a,.text-link,.eyebrow,.practice-intro h1 span,.weekly-masthead h1 span) {color:var(--cu-action)}
+html[data-cu-app="1"] :is(.button,button.button,.button:visited,.button:hover,.button:focus) {background:var(--cu-button);color:#fff;border:1px solid var(--cu-button);border-radius:999px;box-shadow:none;min-height:48px;padding:12px 20px}
+html[data-cu-app="1"] :is(.secondary,button:not(.button),.weekly-actions button,.plan-toolbar button,.weekly-filter-reset) {background:var(--card);color:var(--cu-action);border:1px solid var(--line);border-radius:12px;min-height:44px;padding:10px 14px}
+html[data-cu-app="1"] :is(.button.secondary,.button.secondary:hover,.button.secondary:focus) {background:var(--cu-selected);color:var(--cu-action);border-color:var(--line)}
+html[data-cu-app="1"] :is(a,button,summary):focus-visible {outline:3px solid var(--cu-action);outline-offset:3px}
+html[data-cu-app="1"] :is(input,select,textarea) {background:var(--ink);color:var(--white);border:1px solid var(--line);border-radius:10px;min-height:48px;font-size:1rem}
+html[data-cu-app="1"] :is(input[type=checkbox],input[type=radio]) {min-height:24px;accent-color:var(--cu-button)}
+html[data-cu-app="1"] :is(label,legend,dt,.filter-bottom,.filter-bottom h2) {color:var(--white)}
+html[data-cu-app="1"] :is(.task-card,.activity-card,.practice-banner,.planner-form,.tool-form,.empty,.plan-block,.quiz-panel,.weekly-glance .weekly-paragraph,.weekly-data-cards article,.weekly-sources-disclosure,.weekly-table,.weekly-table caption,.weekly-table tbody tr:nth-child(even),.weekly-result-cards article,.weekly-comment,.weekly-engagement,.weekly-reaction-summary,.activity-requirements,.notice,.weekly-section table) {background:var(--card);border-color:var(--line);color:var(--white);box-shadow:none}
+html[data-cu-app="1"] :is(.planner-grid,.tool-columns,.task-grid,.activity-grid,.weekly-glance,.weekly-rankings,.detail-grid) {grid-template-columns:minmax(0,1fr);gap:16px}
+html[data-cu-app="1"] :is(.planner-form,.tool-form,.task-card,.practice-banner,.plan-block,.quiz-panel) {padding:18px;border-radius:16px;max-width:100%}
+html[data-cu-app="1"] :is(.tool-explanation,.editorial,.related) {margin-block:28px}
+html[data-cu-app="1"] .weekly-article {max-width:100%;color:var(--white);--weekly-border:var(--line);--weekly-muted:var(--grey);color-scheme:inherit}
+html[data-cu-app="1"] .weekly-publication {border:0;display:block;padding:0}
+html[data-cu-app="1"] .weekly-publication .eyebrow {font-size:1.25rem;letter-spacing:-.03em;text-transform:none;color:var(--white);font-weight:700}
+html[data-cu-app="1"] .weekly-publication .weekly-strapline {display:none}
+html[data-cu-app="1"] .weekly-article .weekly-publication span {color:var(--white)}
+html[data-cu-app="1"] .weekly-article .weekly-publication .cu-brand-umpire {color:var(--green)}
+html[data-cu-app="1"] .weekly-article .weekly-masthead h1 {font-size:clamp(2rem,7vw,3rem);line-height:1.18;margin-block:22px 16px}
+html[data-cu-app="1"] :is(.weekly-article .weekly-deck,.weekly-article .weekly-paragraph) {font-size:1.05rem;line-height:1.7}
+html[data-cu-app="1"] .weekly-article .weekly-section {margin:28px 0;scroll-margin-top:16px;border-top:1px solid var(--line);padding-top:20px}
+html[data-cu-app="1"] .weekly-article .weekly-section h2 {font-size:1.45rem;line-height:1.25}
+html[data-cu-app="1"] :is(.weekly-sources li,.weekly-article .weekly-table,.weekly-table th,.weekly-table td) {border-color:var(--line);scroll-margin-top:16px}
+html[data-cu-app="1"] .weekly-article .weekly-table thead th {color:var(--cu-action)}
+html[data-cu-app="1"] .weekly-archive article {border:0;border-bottom:1px solid var(--line);border-radius:0;padding:20px 0;background:transparent}
+html[data-cu-app="1"] .weekly-archive article:first-of-type>a:last-child {display:block;text-align:center;background:var(--cu-button);color:#fff;border-radius:999px;padding:12px 20px;min-height:48px;text-decoration:none;margin-top:16px}
+html[data-cu-app="1"] .weekly-archive h3 {font-size:1.8rem;line-height:1.2}
+html[data-cu-app="1"] .weekly-archive h3 a {color:var(--white);text-decoration:none}
+html[data-cu-app="1"] .weekly-kind {color:var(--grey)}
+html[data-cu-app="1"] :is(.weekly-refs a,.weekly-source-back,.weekly-category,.weekly-snapshot-note,.weekly-table caption span) {color:var(--grey)}
+html[data-cu-app="1"] .weekly-article>.weekly-contents {display:none}
+html[data-cu-app="1"] .weekly-app-contents {display:block;background:var(--card);border:0;border-radius:16px;padding:4px 18px;margin-block:20px}
+html[data-cu-app="1"] .weekly-app-contents summary {min-height:52px;cursor:pointer;font-weight:700;padding-block:12px}
+html[data-cu-app="1"] .weekly-app-contents nav {display:grid;gap:12px;padding-block:12px}
+html[data-cu-app="1"] .weekly-contents {border-radius:16px;background:var(--card);padding:16px;gap:8px;scroll-margin-top:16px}
+html[data-cu-app="1"] .weekly-contents a {font-size:.95rem;min-height:36px}
+html[data-cu-app="1"] :is(.consent-panel,.consent-panel p) {background:var(--card);color:var(--white);border-color:var(--line)}
+html[data-cu-app="1"] .courtside-header {background:var(--ink);color:var(--white)}
+html[data-cu-app="1"] .weekly-preview {background:var(--card);color:var(--white);border:1px solid var(--line)}
+html[data-cu-app="1"] .weekly-article .weekly-form {background:var(--card);border-color:var(--line);padding:18px;grid-template-columns:minmax(0,1fr)}
+html[data-cu-app="1"] .weekly-article [data-engagement]>[role=status] {background:var(--card);color:var(--grey);border-color:var(--line)}
+html[data-cu-app="1"] :is(button[aria-pressed=true],.quiz-options label:has(input:checked)) {background:var(--cu-selected);color:var(--cu-action);border-color:var(--cu-action)}
+html[data-cu-app="1"] .weekly-ranking-warning {color:#ffb4ab}
+html[data-cu-app="1"][data-cu-theme="light"] .weekly-ranking-warning {color:#a22620}
+html[data-cu-app="1"][data-cu-theme="light"] :is(.weekly-reactions img,.weekly-comment-reactions img) {filter:none}
+html[data-cu-app="1"] .form-pair {grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+html[data-cu-app="1"] .weekly-table {overflow-x:auto}
+}
