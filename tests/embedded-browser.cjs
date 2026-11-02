@@ -55,6 +55,12 @@ const origin='http://127.0.0.1:4187',output='.local-review/embedded';
     await contents.locator('summary').click();
     await contents.getByRole('link',{name:'Selected results',exact:true}).click();
     check(new URL(page.url()).hash==='#results','article anchors still work');
+    // Older published rows contain stored article HTML without the new disclosure.
+    // Simulate that markup only in the local browser fixture, keeping its source nav.
+    await page.evaluate(()=>document.querySelector('.weekly-app-contents').remove());
+    check(await page.locator('.weekly-contents').isVisible(),'older stored article retains its contents navigation');
+    await page.locator('.weekly-contents').getByRole('link',{name:'Selected results',exact:true}).click();
+    check(new URL(page.url()).hash==='#results','older article source anchors remain usable');
     await page.goto(origin+'/play-score/?cu-app=1&cu-theme=light');
     for(const link of await page.locator('a[href*="/play-score/scoreboard/"]').all())check(!await link.isVisible(),'website live-score navigation is hidden in app presentation');
     await page.goto(origin+'/play-score/scoreboard/?cu-app=1&cu-theme=light');
