@@ -1,3 +1,4 @@
+import {saveEmbeddedPdf} from '../tools/embedded-pdf.mjs';
 import {track} from '../tools/usage.mjs';
 import { activities, byId } from './catalogue.mjs';
 import { defaults, SESSION_KEY, generate, conflicts, add, swapOptions, total, load, save, summary } from './core.mjs';
@@ -160,7 +161,17 @@ document.addEventListener('click',async event => {
   if (button.hasAttribute('data-exit')) { courtsideIndex = null; renderPlan(); $('[data-start]').focus(); return; }
   if (button.hasAttribute('data-next')) { courtsideIndex++; renderPlan(); $('[data-next]').focus(); return; }
   if (button.hasAttribute('data-previous')) { courtsideIndex--; renderPlan(); $('[data-previous]').focus(); return; }
-  if (button.hasAttribute('data-print')) { window.print(); return; }
+  if (button.hasAttribute('data-print')) {
+    if (document.documentElement.dataset.cuNativePdf !== '1') { window.print(); return; }
+    try {
+      const prepared = document.createElement('template');
+      prepared.innerHTML = printReport(session);
+      const report = prepared.content.firstElementChild;
+      document.body.append(report);
+      try { await saveEmbeddedPdf(report); } finally { report.remove(); }
+    } catch { announce('Could not prepare the practice plan PDF. Try again.'); }
+    return;
+  }
   if (button.hasAttribute('data-copy')) {
     try { await navigator.clipboard.writeText(summary(session)); announce('Session summary copied.'); }
     catch {

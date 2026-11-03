@@ -93,3 +93,8 @@
 .quiz-panel button:disabled{opacity:.6;box-shadow:none}
 #download-card{margin-block:12px;min-height:48px}
 body[data-page="quiz"] .practice-intro{padding-bottom:12px}
+
+.quiz-settings{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end}
+.quiz-settings :is(select,button){box-sizing:border-box;height:max(48px,3rem);min-height:0;padding-block:0;line-height:1.25}
+.quiz-settings button{display:inline-flex;align-items:center;justify-content:center;text-align:center}
+@media(max-width:20em){.quiz-settings{grid-template-columns:minmax(0,1fr)}.quiz-settings button{justify-self:start}}
