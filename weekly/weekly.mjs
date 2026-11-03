@@ -75,7 +75,9 @@ if(article){
       const card=cards.get(row.dataset.resultIndex), values=[...row.cells].map(clean);
       const value=key=>values[labels.indexOf(key)]||'';
       const players=element('div');players.className='weekly-result-players';
-      const winner=element('strong',value('winner')+' (winner)');
+      const winner=element('strong',value('winner'));
+      const badge=element('span','Won');badge.className='weekly-result-winner';
+      winner.append(' ',badge);
       players.append(winner,element('span',value('opponent')));
       const score=element('span',value('score'));score.className='weekly-result-score';score.setAttribute('aria-label','Score: '+value('score'));
       const info=element('p',[value('round'),value('date')].filter(Boolean).join(' · '));info.className='weekly-note';
