@@ -20,6 +20,24 @@
       "icon": "quiz"
     },
     {
+      "id": "helper",
+      "title": "Understand scoring",
+      "description": "Check who serves next in a game or tiebreak",
+      "category": "Play & learn",
+      "order": 21,
+      "url": "https://courtumpire.com/play-score/tiebreak-calculator/",
+      "icon": "guide"
+    },
+    {
+      "id": "result",
+      "title": "Share a result",
+      "description": "Make a shareable card from a completed match",
+      "category": "Play & learn",
+      "order": 22,
+      "url": "https://courtumpire.com/play-score/result-card/",
+      "icon": "tool"
+    },
+    {
       "id": "clubs",
       "title": "Clubs & Coaches",
       "description": "Rotations, printables & checklists",

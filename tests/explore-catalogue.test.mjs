@@ -5,9 +5,10 @@ import {routeDefinitions} from '../practice/routes.mjs';
 import {catalogueFromRoutes,validateCatalogue,permittedToolUrl,cataloguePath} from '../practice/explore-catalogue.mjs';
 import {createPublicEntry} from '../backend/src/public-entry.mjs';
 
-test('public catalogue is derived from existing route identities and matches the bundled fallback',()=>{
+test('public catalogue includes the offline fallback and preserves educational tool access',()=>{
  const value=catalogueFromRoutes();assert.deepEqual(value,JSON.parse(fs.readFileSync('practice/explore.v1.json','utf8')));
- assert.deepEqual(value.entries.map(e=>e.id),['drills','quiz','clubs']);
+ assert.deepEqual(value.entries.map(e=>e.id),['drills','quiz','helper','result','clubs']);
+ assert.deepEqual(value.entries.filter(e=>e.category==='Play & learn').map(e=>new URL(e.url).pathname),['/play-score/umpire-challenge/','/play-score/tiebreak-calculator/','/play-score/result-card/']);
  for(const e of value.entries){assert.ok(routeDefinitions.some(r=>r.id===e.id&&'https://courtumpire.com'+r.path===e.url));assert.ok(!e.url.includes('/scoreboard/'));}
 });
 test('adding, hiding, removing and reordering real tools only changes the website catalogue',()=>{
