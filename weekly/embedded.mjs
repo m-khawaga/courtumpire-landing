@@ -41,6 +41,14 @@ export function startEmbeddedPresentation(value) {
       }
     }
   };
+  const labelPdfActions = () => {
+    if (root.dataset.cuNativePdf !== '1') return;
+    for (const button of document.querySelectorAll('[data-print-rotation],[data-print-kit],[data-print],#rules-print,#sheet-print,#checklist-print')) {
+      const label = button.matches('[data-print-kit="scoring-reference"]') ? 'Save scoring reference PDF' : 'Save PDF';
+      if (button.textContent.trim() !== label) button.textContent = label;
+    }
+  };
+  window.addEventListener('cu-native-pdf-ready', labelPdfActions);
   window.courtUmpirePresentation = {setTheme(value) {
     theme = value === 'light' ? 'light' : 'dark'; root.dataset.cuTheme = theme;
     const presented=presentationLink(location.href, location.href, theme);
@@ -102,8 +110,9 @@ export function startEmbeddedPresentation(value) {
       details.append(summary, contents);
     }
     apply();
+    labelPdfActions();
     new MutationObserver(records => {
-      if(records.some(record => record.addedNodes.length)) apply();
+      if(records.some(record => record.addedNodes.length)) { apply(); labelPdfActions(); }
     }).observe(document.body, {childList:true, subtree:true});
   };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',ready,{once:true}); else ready();

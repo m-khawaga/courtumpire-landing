@@ -82,7 +82,7 @@ html[data-cu-app="1"] :is(.cu-legal,.cu-planner-help) summary {min-height:48px;p
 html[data-cu-app="1"] .cu-legal .footer-links {padding-block:0 14px;justify-content:start}
 html[data-cu-app="1"] .cu-planner-help .tool-explanation {margin:0;padding-block:4px 14px}
 html[data-cu-app="1"] .weekly-masthead .weekly-actions {display:none}
-html[data-cu-app="1"] .quiz-settings :is(button,select) {min-height:48px}
+html[data-cu-app="1"] .quiz-settings :is(button,select) {min-height:0;padding-block:0}
 }
 
 @media screen {

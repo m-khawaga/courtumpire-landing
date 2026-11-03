@@ -154,3 +154,5 @@ body[data-page="planner"] .planner-layout {margin-top:12px}
 .planner-form #planner-priorities {margin-top:-8px}
 .planner-form legend {font-size:1rem;font-weight:700;margin-bottom:6px}
 .planner-form > button {width:100%;min-height:48px}
+
+body[data-page="clubs"] .task-card .card-actions > .button {display:inline-flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;min-height:48px;max-width:100%;padding:10px 16px;line-height:1.25;white-space:normal}
