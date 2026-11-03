@@ -1,3 +1,4 @@
+import './explore-catalogue-build.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {publicPaths} from '../practice/routes.mjs';

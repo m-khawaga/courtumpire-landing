@@ -10,9 +10,9 @@ export function canonicalResource(href) {
   return url.href;
 }
 export function nativeScoringLink(href, base) {
-  const url = new URL(href, base);
-  return url.origin === new URL(base).origin &&
-    decodeURIComponent(url.pathname).replace(/\/$/, '').toLowerCase().replace(/\/index\.html$/, '') === '/play-score/scoreboard';
+  try { const url = new URL(href, base); const path = decodeURIComponent(url.pathname).replace(/\/$/, '').toLowerCase().replace(/\/index\.html$/, '');
+    return url.origin === new URL(base).origin && (path === '/play-score/scoreboard' || path.startsWith('/play-score/scoreboard/'));
+  } catch { return false; }
 }
 export function presentationLink(href, base, theme) {
   const url = new URL(href, base);
@@ -21,8 +21,13 @@ export function presentationLink(href, base, theme) {
   return url.href;
 }
 
-if (typeof document !== 'undefined' && embeddedOptions(location.href)) {
-  let theme = embeddedOptions(location.href).theme;
+export function startEmbeddedPresentation(value) {
+  if(typeof document==='undefined')return;
+  if(window.courtUmpirePresentation){window.courtUmpirePresentation.setTheme(value);return;}
+  let theme = value==='light'?'light':'dark';
+  // One authoritative opt-in mode, also callable after a native WebView redirect/POST.
+  const style=document.createElement('link');style.rel='stylesheet';style.href='/weekly/embedded.css';
+  style.dataset.cuEmbeddedStyle='1';document.head.append(style);
   const root = document.documentElement;
   root.dataset.cuApp = '1'; root.dataset.cuTheme = theme;
   const apply = () => {
@@ -38,8 +43,11 @@ if (typeof document !== 'undefined' && embeddedOptions(location.href)) {
   };
   window.courtUmpirePresentation = {setTheme(value) {
     theme = value === 'light' ? 'light' : 'dark'; root.dataset.cuTheme = theme;
-    history.replaceState(history.state, '', presentationLink(location.href, location.href, theme)); apply();
+    const presented=presentationLink(location.href, location.href, theme);
+    if(presented!==location.href)history.replaceState(history.state, '', presented);
+    apply();
   }};
+  window.courtUmpirePresentation.setTheme(theme);
   // Existing print and PNG controls use deliberate same-origin navigation requests,
   // intercepted by the app. No JavaScript interface, native scoring or state sync.
   window.print = () => {
@@ -73,3 +81,5 @@ if (typeof document !== 'undefined' && embeddedOptions(location.href)) {
   };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',ready,{once:true}); else ready();
 }
+
+if(typeof document!=='undefined' && embeddedOptions(location.href))startEmbeddedPresentation(embeddedOptions(location.href).theme);
