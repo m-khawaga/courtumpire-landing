@@ -1,3 +1,7 @@
+if (new URLSearchParams(location.search).get('cu-app') === '1') {
+  // Keep tools usable if the public presentation asset release is still pending.
+  try { await import('../weekly/embedded.mjs'); } catch { }
+}
 const groups=[...document.querySelectorAll('.nav-group')];
 function placeMenu(group){const panel=group.querySelector('.nav-submenu');panel.style.transform='none';if(!group.open)return;const r=panel.getBoundingClientRect(),shift=r.left<12?12-r.left:r.right>innerWidth-12?innerWidth-12-r.right:0;panel.style.transform=`translateX(${shift}px)`;}
 function syncMenus(){for(const group of groups){group.querySelector('summary').setAttribute('aria-expanded',String(group.open));placeMenu(group);}}
@@ -11,6 +15,6 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'){const open=
 if(document.querySelector('[data-product-gallery]')) await import('../assets/gallery/gallery.mjs');
 const kind=document.body.dataset.page;
 if(['planner','library','activity','players'].includes(kind)){await import('./app.mjs');document.body.dataset.practiceReady='true';}
-if(['scoreboard','helper','result','quiz','rotation','checklist','kit','rules','score-sheet'].includes(kind))await import('../tools/app.mjs');
+if(['scoreboard','helper','result','quiz','rotation','checklist','kit','rules','score-sheet'].includes(kind) && !(kind==='scoreboard' && document.documentElement.dataset.cuApp==='1'))await import('../tools/app.mjs');
 
 if(kind==='contact')(await import('../tools/contact.mjs')).initContact();

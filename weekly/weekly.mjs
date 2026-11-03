@@ -1,3 +1,6 @@
+if (new URLSearchParams(location.search).get('cu-app') === '1') {
+  try { await import('./embedded.mjs'); } catch { }
+}
 const article=document.querySelector('[data-article-id]');
 if(article){
   // Filters use rendered values only; no article fetches or changes to source data.

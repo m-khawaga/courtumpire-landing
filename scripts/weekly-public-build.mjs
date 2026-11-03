@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 let shell=fs.readFileSync('weekly/index.html','utf8');
 shell=shell.replace(/<title>[\s\S]*?<\/title>/,'<title>__TITLE__</title>').replace(/<meta (?:name="(?:description|twitter:[^"]+)"|property="og:[^"]+")[^>]*>/g,'').replace(/<link rel="(?:canonical|alternate)"[^>]*>/g,'').replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g,'').replace(/(<main\b[^>]*>)[\s\S]*?<\/main>/,'$1__BODY__</main>').replace('</head>','__HEAD__<script type="module" src="/weekly/weekly.mjs"></script></head>');
-const assets={};for(const [url,file,type]of [['/weekly/weekly.css','weekly/weekly.css','text/css'],['/weekly/weekly.mjs','weekly/weekly.mjs','text/javascript'],['/weekly/engagement.mjs','weekly/engagement.mjs','text/javascript'],['/weekly/dates.mjs','weekly/dates.mjs','text/javascript'],['/weekly/privacy/','weekly/privacy/index.html','text/html']])assets[url]={body:fs.readFileSync(file,'utf8'),type};
+const assets={};for(const [url,file,type]of [['/weekly/weekly.css','weekly/weekly.css','text/css'],['/weekly/weekly.mjs','weekly/weekly.mjs','text/javascript'],['/weekly/engagement.mjs','weekly/engagement.mjs','text/javascript'],['/weekly/dates.mjs','weekly/dates.mjs','text/javascript'],['/weekly/embedded.mjs','weekly/embedded.mjs','text/javascript'],['/weekly/embedded.css','weekly/embedded.css','text/css'],['/weekly/privacy/','weekly/privacy/index.html','text/html']])assets[url]={body:fs.readFileSync(file,'utf8'),type};
 // Existing practice tools import this public navigation module through practice/routes.mjs.
 // The /weekly/* Worker route must serve it as well as the article assets.
 assets['/weekly/routes.mjs']={body:fs.readFileSync('weekly/routes.mjs','utf8'),type:'text/javascript'};
