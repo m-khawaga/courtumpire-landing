@@ -13,7 +13,7 @@ html[data-cu-app="1"][data-cu-theme="light"] {
   --cu-action:#0062e6; --cu-selected:#e4eeff; color-scheme:light;
 }
 html[data-cu-app="1"] body {background:var(--ink);color:var(--white);line-height:1.65;font-family:Roboto,Arial,sans-serif}
-html[data-cu-app="1"] :is(.site-header,.breadcrumbs,.app-invite,a[href^="https://play.google.com/store/apps/details?id=com.mahmoud.courtvoice"],.weekly-teaser,.ad-slot,.footer-columns,.site-footer .footer-links>a[href="/site-map/"],body[data-page="scoreboard"] #match-setup,body[data-page="scoreboard"] #scoreboard,.cu-native-score-link,.task-card:has(.cu-native-score-link)) {display:none!important}
+html[data-cu-app="1"] :is(.site-header,.breadcrumbs,.app-invite,a[href^="https://play.google.com/store/apps/details?id=com.mahmoud.courtvoice"],.weekly-teaser,.ad-slot,.footer-columns,body[data-page="scoreboard"] #match-setup,body[data-page="scoreboard"] #scoreboard,.cu-native-score-link,.task-card:has(.cu-native-score-link)) {display:none!important}
 html[data-cu-app="1"] .site-footer {background:var(--ink);padding:12px 0;border-color:var(--line)}
 html[data-cu-app="1"] .footer-bottom>p {display:none}
 html[data-cu-app="1"] .footer-bottom {padding:12px 0;border:0}
@@ -72,4 +72,23 @@ html[data-cu-app="1"][data-cu-theme="light"] .weekly-ranking-warning {color:#a22
 html[data-cu-app="1"][data-cu-theme="light"] :is(.weekly-reactions img,.weekly-comment-reactions img) {filter:none}
 html[data-cu-app="1"] .form-pair {grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
 html[data-cu-app="1"] .weekly-table {overflow-x:auto}
+}
+
+@media screen {
+html[data-cu-app="1"] .site-footer .footer-links [hidden] {display:none!important}
+html[data-cu-app="1"] :is(.cu-legal,.cu-planner-help) {background:var(--card);border-radius:12px;padding:0 14px}
+html[data-cu-app="1"] .cu-planner-help {margin-block:24px}
+html[data-cu-app="1"] :is(.cu-legal,.cu-planner-help) summary {min-height:48px;padding-block:10px;cursor:pointer}
+html[data-cu-app="1"] .cu-legal .footer-links {padding-block:0 14px;justify-content:start}
+html[data-cu-app="1"] .cu-planner-help .tool-explanation {margin:0;padding-block:4px 14px}
+html[data-cu-app="1"] .weekly-masthead .weekly-actions {display:none}
+html[data-cu-app="1"] .quiz-settings :is(button,select) {min-height:48px}
+}
+
+@media screen {
+html[data-cu-app="1"] .weekly-page > .weekly-masthead {padding-block:0 18px}
+html[data-cu-app="1"] .weekly-page > .weekly-masthead > .eyebrow {font-size:1.25rem;text-transform:none;letter-spacing:0;font-weight:700;color:var(--white)}
+html[data-cu-app="1"] .weekly-page .cu-brand-umpire {color:var(--green)}
+html[data-cu-app="1"] .weekly-page > .weekly-masthead > h1 {margin-block:8px}
+html[data-cu-app="1"] .weekly-page > .weekly-masthead > p {margin-block:8px}
 }

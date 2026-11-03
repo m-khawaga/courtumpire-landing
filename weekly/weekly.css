@@ -49,3 +49,37 @@ html:has(.weekly-editor){scroll-behavior:auto}.weekly-editor h2{font-size:1.8rem
 .weekly-publication .cu-brand-umpire{color:inherit}
 
 .weekly-app-contents{display:none}
+
+/* Shared narrow-screen article presentation, including previously published editions. */
+.weekly-table-filters .weekly-filter-panel {min-width:0;grid-column:1/-1}
+.weekly-filter-panel summary {cursor:pointer;min-height:44px;padding:8px 12px;background:var(--card);border:1px solid var(--weekly-border);border-radius:10px}
+.weekly-filter-options {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:8px;padding-block:8px}
+.weekly-filter-selections {display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1}
+.weekly-filter-selections:empty {display:none}
+.weekly-table-filters button[hidden],.weekly-table-filters details[hidden] {display:none}
+.weekly-compact-results .weekly-result-score {font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;align-self:center}
+.weekly-compact-results .weekly-result-players {display:grid;min-width:0;gap:2px;overflow-wrap:anywhere}
+.weekly-compact-results :is(.weekly-note,details) {grid-column:1/-1;margin:0}
+.weekly-compact-results summary {cursor:pointer;min-height:44px;padding-block:8px}
+@media(max-width:720px) {
+  .weekly-article .weekly-table-filters {grid-template-columns:minmax(0,1fr);gap:8px}
+  .weekly-table-filters :is(input,select,button) {min-height:44px}
+  .weekly-article .weekly-compact-results article {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;margin:0;padding:10px 0 4px;background:none;border:0;border-bottom:1px solid var(--weekly-border);border-radius:0}
+  .weekly-article .weekly-compact-results article[hidden],.weekly-compact-group[hidden] {display:none}
+  .weekly-compact-group {margin-block:12px;padding:0 12px;border:1px solid var(--weekly-border);border-radius:12px}
+  .weekly-compact-group h4 {margin:10px 0 0}
+  .weekly-schedule-block .weekly-table {display:block;overflow-x:auto}
+  .weekly-schedule-block .weekly-table table {min-width:34rem;table-layout:auto}
+  .weekly-schedule-block .weekly-table :is(td,th) {overflow-wrap:normal;word-break:normal}
+  .weekly-schedule-block .weekly-table tr>:first-child {min-width:9rem}
+  .weekly-schedule-block .weekly-table tr>:last-child {min-width:13rem}
+  .weekly-schedule-block .weekly-data-cards {display:none}
+}
+
+@media(max-width:720px) {
+  .weekly-article .weekly-refs {white-space:normal}
+  .weekly-article .weekly-refs a {display:inline-block}
+  .weekly-article .weekly-table-filters {grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  .weekly-table-filters .weekly-filter-panel:not([open]) {grid-area:1/2;align-self:end}
+  .weekly-table-filters .weekly-filter-panel[open],.weekly-table-filters .weekly-note {grid-column:1/-1}
+}

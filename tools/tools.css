@@ -76,3 +76,20 @@
 .score-value[data-digits="4"]{font-size:2.4rem}@media(max-width:600px){.score-value[data-digits="4"]{font-size:1.4rem}}
 
 .activity-requirements{display:flex;flex-wrap:wrap;gap:16px 30px;margin:22px 0}.activity-requirements div{min-width:140px}.activity-requirements dt{color:#aebfd1;font-size:.8rem}.activity-requirements dd{margin:4px 0 0;color:#f7f9fc;font-size:.9rem}
+
+/* Quiz controls and result preview actions. */
+.quiz-settings{align-items:end;gap:12px;margin:16px 0}
+.quiz-settings label{flex:1 1 10rem;min-width:0}
+.quiz-settings :is(select,button){min-height:48px}
+.quiz-settings button{align-self:end}
+.quiz-options{margin-bottom:12px}
+.quiz-options legend{min-height:0;margin-bottom:8px}
+.quiz-options label{min-height:48px;margin:8px 0;padding:10px 12px}
+.quiz-progress{margin:0;font-weight:700}
+.quiz-topic{margin:2px 0 12px;font-size:.9rem}
+.quiz-explanation{display:block;margin-top:12px}
+.quiz-navigation{gap:8px;margin-top:12px;flex-wrap:wrap}
+.quiz-navigation button{min-width:0}
+.quiz-panel button:disabled{opacity:.6;box-shadow:none}
+#download-card{margin-block:12px;min-height:48px}
+body[data-page="quiz"] .practice-intro{padding-bottom:12px}

@@ -48,32 +48,59 @@ export function startEmbeddedPresentation(value) {
     apply();
   }};
   window.courtUmpirePresentation.setTheme(theme);
-  // Existing print and PNG controls use deliberate same-origin navigation requests,
-  // intercepted by the app. No JavaScript interface, native scoring or state sync.
+  // Print stays on the existing app navigation action. PNG bytes never go in a URL.
   window.print = () => {
     const url = new URL(location.href); url.searchParams.set('cu-action', 'print'); location.assign(url.href);
   };
-  document.addEventListener('click', async event => {
-    const anchor = event.target.closest('a[href]'); if(!anchor) return;
-    if(anchor.hasAttribute('download') && anchor.href.startsWith('blob:')) {
-      event.preventDefault();
-      try {
-        const blob = await (await fetch(anchor.href)).blob();
-        if(blob.type !== 'image/png' || blob.size > 4 * 1024 * 1024) throw Error('Export too large');
-        const reader = new FileReader(); reader.onload = () => {
-          const url = new URL(location.href); url.searchParams.set('cu-action','download');
-          url.searchParams.set('cu-data',reader.result); location.assign(url.href);
-        }; reader.readAsDataURL(blob);
-      } catch { alert('Could not prepare this download. Use Open in browser to export it.'); }
-    } else if(anchor.getAttribute('href').startsWith('#')) {
-      // Leave article anchors and source/back links as native in-page navigation.
-    } else {
-      anchor.href = presentationLink(anchor.href, location.href, theme);
-    }
+  document.addEventListener('click', event => {
+    const anchor = event.target.closest('a[href]');
+    if (!anchor || anchor.hasAttribute('download') || anchor.getAttribute('href').startsWith('#')) return;
+    anchor.href = presentationLink(anchor.href, location.href, theme);
   }, true);
   const ready = () => {
-    // Existing footer links include Privacy, participation policy and the original
-    // analytics-settings control with its original listener and consent behavior.
+    // Keep the actual web consent button and its listener in the original footer.
+    const links = document.querySelector('.site-footer .footer-links');
+    if (links) {
+      for (const link of links.querySelectorAll('a[href]')) {
+        const path = new URL(link.href, location.href).pathname.replace(/\/$/, '');
+        if (path === '/site-map' || path === '/site-map/') link.hidden = true;
+      }
+      const legal = document.createElement('details');
+      legal.className = 'cu-legal';
+      const summary = document.createElement('summary');
+      summary.textContent = 'Privacy & legal';
+      links.before(legal);
+      legal.append(summary, links);
+    }
+    if (location.pathname === '/practice-planner/') {
+      const explanation = document.querySelector('.tool-explanation');
+      if (explanation) {
+        const details = document.createElement('details');
+        details.className = 'cu-planner-help';
+        const summary = document.createElement('summary');
+        summary.textContent = 'How this works';
+        explanation.before(details);
+        details.append(summary, explanation);
+      }
+    }
+    const brand = document.querySelector('.weekly-publication .eyebrow, .weekly-page > .weekly-masthead > .eyebrow');
+    if (brand?.textContent.trim() === 'CourtUmpire Weekly' && !brand.querySelector('.cu-brand-umpire')) {
+      const umpire = document.createElement('span');
+      umpire.className = 'cu-brand-umpire';
+      umpire.textContent = 'Umpire';
+      brand.replaceChildren('Court', umpire, ' Weekly');
+    }
+    const article = document.querySelector('.weekly-article');
+    const contents = article?.querySelector(':scope > .weekly-contents');
+    if (contents && !article.querySelector('.weekly-app-contents')) {
+      const details = document.createElement('details');
+      details.className = 'weekly-app-contents';
+      const summary = document.createElement('summary');
+      summary.textContent = 'In this edition';
+      contents.before(details);
+      contents.classList.remove('weekly-contents');
+      details.append(summary, contents);
+    }
     apply();
     new MutationObserver(records => {
       if(records.some(record => record.addedNodes.length)) apply();
