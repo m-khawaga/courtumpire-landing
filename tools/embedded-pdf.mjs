@@ -52,8 +52,7 @@ async function snapshot(report) {
     if (tag === 'table') {
       const rows = [...node.rows].map(row => [...row.cells].map(cell => ({text:text(cell),span:cell.colSpan})));
       if (node.caption) blocks.push({kind:'heading',text:text(node.caption)});
-      blocks.push({kind:'table',rows,headers:node.tHead?.rows.length || 0,writing:node.matches('.writing-table,.blank-worksheet'),
-        keepTogether:node.closest('.participation-section') && rows.length <= 10 && rows.every(row => row.every(cell => cell.text.length < 70))});
+      blocks.push({kind:'table',rows,headers:node.tHead?.rows.length || 0,writing:node.matches('.writing-table,.blank-worksheet')});
     } else if (tag === 'img' || tag === 'svg') {
       blocks.push({kind:'image',data:await imageData(node)});
     } else if (node.matches('.diagram-legend')) {
@@ -94,7 +93,7 @@ function engine() {
     .catch(error => { pdfEngine = undefined; throw error; });
 }
 
-function tableDefinition(block) {
+function tableDefinition(block, headings) {
   const columns = Math.max(...block.rows.map(row => row.reduce((n, cell) => n + cell.span, 0)));
   const body = block.rows.map((row, index) => {
     const cells = row.flatMap(cell => [
@@ -105,28 +104,49 @@ function tableDefinition(block) {
     while (cells.length < columns) cells.push({text:''});
     return cells;
   });
+  // Put section headings in the repeating header block so pdfmake moves them
+  // with the column labels and first data row, while later rows can still flow.
+  const hasHeading = headings.length > 0;
+  if (hasHeading) {
+    body.unshift([
+      {stack:headings, colSpan:columns, border:[false,false,false,false]},
+      ...Array.from({length:columns - 1}, () => ({}))
+    ]);
+  }
+  const headingRow = row => hasHeading && row === 0;
   return {
-    table:{widths:Array(columns).fill('*'), body, headerRows:block.headers,
-      keepWithHeaderRows:block.keepTogether ? body.length - block.headers : 1, heights:block.writing ? 28 : undefined,
+    table:{widths:Array(columns).fill('*'), body, headerRows:block.headers + Number(hasHeading),
+      keepWithHeaderRows:1, heights:block.writing ? row => headingRow(row) ? 'auto' : 28 : undefined,
       dontBreakRows:block.rows.every(row => row.every(cell => cell.text.length < 850))},
-    layout:{hLineColor:()=>'#a4b1c0',vLineColor:()=>'#a4b1c0',hLineWidth:()=>0.5,vLineWidth:()=>0.5,
-      paddingTop:()=>4,paddingBottom:()=>4,paddingLeft:()=>5,paddingRight:()=>5},
+    layout:{hLineColor:()=>'#a4b1c0',vLineColor:()=>'#a4b1c0',hLineWidth:row=>headingRow(row)?0:0.5,vLineWidth:()=>0.5,
+      paddingTop:row=>headingRow(row)?0:4,paddingBottom:row=>headingRow(row)?0:4,
+      paddingLeft:()=>5,paddingRight:()=>5},
     fontSize:9, margin:[0,2,0,12]
   };
 }
 
 function reportDefinition(title, model) {
-  const content = model.blocks.map((block,index) => {
-    if (block.kind === 'table') return tableDefinition(block);
+  const content = [];
+  let headings = [];
+  function renderBlock(block) {
     if (block.kind === 'image') return {image:'data:image/png;base64,'+block.data,fit:[285,165],margin:[0,2,0,8]};
-    if (block.kind === 'heading') return {text:block.text,style:index===0?'title':'section',headlineLevel:index===0?1:2};
     if (block.kind === 'check') {
       const outline = {type:'rect',x:0,y:1,w:9,h:9,lineColor:'#526175'};
       const mark = {type:'polyline',points:[{x:2,y:5},{x:4,y:7},{x:7,y:3}],lineColor:'#182330'};
       return {columns:[{width:14,canvas:block.checked?[outline,mark]:[outline]},{text:block.text}],margin:[0,0,0,7]};
     }
     return {text:block.text,margin:[0,0,0,6]};
-  });
+  }
+  for (const [index, block] of model.blocks.entries()) {
+    if (block.kind === 'heading') {
+      headings.push({text:block.text,style:index===0?'title':'section'});
+      continue;
+    }
+    if (block.kind === 'table') content.push(tableDefinition(block, headings));
+    else content.push(...headings.map(heading => ({...heading,headlineLevel:heading.style==='section'?2:1})), renderBlock(block));
+    headings = [];
+  }
+  content.push(...headings);
   const images = model.images.map((data,i) => ({
     image:'data:image/png;base64,'+data,fit:i===1&&model.images.length===3?[100,32]:[35,35],
     width:'auto'
