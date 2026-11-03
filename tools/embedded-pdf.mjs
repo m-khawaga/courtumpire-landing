@@ -17,7 +17,12 @@ async function imageData(element) {
       }
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       const style = document.createElementNS(svg.namespaceURI, 'style');
-      style.textContent = '.court-background,.court-surface{fill:white}.court-surface{stroke:#333}.player-label,.target-label{fill:#111;font: bold 17px sans-serif}';
+      style.textContent = [
+        '.court-background,.court-surface{fill:white}.court-surface,g[fill="none"],path[stroke="#e5f2ef"]{stroke:#333}',
+        '[stroke="#dfff00"]{stroke:#42641d}[fill="#dfff00"]{fill:#42641d}',
+        '[stroke="#91cfff"]{stroke:#285681}[fill="#91cfff"]{fill:#285681}',
+        '.player-label,.target-label,.side-label{fill:#111;font:bold 17px sans-serif;text-anchor:middle}'
+      ].join('');
       svg.prepend(style);
       url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type:'image/svg+xml'}));
       image = new Image();
@@ -51,6 +56,8 @@ async function snapshot(report) {
         keepTogether:node.closest('.participation-section') && rows.length <= 10 && rows.every(row => row.every(cell => cell.text.length < 70))});
     } else if (tag === 'img' || tag === 'svg') {
       blocks.push({kind:'image',data:await imageData(node)});
+    } else if (node.matches('.diagram-legend')) {
+      blocks.push({kind:'text',text:'Letter = player · Solid arrow = ball · Dashed arrow = movement · T = target'});
     } else if (/^h[1-6]$/.test(tag) || ['p','li','summary','dt','dd'].includes(tag)) {
       const value = text(node);
       const mark = tag === 'li' && node.querySelector('.paper-check');
@@ -138,7 +145,8 @@ function reportDefinition(title, model) {
     header:page=>page>1?{text:'CourtUmpire',color:'#475569',fontSize:8,margin:[38,18,38,0]}:null,
     footer:(page,count)=>({columns:[{text:'courtumpire.com'},{text:'Page '+page+' of '+count,alignment:'right'}],
       fontSize:8,color:'#475569',margin:[38,12,38,0]}),
-    pageBreakBefore:(node,following)=>node.headlineLevel===2&&following.getFollowingNodesOnPage().length===0,
+    pageBreakBefore:(node,following)=>node.headlineLevel===2&&
+      (node.startPosition?.verticalRatio>.88||following.getFollowingNodesOnPage().length===0),
     content
   };
 }
