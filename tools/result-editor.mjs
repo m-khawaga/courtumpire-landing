@@ -26,7 +26,44 @@ export function initResultEditor(){
  function invalidate(){revision++;ready=false;download.disabled=true;state.textContent='Inputs changed. Refresh the preview before downloading.';canvas.classList.add('stale-preview');message.textContent='';clearErrors();updateFields();persist();}
  async function preview(){const token=++revision;ready=false;download.disabled=true;clearErrors();if(sourceInvalid)return;try{const data=validateResult(readResultForm(form)),offscreen=document.createElement('canvas');state.textContent='Preparing local images and preview…';await drawResult(offscreen,data,{design:form.elements.design.value,layout:form.elements.layout.value});if(token!==revision)return;canvas.width=offscreen.width;canvas.height=offscreen.height;canvas.getContext('2d').drawImage(offscreen,0,0);canvas.setAttribute('aria-label',offscreen.getAttribute('aria-label'));canvas.hidden=false;canvas.classList.remove('stale-preview');ready=true;download.disabled=false;state.textContent='Preview matches the current inputs. PNG is ready.';tell('Completed result checked. Tiebreak details are shown only when supplied; manually entered results are not independently verified.');persist();}catch(err){if(token!==revision)return;canvas.hidden=true;state.textContent='Download unavailable until the highlighted result is corrected and previewed.';showError(err);track('tool_error',{tool_id:'result_card',error_category:'validation'});}}
  form.addEventListener('input',invalidate);form.addEventListener('change',invalidate);form.addEventListener('submit',ev=>{ev.preventDefault();preview();});form.addEventListener('click',ev=>{const set=ev.target.closest('[data-clear-set]'),tie=ev.target.closest('[data-clear-tie]');if(set||tie){const i=(set||tie).dataset[set?'clearSet':'clearTie'];for(const prefix of set?['a','b','ta','tb']:['ta','tb'])form.elements[prefix+i].value='';invalidate();preview();}});
- download.addEventListener('click',()=>{if(!ready)return;const token=revision;canvas.toBlob(blob=>{if(token!==revision||!ready)return;if(!blob){tell('PNG creation failed in this browser. Refresh the preview and try again.',true);return;}track('export_generated',{tool_id:'result_card',document_type:'result_card',export_format:'png',match_format:form.elements.format.value,games_per_set:form.elements.gamesPerSet.value});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='courtumpire-match-result.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);},'image/png');});
+ let requestedRevision = null;
+ const nativeSave = () => document.documentElement.dataset.cuNativePng === '1';
+ const updateSaveLabel = () => { download.textContent = nativeSave() ? 'Save PNG' : 'Download PNG'; };
+ window.addEventListener('cu-native-png-ready', updateSaveLabel);
+ updateSaveLabel();
+ window.courtUmpireTakeResultPng = () => {
+   const token = requestedRevision;
+   requestedRevision = null;
+   if (!nativeSave() || !ready || token !== revision) return null;
+   return canvas.toDataURL('image/png');
+ };
+ download.addEventListener('click', () => {
+   if (!ready) return;
+   if (nativeSave()) {
+     requestedRevision = revision;
+     const signal = new URL(location.pathname, location.origin);
+     signal.searchParams.set('cu-action', 'save-result-png');
+     location.assign(signal.href);
+     return;
+   }
+   if (document.documentElement.dataset.cuApp === '1') {
+     state.textContent = 'This app version needs an update to save PNG. Open this tool in your browser to make and download a card there.';
+     return;
+   }
+   const token = revision;
+   canvas.toBlob(blob => {
+     if (token !== revision || !ready) return;
+     if (!blob) { state.textContent = 'PNG creation failed. Refresh the preview and try again.'; return; }
+     track('export_generated',{tool_id:'result_card',document_type:'result_card',export_format:'png',match_format:form.elements.format.value,games_per_set:form.elements.gamesPerSet.value});
+     const url = URL.createObjectURL(blob), link = document.createElement('a');
+     link.href = url;
+     link.download = 'courtumpire-match-result.png';
+     document.body.append(link);
+     link.click();
+     link.remove();
+     setTimeout(() => URL.revokeObjectURL(url), 1000);
+   }, 'image/png');
+ });
  window.addEventListener('storage',ev=>{if(imported&&ev.key===SCORED_RESULT_KEY){sourceInvalid=true;invalidate();tell('The scored match changed. Return to the scoreboard and create a new card from its completed result.',true);}});
  updateFields();preview();
 }

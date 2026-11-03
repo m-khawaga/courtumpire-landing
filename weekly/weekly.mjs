@@ -6,29 +6,102 @@ if(article){
   // Filters use rendered values only; no article fetches or changes to source data.
   const clean=node=>{const copy=node.cloneNode(true);copy.querySelectorAll('.weekly-refs').forEach(n=>n.remove());return copy.textContent.trim();};
   function filters(panel,records,columns,onChange){
-    const controls=document.createElement('div');controls.className='weekly-table-filters';
-    const searchLabel=document.createElement('label'),search=document.createElement('input');search.type='search';search.placeholder='Player, tournament or other text';searchLabel.append('Search this table',search);controls.append(searchLabel);
+    const element=(tag,text='')=>Object.assign(document.createElement(tag),{textContent:text});
+    const controls=element('div');controls.className='weekly-table-filters';
+    const searchLabel=element('label','Search this table'), search=element('input');
+    search.type='search';search.placeholder='Player, tournament or other text';searchLabel.append(search);
+    const fields=element('details'),summary=element('summary','Filters'),options=element('div');
+    fields.className='weekly-filter-panel';options.className='weekly-filter-options';fields.append(summary,options);
+    const selected=element('div');selected.className='weekly-filter-selections';
     const selects=[];
-    for(const [index,title]of columns.entries()){
+    for(const [index,title] of columns.entries()){
       if(!/^(tour|tour\s*\/\s*category|category|tournament|coverage|status)$/i.test(title))continue;
-      const values=[...new Set(records.map(r=>r.cells[index]).filter(Boolean))].sort();if(values.length<2||values.length>50)continue;
-      const label=document.createElement('label'),select=document.createElement('select');select.setAttribute('aria-label',title);label.append(title,select);const plural={tour:'tours',category:'categories',tournament:'tournaments',coverage:'coverage states',status:'statuses'};select.append(new Option('All '+(plural[title.toLowerCase()]||title.toLowerCase()),''));values.forEach(v=>select.append(new Option(v,v)));controls.append(label);selects.push({select,index});select.addEventListener('change',onChange);
+      const values=[...new Set(records.map(r=>r.cells[index]).filter(Boolean))].sort();
+      if(values.length<2||values.length>50)continue;
+      const label=element('label',title),select=element('select');
+      select.setAttribute('aria-label',title);label.append(select);
+      const plural={tour:'tours',category:'categories',tournament:'tournaments',coverage:'coverage states',status:'statuses'};
+      select.append(new Option('All '+(plural[title.toLowerCase()]||title.toLowerCase()),''));
+      values.forEach(v=>select.append(new Option(v,v)));
+      options.append(label);selects.push({select,index,title});select.addEventListener('change',onChange);
     }
-    const reset=document.createElement('button');reset.type='button';reset.textContent='Clear filters';controls.append(reset);
-    const status=document.createElement('p');status.className='weekly-note';status.setAttribute('role','status');controls.append(status);
-    panel.prepend(controls);search.addEventListener('input',onChange);reset.onclick=()=>{search.value='';selects.forEach(({select})=>select.value='');onChange();};
-    return {matches:r=>{const q=search.value.trim().toLocaleLowerCase();return (!q||r.cells.join(' ').toLocaleLowerCase().includes(q))&&selects.every(({select,index})=>!select.value||r.cells[index]===select.value);},status};
+    fields.hidden=!selects.length;
+    const reset=element('button','Clear filters');reset.type='button';
+    const status=element('p');status.className='weekly-note';status.setAttribute('role','status');
+    controls.append(searchLabel,fields,selected,reset,status);
+    const caption=panel.querySelector('caption');
+    if(caption){
+      const heading=element('h3'), description=caption.querySelector('span');
+      heading.textContent=[...caption.childNodes].filter(node=>node.nodeType===Node.TEXT_NODE).map(node=>node.textContent).join('').trim();
+      if(heading.textContent){
+        panel.prepend(heading);
+        if(description){const note=element('p');note.className='weekly-note';note.append(...description.childNodes);heading.after(note);note.after(controls);}
+        else heading.after(controls);
+        caption.classList.add('sr-only');
+      } else panel.prepend(controls);
+    } else panel.prepend(controls);
+    search.addEventListener('input',onChange);
+    reset.onclick=()=>{search.value='';selects.forEach(({select})=>select.value='');onChange();search.focus();};
+    return {
+      matches:r=>{const q=search.value.trim().toLocaleLowerCase();return (!q||r.cells.join(' ').toLocaleLowerCase().includes(q))&&selects.every(({select,index})=>!select.value||r.cells[index]===select.value);},
+      update(visible,total){
+        const active=selects.filter(({select})=>select.value);
+        summary.textContent=active.length?'Filters ('+active.length+')':'Filters';
+        selected.replaceChildren(...active.map(({select,title})=>{
+          const button=element('button',select.value+' ×');button.type='button';
+          button.setAttribute('aria-label','Remove '+title+': '+select.value);
+          button.onclick=()=>{select.value='';onChange();summary.focus();};
+          return button;
+        }));
+        reset.hidden=!active.length&&!search.value.trim();
+        status.textContent='Showing '+visible+' of '+total+' rows.';
+      }
+    };
+  }
+  function compactResults(panel,rows){
+    const mobile=panel.querySelector('.weekly-data-cards');
+    const labels=[...panel.querySelectorAll('thead th')].map(node=>clean(node).toLowerCase());
+    if(!mobile||!['winner','opponent','score'].every(key=>labels.includes(key)))return;
+    const cards=new Map([...mobile.querySelectorAll('article[data-result-index]')].map(card=>[card.dataset.resultIndex,card]));
+    if(rows.some(row=>!cards.has(row.dataset.resultIndex)))return;
+    const element=(tag,text='')=>Object.assign(document.createElement(tag),{textContent:text});
+    const groups=new Map();
+    for(const row of rows){
+      const tournament=row.dataset.resultTournament;
+      if(!groups.has(tournament)){
+        const group=element('section');group.className='weekly-compact-group';group.dataset.resultsGroup='';
+        group.append(element('h4',tournament));groups.set(tournament,group);
+      }
+      const card=cards.get(row.dataset.resultIndex), values=[...row.cells].map(clean);
+      const value=key=>values[labels.indexOf(key)]||'';
+      const players=element('div');players.className='weekly-result-players';
+      const winner=element('strong',value('winner'));
+      const badge=element('span','Won');badge.className='weekly-result-winner';
+      winner.append(' ',badge);
+      players.append(winner,element('span',value('opponent')));
+      const score=element('span',value('score'));score.className='weekly-result-score';score.setAttribute('aria-label','Score: '+value('score'));
+      const info=element('p',[value('round'),value('date')].filter(Boolean).join(' · '));info.className='weekly-note';
+      const details=element('details'), summary=element('summary','Match details');
+      details.append(summary,...card.querySelectorAll('dl,.weekly-refs'));
+      card.replaceChildren(info,players,score,details);
+      groups.get(tournament).append(card);
+    }
+    mobile.classList.add('weekly-compact-results');
+    mobile.replaceChildren(...groups.values());
   }
   for(const panel of article.querySelectorAll('[data-table-filter]')){
     if(panel.matches('.weekly-ranking-panel')||panel.querySelector('.status-cards'))continue;
     const tableRows=[...panel.querySelectorAll('tr[data-table-row]')],cardRows=[...panel.querySelectorAll('.weekly-data-cards > article[data-table-row]')],primary=tableRows.length?tableRows:cardRows;
+    panel.classList.toggle('weekly-schedule-block', [...panel.querySelectorAll('thead th')].some(node => /latest update|what.s next/i.test(clean(node))));
     const columns=tableRows.length?[...panel.querySelectorAll('thead th')].map(clean):[...cardRows[0]?.querySelectorAll('dt')||[]].map(clean);
     const records=primary.map(n=>({id:n.dataset.tableRow,cells:[...n.querySelectorAll(tableRows.length?'th,td':'dd')].map(clean)}));
     if(records.length<=3)continue;const controls=filters(panel,records,columns,update);
-    function update(){const visible=new Set(records.filter(controls.matches).map(r=>r.id));[...tableRows,...cardRows].forEach(n=>n.hidden=!visible.has(n.dataset.tableRow));controls.status.textContent=`Showing ${visible.size} of ${records.length} rows.`;}update();
+    function update(){const visible=new Set(records.filter(controls.matches).map(r=>r.id));[...tableRows,...cardRows].forEach(n=>n.hidden=!visible.has(n.dataset.tableRow));controls.update(visible.size,records.length);}update();
   }
   for(const panel of article.querySelectorAll('[data-results]')){
-    const rows=[...panel.querySelectorAll('tr[data-result-index]')],representations=[...panel.querySelectorAll('[data-result-index]')],tour=panel.querySelector('[data-results-tour]'),tournament=panel.querySelector('[data-results-tournament]'),toggle=panel.querySelector('[data-results-toggle]'),count=panel.querySelector('[data-results-count]');let expanded=false;
+    const rows=[...panel.querySelectorAll('tr[data-result-index]')];
+    compactResults(panel,rows);
+    const representations=[...panel.querySelectorAll('[data-result-index]')],tour=panel.querySelector('[data-results-tour]'),tournament=panel.querySelector('[data-results-tournament]'),toggle=panel.querySelector('[data-results-toggle]'),count=panel.querySelector('[data-results-count]');let expanded=false;
     if(rows.length<=3)continue;
     panel.querySelector('.weekly-results-controls').hidden=false;
     function update(){const matching=rows.filter(r=>(!tour.value||r.dataset.resultTour===tour.value)&&(!tournament.value||r.dataset.resultTournament===tournament.value)),visible=new Set((expanded?matching:matching.slice(0,5)).map(r=>r.dataset.resultIndex));representations.forEach(r=>r.hidden=!visible.has(r.dataset.resultIndex));panel.querySelectorAll('[data-results-group]').forEach(g=>g.hidden=![...g.querySelectorAll('[data-result-index]')].some(r=>!r.hidden));count.textContent=`Showing ${visible.size} of ${matching.length} matches${tour.value?' · '+tour.value:''}${tournament.value?' · '+tournament.value:''}.`;toggle.hidden=matching.length<=5;toggle.textContent=expanded?'Show fewer':'Show all '+matching.length+' matches';toggle.setAttribute('aria-expanded',String(expanded));}
