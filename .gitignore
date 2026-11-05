@@ -20,3 +20,11 @@ backend/src/public-assets.generated.mjs
 .wrangler/
 
 design-qa.md
+
+# Local credentials at any tool root; public example files remain eligible.
+.env
+.env.*
+!.env.example
+!.env.*.example
+.dev.vars
+.dev.vars.*
