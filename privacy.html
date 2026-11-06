@@ -62,7 +62,7 @@
           <h2>Match information</h2>
           <p>The phone stores player names, match settings, scores, match logs and saved history in app storage. The connected Wear OS companion displays match information, including player names and scores, and sends scoring, undo and status commands to the phone through Google Play services’ Wearable Data Layer. The phone controls the active match. This is companion-device communication, not a CourtUmpire cloud match account.</p>
           <p>Android system backup and restore are enabled for the app. Its backup rules do not exclude match records or preferences. Depending on your Android version, device, backup provider and settings, eligible app data can be copied into system backups or transferred to another device and restored later. CourtUmpire does not provide its own match-backup server or give the developer access to your system backup. See <a href="https://developer.android.com/identity/data/autobackup">Android’s backup information</a> and your device’s backup controls.</p>
-          <p>Deleting a saved match, clearing app data or uninstalling removes the relevant local app copy. It does not necessarily erase system backups, copies on another device, or files you saved or shared. Manage backup and migration copies through the relevant device or backup service, and remove exported copies separately.</p>
+          <p>Use Android’s app settings to clear CourtUmpire’s app data, or uninstall the app, to remove its local match records and preferences. This release does not provide a separate control to delete one saved match. It does not necessarily erase system backups, copies on another device, or files you saved or shared. Manage backup and migration copies through the relevant device or backup service, and remove exported copies separately.</p>
         </section>
 
         <section>
@@ -119,7 +119,7 @@
           <h2>Your choices</h2>
           <ul class="legal-list">
             <li>You can avoid entering real player names.</li>
-            <li>You can delete saved matches or local app data. Manage system backups, migration copies and exported files separately.</li>
+            <li>You can clear local match history and preferences using Android’s app-data controls. Manage system backups, migration copies and exported files separately.</li>
             <li>You choose whether to export, save, print or share PDF reports and PNG images, and which destination receives them.</li>
             <li>You can turn live-match notifications and Weekly article alerts on or off separately and use Android’s lock-screen privacy settings.</li>
             <li>You can reject optional website analytics or withdraw through “Analytics settings”.</li>
