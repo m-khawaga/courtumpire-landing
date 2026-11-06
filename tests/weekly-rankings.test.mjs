@@ -12,3 +12,42 @@ test('unknown identity flags review without blocking article; profile alone does
 test('comparison points to immutable saved snapshot, not a later revision of the previous edition',()=>{const old=snapshot({...ranked(),editionNumber:1}),current={...ranked(),id:'cu-weekly-2026-10-30',editionNumber:2};const history={snapshots:{saved:structuredClone(old)},comparisons:{[current.id]:'saved'}};old.tables.atp.rows[0].points=1;const picked=comparisonFor(current,[old],history);assert.equal(picked.tables.atp.rows[0].points,10000);assert.equal(comparisonRows(current,'atp',picked)[0].pointsChange,'0 (unchanged)');});
 
 test('pinned comparisons follow renamed editions and retain withdrawn snapshots without broken links',()=>{const old=snapshot({...ranked(),editionNumber:1}),current={...ranked(),id:'cu-weekly-2026-10-30',editionNumber:2};const history={snapshots:{saved:structuredClone(old)},comparisons:{[current.id]:'saved'}};const renamed=comparisonFor(current,[{...old,slug:'2026-10-23-new-slug'}],history);assert.equal(renamed.slug,'2026-10-23-new-slug');assert.equal(renamed.tables.atp.rows[0].points,10000);const withdrawn=comparisonFor(current,[],history),html=article(current,{comparison:withdrawn});assert.equal(withdrawn.unpublished,true);assert.ok(html.includes('withdrawn; historical snapshot retained'));assert.ok(!html.includes('href="/weekly/'+old.slug+'/"'));assert.equal(history.snapshots.saved.slug,old.slug);});
+
+function novemberRankings(){
+  const a=ranked();a.id='cu-weekly-2026-11-06';
+  const previous={id:'cu-weekly-2026-10-30',slug:'previous',title:'Previous edition',editionNumber:1,tables:{}};
+  for(const [tour,identity,name,rank,printed,current] of [
+    ['atp','a0e2','Carlos Alcaraz',3,6610,5700],
+    ['wta','324166','Elena Rybakina',1,9501,9400],
+  ]){
+    const t=a.sections.find(s=>s.id==='rankings').tables.find(t=>t.id===tour+'-top10');
+    const source=a.sources.find(s=>s.id===tour+'-player-0');
+    source.url=tour==='atp'?`https://www.atptour.com/en/players/player/${identity}/overview`:`https://www.wtatennis.com/players/${identity}/player`;
+    t.rows[0].cells.player=name;t.rows[0].cells.points=String(current);
+    previous.tables[tour]={asOf:'2026-10-26',complete:false,rows:Array.from({length:10},(_,i)=>({identity:null,name:i+1===rank?name:'Other player '+i,rank:i+1,points:i+1===rank?printed:1000}))};
+  }
+  return {a,previous};
+}
+
+test('November comparison corrects the printed October baseline and renders both Points change columns',()=>{
+  const {a,previous}=novemberRankings();
+  assert.equal(comparisonRows(a,'atp',previous)[0].pointsChange,'↑ 90 (up 90 points)');
+  assert.equal(comparisonRows(a,'wta',previous)[0].pointsChange,'↓ 101 (down 101 points)');
+  const html=article(a,{preview:true,comparison:previous});
+  assert.equal((html.match(/<th scope="col">Points change<\/th>/g)||[]).length,2);
+  assert.match(html,/<span class="weekly-points-up">↑ 90 \(up 90 points\)<\/span>/);
+  assert.match(html,/<span class="weekly-points-down">↓ 101 \(down 101 points\)<\/span>/);
+});
+
+test('October fallback rejects a different edition, date, printed value, or established identity',()=>{
+  for(const mutate of [
+    ({a})=>{a.id='cu-weekly-2026-11-13';},
+    ({previous})=>{previous.id='cu-weekly-2026-10-23';},
+    ({previous})=>{previous.tables.atp.asOf='2026-10-19';},
+    ({previous})=>{previous.tables.atp.rows[2].points=1;},
+    ({previous})=>{previous.tables.atp.rows[2].identity='atp:zz99';},
+  ]){
+    const input=novemberRankings();mutate(input);
+    assert.equal(comparisonRows(input.a,'atp',input.previous)[0].pointsChange,'N/A');
+  }
+});

@@ -1,0 +1,53 @@
+WEEKLY POINTS DISPLAY — CODE RELEASE, 6 NOVEMBER 2026
+
+Applied weekly-points-display.patch to current main 8fbfd53 in isolated branch
+codex/weekly-points-display. Changes are confined to ranking comparison/rendering,
+direction colours, focused regression tests and this release record.
+
+VALIDATION
+node --test tests/weekly-rankings.test.mjs: 8 passed.
+npm run publishing:build: passed.
+Both Wrangler production-entrypoint dry runs: passed (installed 4.152.0).
+Publishing/private-admin local D1 regression suites: 13 passed after granting
+loopback networking. No production test publication or database mutation occurred.
+git diff --check: passed.
+Additional presentation/public-assets checks: 8 passed, one existing prompt/schema
+embedding check failed because the Windows checkout has CRLF. Normalizing CRLF to
+LF in memory confirms an exact schema match; no prompt content was changed.
+
+CURRENT EDITION VERIFICATION
+The owner's 6 November JSON was rendered privately against the retained published
+30 October ranking snapshot, using the patched code. Both ATP/WTA Top 10 tables
+contain Points change, ten rows each, with all twenty comparisons available.
+Private HTML/report remain in ignored release evidence. The input was not modified,
+saved to the online drafts database or published. The existing published first
+edition retains its original content/revision and has no previous-edition baseline.
+Browser screenshot verification could not complete: in-app localhost navigation
+timed out, and Windows Computer Use stopped because browser URL detection failed.
+HTML assertions and production HTTPS checks are the completed verification evidence.
+
+DEPLOYMENT
+Used existing Cloudflare account a5646237c003a20af52d12c61b4bd0b7 and the connected
+API: upload reviewed Wrangler-built versions, verify bindings/runtime, promote 100%.
+Every existing plain-text, secret, D1 and service binding was retained. No routes,
+domains, schedules, authentication policies, CPU limits or publication controls changed.
+
+Public courtumpire-weekly:
+  version b34352d4-e159-4c93-8e4e-3ef410cb087a
+  deployment 20ccf7e4-60ef-4af2-921b-3b85d01dae60
+  previous version 4dd10d93-9b22-4da4-adc8-eb7ef7bd9dfd
+Private courtumpire-private-admin:
+  version 83a5019b-d1ea-4b1f-a240-dc7823790337
+  deployment 71fd1d80-84fe-4998-b863-5c665c374340
+  previous version 6da6dc36-8bad-4edb-9bba-7129294c74cc
+
+Read-back confirms both versions at 100% and identical binding settings/CPU limits.
+Live /weekly/weekly.css and /weekly/routes.mjs match local source bytes exactly.
+Archive and existing published edition return HTTP 200. Private rankings module
+redirects unauthenticated requests to Access login. Article publication remains
+with the owner; this release does not publish or revise an article.
+
+ROLLBACK
+Promote the captured previous compatible Worker versions through the deployment
+API, preserving all current bindings and controls. Revert source through the
+repository's normal reviewed PR workflow. Do not restore or delete databases.
