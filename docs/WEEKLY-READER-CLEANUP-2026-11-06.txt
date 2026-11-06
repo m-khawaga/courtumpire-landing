@@ -1,0 +1,37 @@
+WEEKLY READER CLEANUP — 6 NOVEMBER 2026
+
+Reader-only changes:
+- Both Rank change and Points change display canonical 0 (unchanged) as unchanged.
+  No colour span is applied to unchanged; it inherits the normal text colour.
+  Ranking calculations, canonical JSON cells and zero validation are unchanged.
+- Skip only atp-comparison-baseline and wta-comparison-baseline when rendering.
+  Retain legacy evidence as calculation input. Current ATP/WTA Top 10s and both
+  movement columns, tournament overview and match results remain present.
+- Generation prompt and contract/ranking guides forbid those two comparison
+  tables in new article JSONs. Additional historical research belongs in the
+  private editorial handoff. Missing previous values remain N/A.
+
+Verification:
+19 ranking/presentation/public-asset tests and 13 publishing/admin regressions pass.
+The existing schema-embedding assertion now normalizes CRLF before comparison,
+so it verifies prompt content consistently on Windows. The schema is unchanged.
+publishing:build, both Wrangler 4.152.0 entrypoint dry runs and diff checks pass.
+
+The owner's unmodified 6 November JSON passed the real publication-preview API
+validation/rendering path locally, with the retained published October ranking
+snapshot as read-only test input. Desktop/mobile browser assertions confirm:
+two current Top 10s, ten players each, both movement columns; 13 unchanged cells
+in default colour; both prior comparison tables absent; tournament overview
+present; all 108 match-result rows retained. Source sections remain identical.
+No production article mutation or publication occurred. Private report, HTML
+and desktop/mobile screenshots are retained in ignored release evidence.
+
+Deployed at 100% with every existing binding and CPU limit retained:
+courtumpire-weekly 00cc101b-eed9-4744-a07b-b42791e1fa2d
+courtumpire-private-admin 1ac71409-da9a-46b1-9426-4f71dc9a2057
+Previous compatible versions for rollback:
+Weekly b34352d4-e159-4c93-8e4e-3ef410cb087a
+Private 83a5019b-d1ea-4b1f-a240-dc7823790337
+No domain, route, schedule, authentication or publication-control changes.
+Rollback by promoting those captured versions, retaining current configuration.
+Do not restore or delete databases. Article publication stays with the owner.

@@ -51,3 +51,30 @@ test('October fallback rejects a different edition, date, printed value, or esta
     assert.equal(comparisonRows(input.a,'atp',input.previous)[0].pointsChange,'N/A');
   }
 });
+
+test('both movement columns display unchanged without changing canonical zero values or colour',()=>{
+  const a=ranked(),previous=snapshot({...a,editionNumber:1});
+  calculateChanges(a,previous);const saved=JSON.stringify(a);
+  const html=article(a,{preview:true,comparison:previous});
+  assert.equal((html.match(/<td>unchanged<\/td>/g)||[]).length,40);
+  assert.ok(!html.includes('0 (unchanged)'));
+  assert.ok(!html.includes('weekly-points-up')&&!html.includes('weekly-points-down'));
+  assert.equal(JSON.stringify(a),saved);
+  assert.equal(a.sections.find(s=>s.id==='rankings').tables[0].rows[0].cells['points-change'],'0 (unchanged)');
+  assert.deepEqual(rankingErrors(a,previous),[]);
+});
+
+test('reader omits only legacy ATP/WTA baseline tables and keeps current movements, tournament overview and results',()=>{
+  const a=ranked(),previous=snapshot({...a,editionNumber:1}),rankings=a.sections.find(s=>s.id==='rankings');
+  for(const tour of ['atp','wta']){
+    const current=rankings.tables.find(t=>t.id===tour+'-top10');
+    rankings.tables.push({...structuredClone(current),id:tour+'-comparison-baseline',variant:'general',caption:'Prior '+tour+' comparison evidence',columns:rankingColumns.slice(0,3)});
+  }
+  a.sections.find(s=>s.id==='results').tables.push({id:'tournament-overview',variant:'general',caption:'Tournament overview retained',scope:'Synthetic tournament overview',asOf:null,columns:[{key:'tournament',label:'Tournament'}],rows:[{cells:{tournament:'Overview event'},sourceIds:[]}],sourceIds:[],note:null});
+  const saved=JSON.stringify(a),html=article(a,{preview:true,comparison:previous});
+  assert.ok(!html.includes('Prior atp comparison evidence')&&!html.includes('Prior wta comparison evidence'));
+  assert.equal((html.match(/<th scope="col">Rank change<\/th>/g)||[]).length,2);
+  assert.equal((html.match(/<th scope="col">Points change<\/th>/g)||[]).length,2);
+  assert.match(html,/Tournament overview retained/);assert.match(html,/Fictional Practice Cup/);
+  assert.equal(JSON.stringify(a),saved);
+});

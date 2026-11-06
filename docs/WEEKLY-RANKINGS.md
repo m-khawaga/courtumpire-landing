@@ -39,7 +39,9 @@ Arrows and words convey direction independently of colour. Zero means an actual 
 
 ## Verified baseline for a player outside the previous top 10
 
-Optionally add a `variant: "general"` table in the same section with ID `atp-comparison-baseline` or `wta-comparison-baseline`. Use columns `rank`, `player`, `points`; factual row sourceIds include the same stable profile identity and **separate historical ranking evidence**. Its `asOf` must equal the previous Weekly edition's official snapshot date for that tour, not the current date. Caption says selected/all and explains this is historical comparison input. Include a note explaining the verification. This table is visible and sourced, not a hidden guessed value.
+Do not add `atp-comparison-baseline` or `wta-comparison-baseline` tables to new article JSONs. The rankings section contains the current ATP/WTA Top 10s with both movement columns. Use the previous published snapshot for comparisons and put additional historical research in the private editorial handoff. Missing previous values remain N/A.
+
+Existing articles may retain those two legacy tables as calculation evidence. The renderer omits only those exact table IDs from readers, including publication previews, while preserving their data and validation. Tournament overviews, match results and current Top 10 tables remain visible. Canonical zero movement remains `0 (unchanged)` in JSON; both reader movement columns show `unchanged` in the default colour.
 
 Only uniquely matched, dated and evidenced baseline rows are eligible. A missing/wrong date, ambiguous identity or profile-only source produces N/A. An evidenced historical rank of 14 may be used; rank 11 is never assumed. Rank/points are checked independently so an unavailable component stays N/A.
 
