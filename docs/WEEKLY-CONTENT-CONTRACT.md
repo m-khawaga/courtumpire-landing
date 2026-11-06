@@ -75,7 +75,7 @@ Create and update are distinct CLI operations. Updates require the stable ID plu
 
 ## Required ATP/WTA ranking profile for v1
 
-The rankings section must contain atp-top10 and wta-top10, each with ordered keys rank, player, points, rank-change, points-change. Use two separate official snapshot dates. Unknown identities keep comparison N/A and a review warning, without blocking the article. Stable identity comes from a verified official player-profile URL in row sourceIds; separate dated ranking evidence supports rank/points. See [WEEKLY-RANKINGS.md](WEEKLY-RANKINGS.md) for the unchanged-schema mapping, exact change strings, optional historical baseline tables and immutable comparison history. The columns are required; their values may be N/A with a truthful missing-data explanation.
+The rankings section must contain atp-top10 and wta-top10, each with ordered keys rank, player, points, rank-change, points-change. Use two separate official snapshot dates. Unknown identities keep comparison N/A and a review warning, without blocking the article. Stable identity comes from a verified official player-profile URL in row sourceIds; separate dated ranking evidence supports rank/points. See [WEEKLY-RANKINGS.md](WEEKLY-RANKINGS.md) for the unchanged-schema mapping, exact change strings, legacy comparison evidence and immutable comparison history. Do not include previous-edition ATP/WTA comparison tables in new JSONs. Legacy tables remain accepted as evidence but are omitted from readers. The columns are required; their values may be N/A with a truthful missing-data explanation. Canonical 0 (unchanged) validates as before; the reader displays unchanged in both movement columns using the default colour.
 
 ## Presentation conventions (v1 unchanged)
 

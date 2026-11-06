@@ -11,13 +11,15 @@ export function article(a,{preview=false,previous=null,next=null,comparison=null
   const refs=ids=>ids.length?` <span class="weekly-refs">${ids.map(id=>{const anchor='citation-'+(++citation);if(!backs.has(id))backs.set(id,anchor);return `<a id="${anchor}" href="#source-${esc(id)}" data-citation aria-label="Source ${numbers.get(id)}">[${numbers.get(id)}]</a>`;}).join(' ')}</span>`:'';
   const first=a.status==='published'&&a.editionNumber===1&&!comparison&&!comparisonUnknown;
   const table=t=>{
+    // Legacy evidence tables remain calculation inputs, never reader tables.
+    if(tours.some(tour=>t.id===tour.id+'-comparison-baseline'))return '';
     if(t.variant==='results')return resultsTable(t,refs);
     const tour=tours.find(tour=>t.id===tour.id+'-top10'),changes=tour?comparisonRows(a,tour.id,comparison):null;
     const baseline=tour&&comparison?.tables?.[tour.id]?.rows.some(r=>r.rank!==null||r.points!==null);
     const columns=tour?t.columns.filter(c=>c.key==='rank-change'?changes.some(r=>r.rankChange!=='N/A'):c.key==='points-change'?changes.some(r=>r.pointsChange!=='N/A'):true):t.columns;
     const title=tour?`<h3>${esc(tour.readerLabel)}</h3><p class="weekly-note">${t.asOf&&changes?.some(r=>r.rank!==null||r.points!==null)?'Official ranking date: '+esc(friendlyDate(t.asOf)):'Historical snapshot unavailable'}${refs(t.sourceIds)} · <a href="${tour.id==='atp'?'https://www.atptour.com/en/rankings/singles':'https://www.wtatennis.com/rankings/singles'}">View today’s ${tour.id.toUpperCase()} rankings ↗</a></p>${comparison?`<p class="weekly-note">Compared with <a href="${comparison.unpublished?'/weekly/':'/weekly/'+esc(comparison.slug)+'/'}">Edition ${comparison.editionNumber}: ${esc(comparison.title)}</a> · previous snapshot ${esc(friendlyDate(comparison.tables[tour.id]?.asOf))}${comparison.unpublished?' (withdrawn; historical snapshot retained)':''}.${!baseline?' Comparison values unavailable.':''}</p>`:''}`:'';
     if(!t.rows.length||tour&&changes.every(r=>r.rank===null&&r.points===null))return `<div class="weekly-ranking-panel">${title}<p class="weekly-note">${esc(t.note||'This snapshot is unavailable; no figures have been supplied.')}</p></div>`;
-    const cell=(r,c,index)=>{let value=r.cells[c.key];const info=changes?.[index];if(info){if((c.key==='rank'&&info.rank===null||c.key==='points'&&info.points===null))value='N/A';if(c.key==='rank-change')value=info.rankChange;if(c.key==='points-change')value=info.pointsChange;}if(['date','announcement-date'].includes(c.key)&&/^\d{4}-\d{2}-\d{2}$/.test(value))value=friendlyDate(value);if (tour && c.key === 'points-change') {
+    const cell=(r,c,index)=>{let value=r.cells[c.key];const info=changes?.[index];if(info){if((c.key==='rank'&&info.rank===null||c.key==='points'&&info.points===null))value='N/A';if(c.key==='rank-change')value=info.rankChange;if(c.key==='points-change')value=info.pointsChange;}if(tour&&['rank-change','points-change'].includes(c.key)&&value==='0 (unchanged)')value='unchanged';if(['date','announcement-date'].includes(c.key)&&/^\d{4}-\d{2}-\d{2}$/.test(value))value=friendlyDate(value);if (tour && c.key === 'points-change') {
       if (value.startsWith('↑')) return '<span class="weekly-points-up">'+esc(value)+'</span>';
       if (value.startsWith('↓')) return '<span class="weekly-points-down">'+esc(value)+'</span>';
     }
