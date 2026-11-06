@@ -43,9 +43,9 @@
 
   <main id="main-content" tabindex="-1" class="legal-main">
     <div class="container narrow-container">
-      <p class="eyebrow">Your data, your device</p>
+      <p class="eyebrow">Your data and choices</p>
       <h1>Privacy Policy</h1>
-      <p class="last-updated">Effective date: 22 June 2026<br>Last updated: 26 October 2026</p>
+      <p class="last-updated">Effective date: 22 June 2026<br>Last updated: 6 November 2026</p>
 
       <div class="legal-card">
         <section>
@@ -55,26 +55,37 @@
 
         <section>
           <h2>App privacy at a glance</h2>
-          <p>The CourtUmpire Android and connected Wear OS app requires no account and has no ads. Match records stay locally on your device. The app does not intentionally use analytics, advertising cookies, external tracking, payments, or backend services. Optional analytics on this website is separate and does not give us access to your app’s match data.</p>
+          <p>Native scorekeeping requires no CourtUmpire account and has no ads or analytics SDK. Player names, match settings, scores and history are stored by the app. A connected Wear OS companion exchanges match information with the phone. System backup, device migration and your own exports can create copies elsewhere. Explore opens online website content and checks the public Weekly feed; optional website analytics and Weekly participation are also available there. These web features do not automatically receive your native match history.</p>
         </section>
 
         <section>
           <h2>Match information</h2>
-          <p>The app allows you to enter match information such as player names, scores, match log entries, and match settings. This information is stored locally on your device. The developer does not receive or access this match information through the website. A connected Wear OS companion can control the active match on your phone.</p>
-          <p>Local match data remains on your device until you delete the match data, clear the app data, or uninstall the app.</p>
+          <p>The phone stores player names, match settings, scores, match logs and saved history in app storage. The connected Wear OS companion displays match information, including player names and scores, and sends scoring, undo and status commands to the phone through Google Play services’ Wearable Data Layer. The phone controls the active match. This is companion-device communication, not a CourtUmpire cloud match account.</p>
+          <p>Android system backup and restore are enabled for the app. Its backup rules do not exclude match records or preferences. Depending on your Android version, device, backup provider and settings, eligible app data can be copied into system backups or transferred to another device and restored later. CourtUmpire does not provide its own match-backup server or give the developer access to your system backup. See <a href="https://developer.android.com/identity/data/autobackup">Android’s backup information</a> and your device’s backup controls.</p>
+          <p>Deleting a saved match, clearing app data or uninstalling removes the relevant local app copy. It does not necessarily erase system backups, copies on another device, or files you saved or shared. Manage backup and migration copies through the relevant device or backup service, and remove exported copies separately.</p>
         </section>
 
         <section>
-          <h2>PDF reports</h2>
-          <p>PDF reports are generated on your device. You choose whether to save, export, or share them.</p>
-          <p>If you share a PDF report outside CourtUmpire, that sharing is controlled by you and by the sharing app or service you select.</p>
+          <h2>PDF reports and PNG result images</h2>
+          <p>Reports and result images are generated on your device. Exporting a PDF can save a file in Downloads or the app’s document storage. Sharing a PNG result card opens Android’s sharing chooser and grants the app you choose access to that image. Explore’s supported Save PDF and Save PNG actions use the system document picker; printing uses Android’s print service.</p>
+          <p>A report or image may contain player names, scores, dates, match details or information you entered into a website tool. A destination you choose, such as a messaging app, cloud drive, email app or print service, may receive the file and associated delivery information and may store or forward it under its own rules. CourtUmpire does not automatically publish these files. Saved files and recipients’ copies can remain after you delete a match or uninstall the app.</p>
+        </section>
+
+        <section id="app-explore">
+          <h2>Explore, Weekly reading and notifications</h2>
+          <p>Explore displays CourtUmpire’s public website in an embedded Android WebView. Opening pages or refreshing online content makes HTTPS requests to our website and its delivery services. The app also requests the public <a href="/weekly/feed.xml">Weekly RSS feed</a> to obtain article titles, descriptions, links and publication dates. It keeps public article metadata in memory and can use a local feed cache where the server permits caching. Article read/dismiss state and notification preferences are stored locally. Website cookies and local storage inside Explore are separate from your ordinary browser and from native match history.</p>
+          <p>The feed can be checked when you enter or refresh Explore. If you enable “New Weekly articles” and Android permits its notification channel, Android WorkManager can also check in the background approximately every three hours when a network is available and the battery is not low. Android may delay checks or alerts. These alerts are generated locally after feed polling; they are not an email subscription or a remote push-notification service. Adding the public RSS feed to a separate reader is another choice, governed by that reader’s settings.</p>
+          <p>“Live match score” notifications are a separate, optional local display of the current native match, not Weekly alerts. Notifications can reveal player names, scores, or article titles and excerpts on the notification shade or lock screen, depending on Android’s settings. Use the app’s separate “Live match score” and “New Weekly articles” controls, Android notification/channel settings, and lock-screen privacy controls to choose what is shown. Turning Weekly alerts off stops scheduled article checks; it does not stop a feed request when you deliberately open or refresh Explore.</p>
+          <p>Optional Google Analytics and Weekly participation can be available on website pages viewed inside Explore, just as on the website. Before acceptance, optional analytics stays off. In Explore’s compact footer, open “Privacy &amp; legal” and then “Analytics settings” to review or withdraw that WebView’s analytics choice; in an ordinary browser, use “Analytics settings” in the footer. See the analytics section below. Native notification permission is a separate choice and does not consent to analytics or comments.</p>
+          <p>Weekly reading needs no participation. If you choose to comment under an unverified nickname, react or report a comment, the separate <a href="/weekly/privacy/">Weekly privacy and participation notice</a> explains the information involved, moderation, optional private email, anti-abuse services, retention and deletion. Providing a commenter email does not subscribe you to email updates or Android article alerts.</p>
         </section>
 
         <section id="local-website-tools"><h2>Local website tools and club logos</h2><p>Practice plans, scoring histories, result-card drafts, rotation settings, separate session/organizer checklists and event details are processed in your browser. Where available, browser local storage remembers them until you remove them or clear this site’s data. They are not uploaded to CourtUmpire or Google by these tools. Sharing a downloaded or printed document is your own action; its contents may include the names and event details you entered.</p><p>An optional PNG, JPEG or WebP club logo is decoded, resized and re-encoded locally. Only the processed image and its dimensions are saved locally; the original filename and embedded metadata are not retained by this logo feature. The selected logo is reused in local document previews and prints. Remove club logo clears that saved image. If storage is unavailable or full, the current page remains usable but changes may not persist. Clearing analytics consent does not erase your checklists, event details or logo.</p></section>
 
 <section>
           <h2>Website access data</h2>
-          <p>When you visit courtumpire.com, the website hosting provider, GitHub Pages, may process technical access data such as your IP address, browser information, the date and time of access, and server logs. This is used to deliver the website securely and reliably, independently of your optional analytics choice.</p>
+          <p>The website is published through GitHub Pages. Cloudflare provides DNS and proxies delivery and security for courtumpire.com; Weekly pages, its public feed and participation services also use Cloudflare Workers, with Weekly content and participation data stored in Cloudflare D1. Website requests, including those from Explore, expose technical connection information such as IP address, browser/device information, requested address and access time to the services handling the request. GitHub can process origin requests, and Cloudflare processes requests delivered through its network. DNS resolution, content delivery and security are separate from optional Google Analytics and can occur before any analytics choice.</p>
+          <p>See <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub’s privacy statement</a> and <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare’s privacy policy</a>. These services may process data internationally. This notice does not promise that all delivery data stays in the EU or specify an unverified provider log-retention period.</p>
         </section>
 
         <section id="local-tool-data"><h2>Your saved tools and local quiz</h2><p>Practice plans, match configuration and point/undo history, event settings, optional processed club logos and both checklist templates can be saved in this browser where storage is available. Checklists include text, completion state and temporarily removed reminders. Permanently deleting a reminder removes it from that saved checklist; restoring defaults can bring back predefined reminders, but not deleted custom text. Reset score clears match scores and undo history while retaining configured names and format. These local records are not automatically sent to us.</p><p>Use the planner’s Clear saved session, checklist remove/delete actions, score reset and logo remove controls as appropriate. You can remove all stored website data through your browser’s site-data settings; this also clears other locally saved CourtUmpire preferences and tool data. The quiz randomizes and scores in memory without visitor identifiers, accounts or persistent quiz history; refresh starts a new run. Optional analytics receives only approved categories and bounded question/score totals after consent, never your submitted answer text or saved tool contents.</p></section>
@@ -82,7 +93,7 @@
           <p>The Contact page opens your own email app. Selecting a topic prepares an email subject; the website does not send a message, upload an attachment or submit a contact form. The copy button copies only our public contact address. We do not store draft enquiries in this website’s browser storage.</p>
           <p>If you email us, we receive the information you choose to provide, such as your name, email address, message and any attachments, together with ordinary email delivery metadata. We use it to handle your enquiry and respond. Please avoid sending unnecessary sensitive information.</p>
           <p>For general enquiries, the intended legal basis is Article 6(1)(f) GDPR: our legitimate interest in responding, subject to necessity and balancing. Article 6(1)(b) applies only where the enquiry is necessary for a contract or steps you request before a contract; applicable statutory rights requests may require processing under Article 6(1)(c). Optional website analytics consent is not required to email us.</p>
-          <p>Enquiries are processed through the email services involved in sending and receiving your message. We retain correspondence while needed to resolve the enquiry and necessary follow-up, and longer only where justified by applicable legal duties or a dispute. The website does not automatically delete mailbox messages. No specific provider retention period, EU-only processing guarantee or completed contractual review is asserted here; the owner must verify the actual mailbox arrangements, safeguards and deletion procedures.</p>
+          <p>Email to our contact address is routed through Mailgun mail servers and the configured receiving email services. Mail delivery or forwarding passes the message and attachments to the receiving mailbox; it is distinct from that mailbox’s storage and deletion. See <a href="https://www.mailgun.com/legal/privacy-policy/">Mailgun’s privacy information</a>. We retain correspondence while needed to resolve the enquiry and necessary follow-up, and longer only where justified by applicable legal duties or a dispute. Clearing website or app data does not delete mailbox messages, copies held by your email service, or backups. Email handling may involve processing outside the EEA; no EU-only processing or fixed provider-retention guarantee is made here.</p>
           <p>Depending on the applicable conditions, you may request access, correction, erasure, restriction or portability, and object to processing based on legitimate interests. Contact <a href="mailto:info@courtumpire.com">info@courtumpire.com</a> to exercise your rights. You may complain to a competent data-protection supervisory authority, including where you live or work or where an alleged infringement occurred.</p>
         </section>
 
@@ -108,9 +119,11 @@
           <h2>Your choices</h2>
           <ul class="legal-list">
             <li>You can avoid entering real player names.</li>
-            <li>You can delete local app data from your device.</li>
-            <li>You choose whether to export or share PDF reports.</li>
+            <li>You can delete saved matches or local app data. Manage system backups, migration copies and exported files separately.</li>
+            <li>You choose whether to export, save, print or share PDF reports and PNG images, and which destination receives them.</li>
+            <li>You can turn live-match notifications and Weekly article alerts on or off separately and use Android’s lock-screen privacy settings.</li>
             <li>You can reject optional website analytics or withdraw through “Analytics settings”.</li>
+            <li>You can read Weekly without commenting or reacting and contact us about deletion of participation data.</li>
           </ul>
         </section>
 
@@ -121,19 +134,19 @@
 
         <section>
           <h2>No automated decision-making</h2>
-          <p>The CourtUmpire app does not use automated decision-making or profiling. Website analytics is used to understand visits and link clicks, not to make decisions about individual users.</p>
+          <p>We do not use automated decisions with legal or similarly significant effects on you. Optional website analytics uses browser identifiers to understand website use; it does not make scoring decisions or provide the developer with native match history.</p>
         </section>
 
         <section>
           <h2>Children and younger users</h2>
           <p>CourtUmpire is intended for tennis players, coaches, and match organizers aged 13 and over. The app is not designed for children under 13.</p>
-          <p>The CourtUmpire app does not require an account, does not use advertising or analytics, and does not intentionally collect personal data from children or younger users. This website’s separate analytics is optional; visitors can reject it.</p>
+          <p>Native scorekeeping requires no account and includes no advertising or analytics SDK. Explore loads the online services described above, including optional website analytics and Weekly participation. Younger users can reject analytics and read without participation; please do not submit unnecessary personal information about yourself or other players.</p>
           <p>If the app is used by minors in training, club, school, or tournament contexts, users should avoid entering unnecessary personal information. Player names can be entered as first names, initials, nicknames, or temporary labels.</p>
         </section>
 
         <section>
-          <h2>Future features</h2>
-          <p>This policy must be updated before the app adds analytics, cloud sync, crash reporting, ads, payments, accounts, or third-party SDKs, or the website adds new forms of data collection.</p>
+          <h2>Scope of these choices</h2>
+          <p>Native scoring, device backup, file sharing, Android notifications, website analytics and Weekly participation have different controls. Enabling one does not enable the others. If our processing changes, we will update this notice and request any additional consent required before optional tracking starts.</p>
         </section>
 
         <section>
@@ -142,7 +155,7 @@
         </section>
       </div>
     </div>
-  <section class="container section" id="weekly-privacy"><h2>CourtUmpire Weekly</h2><p>Weekly articles are readable without engagement. See the <a href="/weekly/privacy/">Weekly privacy and participation notice</a> for anonymous comments, optional private email, reactions, moderation, Cloudflare anti-abuse services and optional YouTube video.</p></section></main>
+  </main>
 
   <footer class="site-footer"><div class="container footer-columns"><div><strong>Court<span class="accent-text">Umpire</span></strong><p>Practice, play and every point counted.</p></div><div><h2>Practice</h2><ul><li><a href="/practice/">Practice overview</a></li><li><a href="/practice-planner/">Build a practice</a></li><li><a href="/tennis-drills/">Find a drill</a></li><li><a href="/practice/players/">Practice for 1–4 players</a></li></ul></div><div><h2>Play &amp; Score</h2><ul><li><a href="/play-score/">Play &amp; Score overview</a></li><li><a href="/play-score/scoreboard/">Score a match</a></li><li><a href="/play-score/tiebreak-calculator/">Understand scoring</a></li><li><a href="/play-score/result-card/">Share a result</a></li><li><a href="/play-score/umpire-challenge/">You’re the Umpire</a></li></ul></div><div><h2>Clubs &amp; Coaches</h2><ul><li><a href="/clubs-coaches/">Clubs &amp; Coaches overview</a></li><li><a href="/clubs-coaches/rotation-planner/">Create a rotation schedule</a></li><li><a href="/clubs-coaches/tennis-kit/">Printable club kit</a></li><li><a href="/clubs-coaches/tournament-rules/">Tournament rules &amp; information</a></li><li><a href="/clubs-coaches/match-score-sheet/">Match score sheet builder</a></li><li><a href="/clubs-coaches/session-checklist/">Checklists</a></li></ul></div></div><div class="container footer-bottom"><div class="footer-links"><a href="/site-map/">Site map</a><a href="/privacy.html">Privacy Policy</a><a href="/impressum.html">Impressum / Legal Notice</a><a href="/contact.html">Contact</a><button type="button" class="analytics-settings" data-analytics-settings hidden>Analytics settings</button></div></div></footer>
 </body>
