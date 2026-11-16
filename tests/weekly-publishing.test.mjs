@@ -11,6 +11,19 @@ before(async()=>{mf=new Miniflare({modules:true,script:'export default {fetch(){
 after(async()=>{await mf?.dispose();});
 async function mutation(a,action='publish',old=null){const s=await get('state');return {key:crypto.randomUUID(),action,article:a,expectedRevision:old?.revision??null,expectedHash:old?.hash??null,expectedVersion:s.version,confirmId:a.id,cover:png};}
 async function commit(b){const r=await call('/admin/api/publishing/mutate',b);const j=await r.json();assert.equal(r.status,200,JSON.stringify(j));return j;}
+test('publication preview accepts a Monday issue with 14 days of coverage', async () => {
+  const draft = {
+    ...fixture(),
+    id: 'cu-weekly-2026-10-26',
+    slug: '2026-10-26-flexible-dummy-edition',
+    issueDate: '2026-10-26',
+    coverageStart: '2026-10-09T16:00:00+02:00'
+  };
+  const before = await get('state');
+  const preview = await call('/admin/api/publishing/preview', await mutation(draft));
+  assert.equal(preview.status, 200, await preview.clone().text());
+  assert.deepEqual(await get('state'), before);
+});
 test('two dummy editions, preview, atomic registration, replay, direct refresh, archive/feed/sitemap',async()=>{
  const a=fixture();const p=await mutation(a);const preview=await call('/admin/api/publishing/preview',p);assert.equal(preview.status,200,await preview.clone().text());assert.equal((await read('/weekly/'+a.slug+'/')).status,404);const result=await commit(p);assert.deepEqual(await commit(p),result);assert.equal((await get('state')).editions.length,1);
  const b=JSON.parse(JSON.stringify(fixture()).replace(/2026-10-(\d{2})/g,(_,d)=>'2026-10-'+String(Number(d)-7).padStart(2,'0')));b.id='cu-weekly-2026-10-16';b.slug='2026-10-16-second-dummy';b.title='Second dummy edition';const second=await commit(await mutation(b));assert.notEqual(second.id,result.id);let html=await (await read('/weekly/')).text();assert.ok(html.indexOf(b.title)<html.indexOf(a.title));assert.ok(!html.includes('First edition coming soon'));

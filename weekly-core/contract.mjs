@@ -47,11 +47,9 @@ export function validate(a){
   const ts=k=>Date.parse(a[k]);
   for(const [i,s]of a.sources.entries())if(Date.parse(s.accessedAt)>ts('factsCheckedAt'))fail('sources['+i+'].accessedAt','Source retrieval cannot follow the stated fact-check time.');
   for(const [i,s]of a.sources.entries())if(s.publishedAt&&Date.parse(s.publishedAt)>Date.parse(s.accessedAt))fail('sources['+i+'].publishedAt','Source publication cannot follow actual retrieval.');
-  if(new Date(a.issueDate+'T12:00:00Z').getUTCDay()!==5)fail('issueDate','The intended issue date must be a Friday.');
   if(a.id!=='cu-weekly-'+a.issueDate)fail('id','ID must match the intended issue date.');
   if(!a.slug.startsWith(a.issueDate+'-'))fail('slug','Slug must begin with issueDate.');
   if(!(ts('coverageStart')<ts('coverageEnd')&&ts('coverageEnd')<=ts('plannedCutoff')&&ts('coverageEnd')<=ts('factsCheckedAt')))fail('coverageEnd','Require start < end ≤ planned cutoff and facts checked time.');
-  if(ts('coverageEnd')-ts('coverageStart')>7*86400000+3600000)fail('coverageStart','Coverage must fit the rolling seven-day window (including DST).');
   if(a.status==='published'&&(!a.publishedAt||!a.editionNumber))fail('publishedAt','Publication requires an assigned edition number and real publication timestamp.');
   if(a.publishedAt&&ts('publishedAt')<ts('coverageEnd'))fail('publishedAt','Publication cannot precede coverage end.');
   if(a.updatedAt&&(!a.publishedAt||ts('updatedAt')<=ts('publishedAt')))fail('updatedAt','A revision must be later than original publication.');
