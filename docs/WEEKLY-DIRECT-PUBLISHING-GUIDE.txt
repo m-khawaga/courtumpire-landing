@@ -4,7 +4,7 @@ pending the final DNS-drain/release check. See WEEKLY-DIRECT-ACTIVATION-2026-10-
 After activation this supersedes the old per-article GitHub/import/registry workflow.
 
 1. Sign in at https://admin.courtumpire.com with info@wynctec.com and MFA.
-2. Import article JSON, or Create blank edition. A blank draft needs its ID/Friday date,
+2. Import article JSON, or Create blank edition. A blank draft needs its ID and issue date,
    coverage/cutoff/check timestamps, headline/deck/description, required sections,
    verified sources and both rankings tables (honest unavailable states are allowed).
 3. Edit the normal fields or Advanced · complete JSON. Save private draft persists

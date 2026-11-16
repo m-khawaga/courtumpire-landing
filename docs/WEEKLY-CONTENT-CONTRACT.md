@@ -15,8 +15,8 @@ The canonical publication format is exactly one JSON object, no wrapper, extra p
 | status | `draft` or `published` |
 | title, deck | Required plain text; max 180 / 500 characters |
 | language, timezone | `en`, `Europe/Berlin` |
-| issueDate | Intended Friday, `YYYY-MM-DD` |
-| coverageStart, coverageEnd | ISO timestamps with offset, actual rolling coverage; start < end |
+| issueDate | Intended issue date, `YYYY-MM-DD` |
+| coverageStart, coverageEnd | ISO timestamps with offset, the edition’s actual reporting period; start < end |
 | plannedCutoff | ISO timestamp with offset; coverageEnd must not exceed it |
 | factsCheckedAt | ISO timestamp with offset; at/after coverageEnd and source retrievals |
 | publishedAt | null until the approved publication step; immutable thereafter |

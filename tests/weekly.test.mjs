@@ -10,6 +10,36 @@ import {article,archive,teaser,metadata,social} from '../weekly-core/render.mjs'
 import {hash,updateEdition,published,loadEditions} from '../weekly-core/store.mjs';
 test('shared JSON schema and runtime agree on exact contract and field-specific errors',()=>{const a=fixture();assert.deepEqual(validate(a),[]);const validateSchema=new Ajv({strict:false}).compile(schema);assert.ok(validateSchema(a));for(const mutation of [a=>delete a.deck,a=>a.sections[0].videos=null,a=>a.commentsEnabled='true',a=>a.unknown='private',a=>a.sections[0].paragraphs[0].kind='story']){const b=structuredClone(a);mutation(b);assert.equal(validateSchema(b),false);assert.ok(validate(b).length);}assert.match(validate({...a,title:''})[0].path,/title/);});
 test('source references, timestamps, result status, ranking scope and interactive bounds fail usefully',()=>{for(const [change,pattern]of [[a=>a.sections[0].paragraphs[0]={text:'Unsourced fact',kind:'fact',sourceIds:[]},/Facts require/],[a=>a.sections[0].paragraphs[0].sourceIds=['missing'],/Unknown source/],[a=>a.coverageEnd=a.coverageStart,/Require start/],[a=>a.issueDate='2026-02-30',/calendar date/],[a=>a.publishedAt='2026-10-22T00:00:00Z',/precede/],[a=>a.sections[3].tables[0].rows[0].cells.status='ongoing',/completed, retired/],[a=>a.sections[3].tables[0].rows[0].cells.status='walkover',/no played score/],[a=>a.sections[4].tables[0].asOf='2026-10-19',/Rankings need/],[a=>a.sections[0].reveal=a.sections[2].reveal,/At most one/],[a=>a.sections[2].timeline.pop(),/three to five/],[a=>a.title='<img src=x onerror=alert(1)>',/plain text/]]){const a=fixture();change(a);assert.match(validate(a).map(e=>e.message).join('\n'),pattern);}});
+test('all issue weekdays and extended coverage pass the shared validator', () => {
+  for (let day = 23; day <= 29; day++) {
+    const issueDate = '2026-10-' + day;
+    const draft = {...fixture(), issueDate, id:'cu-weekly-' + issueDate, slug:issueDate + '-fictional-edition'};
+    for (const days of [7, 9, 14, 35]) {
+      const coverageStart = new Date(Date.parse(draft.coverageEnd) - days * 86_400_000).toISOString().replace('.000Z', 'Z');
+      assert.deepEqual(validate({...draft, coverageStart}), [], `${issueDate}, ${days} days`);
+    }
+  }
+});
+test('flexible dates still enforce calendar validity, identity and cutoff ordering', () => {
+  const draft = fixture();
+  for (const [changes, field] of [
+    [{issueDate:'2026-02-30', id:'cu-weekly-2026-02-30', slug:'2026-02-30-fictional-edition'}, 'issueDate'],
+    [{coverageStart:'2026-09-31T16:00:00+02:00'}, 'coverageStart'],
+    [{issueDate:'2026-10-26'}, 'id'],
+    [{issueDate:'2026-10-26', id:'cu-weekly-2026-10-26'}, 'slug'],
+    [{coverageStart:'2026-10-24T16:00:00+02:00'}, 'coverageEnd'],
+    [{coverageEnd:'2026-10-23T16:15:00+02:00'}, 'coverageEnd'],
+    [{coverageEnd:'2026-10-23T17:00:00+02:00', plannedCutoff:'2026-10-23T17:00:00+02:00'}, 'coverageEnd']
+  ]) {
+    const errors = validate({...draft, ...changes});
+    assert.ok(errors.some(error => (error.path === field || error.path === 'edition.' + field)), JSON.stringify({changes, errors}));
+  }
+});
+test('archive describes each edition’s reporting period', () => {
+  const html = archive([]);
+  assert.match(html, /Each edition shows its reporting period and factual cutoff/);
+  assert.doesNotMatch(html, /Friday cutoff|seven-day coverage/i);
+});
 test('eligibility and immutable publication fields, versions, revisions and escaping',()=>{const draft=fixture(),a={...draft,status:'published',editionNumber:1,publishedAt:'2026-10-23T18:00:00+02:00'};assertValid(a);assert.equal(eligible(draft),false);assert.equal(eligible({...a,publishedAt:'2099-01-01T00:00:00Z'}),false);assert.deepEqual(published([draft,a]).map(x=>x.id),[a.id]);const next={...a,title:'A genuine revision',updatedAt:'2026-10-24T12:00:00Z'};assert.equal(updateEdition(a,next,hash(a)).publishedAt,a.publishedAt);assert.throws(()=>updateEdition(a,next,'stale'),/Concurrent/);assert.throws(()=>updateEdition(a,{...next,editionNumber:2},hash(a)),/Immutable/);const malicious={...a,title:'<script>bad()</script>',deck:'" & <img onerror=bad()>'};const html=article(malicious);assert.ok(html.includes('&lt;script&gt;'));assert.ok(!html.includes('<script>bad'));assert.ok(!html.includes('<img onerror'));assert.ok(html.includes('<table>')&&html.includes('<details>')&&html.includes('Show answer'));assert.ok(!html.includes('<iframe'));assert.ok(archive([]).includes('still being prepared'));assert.equal(teaser(null),'');assert.equal(metadata(a).author['@type'],'Organization');assert.ok(social(a).includes('CourtUmpire'));});
 test('build, public packaging, latest, feeds, pagination, redirects and unpublishing use only eligible sources',()=>{
   const base=process.cwd(),tmp=path.join(base,'.weekly-private','build-test-'+crypto.randomUUID());fs.mkdirSync(tmp,{recursive:true});

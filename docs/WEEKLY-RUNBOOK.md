@@ -35,9 +35,9 @@ Then visit `http://127.0.0.1:4187/demo/engagement.html` and `http://127.0.0.1:87
 
 The normal `npm run backend:dev` uses the actual fail-closed Worker, so its admin UI will refuse access without real Access configuration. That is intentional. The working demo is not evidence that remote moderation is deployed.
 
-## Each Friday: the short workflow
+## Preparing an edition
 
-1. Use `docs/WEEKLY-GENERATION-PROMPT.txt` together with the complete `authoring/schema.json` and `docs/WEEKLY-CONTENT-CONTRACT.md`. Check the source links and every factual claim yourself. Proposed cutoff is Friday 16:00 Europe/Berlin, target publication around 18:00, with no automatic scheduling.
+1. Use `docs/WEEKLY-GENERATION-PROMPT.txt` together with the complete `authoring/schema.json` and `docs/WEEKLY-CONTENT-CONTRACT.md`. Check the source links and every factual claim yourself. Choose the issue date and cutoff for each edition. Publication is manual.
 2. Open the editor, import/paste the JSON and choose **Validate & preview**. Fix the field-specific errors. The form lets you edit title, deck, SEO description, byline, section headings, paragraph text, captions and every table cell. Dates and existing timeline text also have normal fields. Use Advanced JSON for structural edits, sources, video and correction records. The untouched blank template does not show validation errors until requested.
 3. Choose **Prepare for publication / export**. This downloads a validated file; it is not live. Unsaved changes trigger a navigation warning. Nothing is uploaded, and the editor receives no GitHub token or secret.
 4. Save exports under `.weekly-private/`. Import a new edition with:

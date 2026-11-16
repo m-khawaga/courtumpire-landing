@@ -4,7 +4,7 @@
 
 Write for a curious tennis reader. Lead with an original observation grounded in a verified event, then develop situation → turning point → consequence. Do not turn every edition into an umpiring lesson. Be the Umpire is a separate future product; the existing scoring quiz is unchanged.
 
-Friday's edition is a rolling seven-day window, normally ending at 16:00 Europe/Berlin and published after review around 18:00. Include the preceding weekend's completed finals and this week's completed matches by the actual cutoff. Clearly separate the coming weekend preview and next-week watchlist. An ongoing tournament is still ongoing; do not manufacture a champion before its final. Record exact coverage bounds and offsets across daylight-saving changes.
+Choose the issue date and cutoff for each edition. Normally start coverage at the most recent published edition’s `coverageEnd`. Include completed results within the stated reporting period and separate them from the upcoming fixtures and watchlist. Publish manually after review. An ongoing tournament is still ongoing; do not manufacture a champion before its final. Record exact coverage bounds and offsets across daylight-saving changes.
 
 Start with an opening and quick summary. Develop the turning point when supported. Include selected results, the official ranking snapshot, player updates and notable incidents where evidence supports them, then the weekend preview and next-week watchlist. A required section with missing evidence gets a brief honest editorial limitation. Do not pad modules, claim comprehensiveness, or confuse opinion with a sourced fact.
 
