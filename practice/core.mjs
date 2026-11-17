@@ -1,6 +1,7 @@
 import { activities, byId } from './catalogue.mjs';
 export const SESSION_KEY = 'courtumpire.practice.v1';
-export const defaults = Object.freeze({ players: 2, duration: 60, goal: 'A mix', level: 'Beginner', focus: '', facilities: ['court'], equipment: ['rackets', 'balls'] });
+export const activityCounts = [3, 4, 5, 6, 7, 8];
+export const defaults = Object.freeze({ players: 2, duration: 60, goal: 'A mix', level: 'Beginner', focus: '', facilities: ['court'], equipment: ['rackets', 'balls'], activityCount: activityCounts[0] });
 export const goals = ['Fun games', 'Technique practice', 'Match preparation', 'A mix'];
 export const levels = ['Beginner', 'Intermediate', 'Advanced', 'Mixed'];
 export const focuses = ['Consistency', 'Crosscourt', 'Down the line', 'Volleys', 'Serve and return', 'Movement', 'Doubles teamwork'];
@@ -21,30 +22,59 @@ export function compatible(s) {
   return activities.filter(a => !conflicts(a,s).length && (s.level !== 'Beginner' || a.level === 'Beginner'));
 }
 export function total(session) { return session.blocks.reduce((n,b) => n + b.minutes, 0) + Math.max(0, session.blocks.length-1); }
+
+function minimumMinutes(pool, count) {
+  if (pool.length < count) return Infinity;
+  return pool.map(a => a.minimum).sort((a,b) => a-b).slice(0,count).reduce((sum,minutes) => sum+minutes,0);
+}
+
+function minimumPlanMinutes(pool, count) {
+  const intro = pool.filter(a => a.intro).sort((a,b) => a.minimum-b.minimum)[0];
+  if (!intro) return Infinity;
+  return intro.minimum + minimumMinutes(pool.filter(a => a !== intro), count-1) + count-1;
+}
+
 export function generate(settings) {
   if (!validSettings(settings)) throw new Error('Choose 1–4 players and a whole duration from 15 to 180 minutes.');
+  const { activityCount = defaults.activityCount, ...preferences } = settings;
+  if (!activityCounts.includes(activityCount)) throw new Error('Choose 3 to 8 activities.');
   const pool = compatible(settings);
+  const minimum = minimumPlanMinutes(pool, activityCount);
+  if (settings.duration < minimum) {
+    if (Number.isFinite(minimum)) {
+      throw new Error(`${activityCount} activities need at least ${minimum} minutes including transitions. Try ${minimum} minutes.`);
+    }
+    const fallback = [...activityCounts].reverse().find(count => count < activityCount && minimumPlanMinutes(pool,count) <= 180);
+    const suggestion = fallback === undefined ? 'Try another player count or level.' :
+      `Try ${fallback} activities at ${Math.max(settings.duration,minimumPlanMinutes(pool,fallback))} minutes.`;
+    throw new Error(`There aren't enough compatible activities for a ${activityCount}-activity plan with these settings. ${suggestion}`);
+  }
   const score = a => (a.focus.includes(settings.focus) ? 8 : 0) +
     (settings.goal === 'Fun games' && a.type === 'Competitive game' ? 5 : 0) +
     (settings.goal === 'Technique practice' && a.type === 'Cooperative drill' ? 5 : 0) +
     (settings.goal === 'Match preparation' && (a.focus.includes('Serve and return') || a.type === 'Match format') ? 5 : 0);
   // Stable, settings-based variation lets new catalogue entries participate without changing saved IDs.
-  const signature=JSON.stringify(settings),rank=id=>{let h=2166136261;for(const ch of signature+id){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
+  const signature=JSON.stringify(preferences),rank=id=>{let h=2166136261;for(const ch of signature+id){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
   const ranked = [...pool].sort((a,b) => score(b)-score(a) || rank(a.id)-rank(b.id) || a.id.localeCompare(b.id));
-  const intro = ranked.find(a => a.intro);
-  const main = ranked.find(a => a !== intro);
-  const finish = ranked.find(a => a !== intro && a !== main && a.type !== 'Cooperative drill') || ranked.find(a => a !== intro && a !== main);
-  if (!intro || !main || !finish) throw new Error('Not enough compatible activities for this combination. Try another player count or level.');
-  const chosen = [intro, main, finish];
-  const minimum = chosen.reduce((n,a) => n+a.minimum,0) + 2;
-  if (settings.duration < minimum) throw new Error(`These activities need at least ${minimum} minutes including two 1-minute transitions. Try ${Math.max(30,minimum)} minutes.`);
-  const blocks = chosen.map(a => ({ id:a.id, minutes:a.minimum }));
-  let remaining = settings.duration-minimum;
-  // Intro stays shorter; distribute extra time deterministically across the main and finish.
-  while (remaining > 0 && blocks[0].minutes < Math.min(intro.suggested, Math.floor(settings.duration/4))) { blocks[0].minutes++; remaining--; }
-  let i = 1;
-  while (remaining-- > 0) { blocks[i].minutes++; i = i === 1 ? 2 : 1; }
-  return { version:1, settings:structuredClone(settings), blocks, edited:false };
+  const blocks = [];
+  let remaining = settings.duration - (activityCount-1);
+  for (let position=0; position<activityCount; position++) {
+    const left = activityCount-position-1;
+    // Keep the ranking preferences whenever the cheapest possible completion still fits.
+    const fits = a => a.minimum + minimumMinutes(ranked.filter(b => b !== a),left) <= remaining;
+    const chosen = ranked.find(a => fits(a) && (position===0 ? a.intro : left>0 || a.type!=='Cooperative drill')) ||
+      ranked.find(fits);
+    blocks.push({ id:chosen.id, minutes:chosen.minimum });
+    remaining -= chosen.minimum;
+    ranked.splice(ranked.indexOf(chosen),1);
+  }
+  // Keep the introduction short and share the remaining time across every other block.
+  const introTarget = Math.min(byId.get(blocks[0].id).suggested,Math.floor(settings.duration/(activityCount+1)));
+  const introExtra = Math.max(0,Math.min(remaining,introTarget-blocks[0].minutes));
+  blocks[0].minutes += introExtra;
+  remaining -= introExtra;
+  for (let i=0; i<remaining; i++) blocks[1 + i%(activityCount-1)].minutes++;
+  return { version:1, settings:structuredClone({ ...settings, activityCount }), blocks, edited:false };
 }
 export function swapOptions(session, index) {
   const used = new Set(session.blocks.map(b => b.id));
@@ -63,7 +93,9 @@ export function restore(raw) {
     const s = JSON.parse(raw);
     if (s?.version !== 1 || !validSettings(s.settings) || !Array.isArray(s.blocks) || s.blocks.length > 24 || typeof s.edited !== 'boolean') return null;
     if (!s.blocks.every(b => b && byId.has(b.id) && Number.isInteger(b.minutes) && b.minutes >= byId.get(b.id).minimum && b.minutes <= 180 && !conflicts(byId.get(b.id), s.settings).length)) return null;
-    return { version:1, settings:structuredClone(s.settings), blocks:s.blocks.map(b => ({ id:b.id, minutes:b.minutes })), edited:s.edited };
+    const settings = structuredClone(s.settings);
+    if (!activityCounts.includes(settings.activityCount)) settings.activityCount = defaults.activityCount;
+    return { version:1, settings, blocks:s.blocks.map(b => ({ id:b.id, minutes:b.minutes })), edited:s.edited };
   } catch { return null; }
 }
 export function load(storage) {
@@ -72,6 +104,7 @@ export function load(storage) {
 }
 export function save(storage, session) { try { storage.setItem(SESSION_KEY,JSON.stringify(session)); return true; } catch { return false; } }
 export function summary(session) {
-  return `CourtUmpire practice · ${session.settings.players} players · ${total(session)} / ${session.settings.duration} minutes\n` +
+  return `CourtUmpire practice · ${session.settings.players} players · ${activityLabel(session.blocks.length)} · ${total(session)} / ${session.settings.duration} minutes\n` +
     session.blocks.map((b,i) => `${i+1}. ${byId.get(b.id).title} — ${b.minutes} min${i < session.blocks.length-1 ? '\n   Transition / retrieve / change roles — 1 min' : ''}`).join('\n');
 }
+export const activityLabel = count => `${count} activit${count===1?'y':'ies'}`;

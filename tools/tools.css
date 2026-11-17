@@ -98,3 +98,7 @@ body[data-page="quiz"] .practice-intro{padding-bottom:12px}
 .quiz-settings :is(select,button){box-sizing:border-box;height:max(48px,3rem);min-height:0;padding-block:0;line-height:1.25}
 .quiz-settings button{display:inline-flex;align-items:center;justify-content:center;text-align:center}
 @media(max-width:20em){.quiz-settings{grid-template-columns:minmax(0,1fr)}.quiz-settings button{justify-self:start}}
+
+.tiebreak-sequence { width:min(100%,28rem); border-collapse:collapse; margin-block:1rem; }
+.tiebreak-sequence caption { text-align:left; margin-bottom:.45rem; }
+.tiebreak-sequence :is(th,td) { text-align:left; padding:.4rem .55rem; border-bottom:1px solid var(--line); }

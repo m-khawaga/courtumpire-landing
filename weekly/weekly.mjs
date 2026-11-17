@@ -3,6 +3,20 @@ if (new URLSearchParams(location.search).get('cu-app') === '1') {
 }
 const article=document.querySelector('[data-article-id]');
 if(article){
+  // Published editions can have plain rank-change text in their stored HTML.
+  for (const table of article.querySelectorAll('.weekly-ranking-panel table')) {
+    const header = Array.from(table.tHead?.rows[0]?.cells ?? []).find(cell => cell.textContent.trim() === 'Rank change');
+    if (!header) continue;
+    for (const body of table.tBodies) {
+      for (const row of body.rows) {
+        const cell = row.cells[header.cellIndex];
+        if (!cell || cell.firstElementChild) continue;
+        const direction = cell.textContent.trim().match(/^([↑↓])\s+[1-9]\d*\s+\(/)?.[1];
+        if (direction) cell.classList.add(direction === '↑' ? 'weekly-rank-up' : 'weekly-rank-down');
+      }
+    }
+  }
+
   // Filters use rendered values only; no article fetches or changes to source data.
   const clean=node=>{const copy=node.cloneNode(true);copy.querySelectorAll('.weekly-refs').forEach(n=>n.remove());return copy.textContent.trim();};
   function filters(panel,records,columns,onChange){
