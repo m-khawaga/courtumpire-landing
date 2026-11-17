@@ -1,7 +1,7 @@
 import {saveEmbeddedPdf} from '../tools/embedded-pdf.mjs';
 import {track} from '../tools/usage.mjs';
 import { activities, byId } from './catalogue.mjs';
-import { defaults, SESSION_KEY, generate, conflicts, add, swapOptions, total, load, save, summary } from './core.mjs';
+import { defaults, SESSION_KEY, generate, conflicts, add, swapOptions, total, load, save, summary, activityLabel } from './core.mjs';
 import { card, court, instructions, escape } from './render.mjs';
 import { hydrateVideos } from './video.mjs';
 import { printReport } from './print-plan.mjs';
@@ -57,7 +57,7 @@ document.addEventListener('click',event => {
 });
 function added(a,stored) {
   track('drill_used',{player_count:String(a.players[0]),source_context:page});
-  notice(`${a.title} added. Your session now has ${session.blocks.length} activities, ${total(session)} planned / ${session.settings.duration} target minutes.${stored?'':' Browser storage is unavailable. Copy or print your plan before leaving.'}`);
+  notice(`${a.title} added. Your session now has ${activityLabel(session.blocks.length)}, ${total(session)} planned / ${session.settings.duration} target minutes.${stored?'':' Browser storage is unavailable. Copy or print your plan before leaving.'}`);
   const n = $('#library-notice');
   if (n) { const link = document.createElement('a'); link.href = '/practice-planner/'; link.className = 'text-link'; link.textContent = 'Open my session →'; n.append(link); }
   if (page === 'planner') renderPlan();
@@ -88,6 +88,8 @@ if (page === 'planner') {
   const desiredPlayers = Number(new URLSearchParams(location.search).get('players'));
   function fill(s) {
     for (const key of ['players','goal','level','focus']) form.elements.namedItem(key).value = String(s[key]);
+    const count = form.elements.namedItem('activityCount');
+    if (count) count.value = String(s.activityCount ?? defaults.activityCount);
     form.elements.duration.value = [30,45,60,90].includes(s.duration) ? String(s.duration) : 'custom';
     form.elements.custom.value = s.duration;
     form.elements.wall.checked = s.facilities.includes('wall'); updateCustom();
@@ -97,10 +99,18 @@ if (page === 'planner') {
   form.elements.duration.addEventListener('change',updateCustom);
   form.addEventListener('submit',event => {
     event.preventDefault();
-    if (session?.blocks.length && !confirm('Generate a new plan? This replaces the current activities and any edits.')) return;
     const data = new FormData(form);
-    const settings = { players:Number(data.get('players')), duration:Number(data.get('duration') === 'custom' ? data.get('custom') : data.get('duration')), goal:data.get('goal'), level:data.get('level'), focus:data.get('focus'), facilities:['court',...(data.has('wall')?['wall']:[])], equipment:['rackets','balls'] };
-    try { session = generate(settings);track('plan_generated',{tool_id:'practice_planner'}); courtsideIndex = null; renderPlan(); if (persist()) announce('Plan generated. Includes one-minute transitions between activities.'); $('#session-area').scrollIntoView({ behavior:'instant', block:'start' }); }
+    const settings = { players:Number(data.get('players')), duration:Number(data.get('duration') === 'custom' ? data.get('custom') : data.get('duration')), goal:data.get('goal'), level:data.get('level'), focus:data.get('focus'), facilities:['court',...(data.has('wall')?['wall']:[])], equipment:['rackets','balls'], activityCount:data.has('activityCount') ? Number(data.get('activityCount')) : defaults.activityCount };
+    try {
+      const next = generate(settings);
+      if (session?.blocks.length && !confirm('Generate a new plan? This replaces the current activities and any edits.')) return;
+      session = next;
+      track('plan_generated',{tool_id:'practice_planner'});
+      courtsideIndex = null;
+      renderPlan();
+      if (persist()) announce(`Plan generated with ${activityLabel(session.blocks.length)}. One-minute transitions are included in your session time.`);
+      $('#session-area').scrollIntoView({ behavior:'instant', block:'start' });
+    }
     catch(error) { notice(error.message);track('tool_error',{tool_id:'practice_planner',error_category:'validation'}); }
   });
   renderPlan();
@@ -118,15 +128,15 @@ function renderPlan() {
   $('#session-area').querySelector('.courtside-header')?.remove();
   $('#session-area').querySelector('.courtside-controls')?.remove();
   if (!session?.blocks.length) {
-    $('#session-summary').innerHTML = '<h2>A plan that fits your court.</h2><p class="muted">Generate a session or add an activity from the library. No wall is assumed.</p>';
+    $('#session-summary').innerHTML = '<h2>A plan that fits your court.</h2><p class="muted">Choose a time and activity count to generate a session, or add activities from the library.</p>';
     $('#session-controls').innerHTML = '<a class="secondary" href="/tennis-drills/">Browse games & drills</a>';
     if (session) $('#session-controls').insertAdjacentHTML('beforeend','<button class="secondary" type="button" data-clear>Clear saved session</button>');
     $('#session-blocks').innerHTML = ''; $('#print-summary').textContent = ''; return;
   }
   const planned = total(session), target = session.settings.duration;
-  $('#session-summary').innerHTML = `<h2>Your practice, ready to play.</h2><p class="plan-total ${planned!==target?'over-target':''}">${planned} planned / ${target} target minutes</p><p class="muted">${session.settings.players} player${session.settings.players>1?'s':''} · ${escape(session.settings.level)} · ${escape(session.settings.goal)} · ${session.blocks.length} activities${session.edited?' · Edited plan':''}<br>Includes ${Math.max(0,session.blocks.length-1)} one-minute transitions for retrieval, water and role changes. Pause longer if you need to.</p>${planned!==target?'<p class="notice">Your edited plan differs from the target. Adjust block minutes, remove activities or regenerate to match it.</p>':''}`;
+  $('#session-summary').innerHTML = `<h2>Your practice, ready to play.</h2><p class="plan-total ${planned!==target?'over-target':''}">${planned} planned / ${target} target minutes</p><p class="muted">${session.settings.players} player${session.settings.players>1?'s':''} · ${escape(session.settings.level)} · ${escape(session.settings.goal)} · ${activityLabel(session.blocks.length)}${session.edited?' · Edited plan':''}<br>Includes ${Math.max(0,session.blocks.length-1)} one-minute transitions for retrieval, water and role changes. Pause longer if you need to.</p>${planned!==target?'<p class="notice">Your edited plan differs from the target. Adjust block minutes, remove activities or regenerate to match it.</p>':''}`;
   $('#session-controls').innerHTML = '<button class="button" type="button" data-start>Start session</button><button class="secondary" type="button" data-print>Print / Save PDF</button><button class="secondary" type="button" data-copy>Copy session summary</button><a class="secondary" href="/tennis-drills/">Add activities</a><button class="secondary" type="button" data-clear>Clear saved session</button>';
-  $('#print-summary').textContent = `${session.settings.players} players · ${session.settings.level} · ${planned} planned / ${target} target minutes · Includes one-minute transitions.`;
+  $('#print-summary').textContent = `${session.settings.players} players · ${session.settings.level} · ${activityLabel(session.blocks.length)} · ${planned} planned / ${target} target minutes · Includes one-minute transitions.`;
   if (active) {
     courtsideIndex = Math.max(0,Math.min(courtsideIndex,session.blocks.length-1));
     $('#session-blocks').innerHTML = renderBlock(session.blocks[courtsideIndex],courtsideIndex,true);

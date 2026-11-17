@@ -58,10 +58,31 @@ test('both movement columns display unchanged without changing canonical zero va
   const html=article(a,{preview:true,comparison:previous});
   assert.equal((html.match(/<td>unchanged<\/td>/g)||[]).length,40);
   assert.ok(!html.includes('0 (unchanged)'));
-  assert.ok(!html.includes('weekly-points-up')&&!html.includes('weekly-points-down'));
+  assert.doesNotMatch(html,/weekly-(rank|points)-(up|down)/);
   assert.equal(JSON.stringify(a),saved);
   assert.equal(a.sections.find(s=>s.id==='rankings').tables[0].rows[0].cells['points-change'],'0 (unchanged)');
   assert.deepEqual(rankingErrors(a,previous),[]);
+});
+
+test('ATP and WTA render opposite rank and points movements independently, preserving missing comparisons',()=>{
+  const a=ranked(),previous=snapshot({...a,editionNumber:1});
+  for(const tour of ['atp','wta']){
+    const [decline,improve,entrant]=a.sections.find(s=>s.id==='rankings').tables.find(t=>t.id===tour+'-top10').rows;
+    decline.cells.rank='2';
+    decline.cells.points='10120';
+    improve.cells.rank='1';
+    improve.cells.points='9420';
+    entrant.sourceIds=[tour+'-rankings',tour+'-new'];
+    a.sources.push({id:tour+'-new',url:tour==='atp'?'https://www.atptour.com/en/players/test-new/zz98/overview':'https://www.wtatennis.com/players/900098/test-new'});
+  }
+  const html=article(a,{preview:true,comparison:previous});
+  const tables=[...html.matchAll(/<table><caption class="weekly-ranking-caption"[\s\S]*?<\/table>/g)];
+  assert.equal(tables.length,2);
+  for(const [table] of tables){
+    assert.match(table,/<span class="weekly-rank-down">↓ 1 \(down 1 place\)<\/span><\/td><td><span class="weekly-points-up">↑ 120/);
+    assert.match(table,/<span class="weekly-rank-up">↑ 1 \(up 1 place\)<\/span><\/td><td><span class="weekly-points-down">↓ 80/);
+    assert.match(table,/New to top 10<\/span><\/td><td>9000<\/td><td>N\/A<\/td><td>N\/A<\/td>/);
+  }
 });
 
 test('reader omits only legacy ATP/WTA baseline tables and keeps current movements, tournament overview and results',()=>{

@@ -94,5 +94,15 @@ html:has(.weekly-editor){scroll-behavior:auto}.weekly-editor h2{font-size:1.8rem
 @container (min-width:20rem){.weekly-filter-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @container (min-width:39rem){.weekly-filter-options{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
-.weekly-ranking-panel .weekly-points-up { color: #6ee7a2; }
-.weekly-ranking-panel .weekly-points-down { color: #ff9393; }
+.weekly-ranking-panel {
+  --weekly-movement-up: #6ee7a2;
+  --weekly-movement-down: #ff9393;
+}
+@media screen {
+  html[data-cu-app="1"][data-cu-theme="light"] .weekly-ranking-panel {
+    --weekly-movement-up: #145d3a;
+    --weekly-movement-down: #9c2c2c;
+  }
+}
+.weekly-ranking-panel :is(.weekly-rank-up, .weekly-points-up) { color: var(--weekly-movement-up); }
+.weekly-ranking-panel :is(.weekly-rank-down, .weekly-points-down) { color: var(--weekly-movement-down); }

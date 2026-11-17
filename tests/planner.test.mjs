@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { activities, byId } from '../practice/catalogue.mjs';
-import { defaults, generate, compatible, conflicts, total, swapOptions, add, restore, save, load } from '../practice/core.mjs';
+import { defaults, generate, compatible, conflicts, total, swapOptions, add, restore, save, load, summary } from '../practice/core.mjs';
+import { printReport } from '../practice/print-plan.mjs';
 import { adMode, advertising } from '../practice/ads-config.mjs';
 import { video, videoReady, court } from '../practice/render.mjs';
 test('50 unique complete activities, at least four for every player count, meaningful diagrams',()=>{
@@ -17,9 +18,52 @@ test('all normal player/level/goal/time combinations are compatible, determinist
   for (const players of [1,2,3,4]) for (const duration of [30,45,60,90,180]) for (const level of ['Beginner','Intermediate','Advanced','Mixed']) for (const goal of ['Fun games','Technique practice','Match preparation','A mix']) {
     const settings = {...defaults,players,duration,level,goal};
     const plan = generate(settings); assert.equal(total(plan),duration);
+    assert.equal(plan.blocks.length,3);
     assert.deepEqual(plan,generate(settings)); assert.equal(new Set(plan.blocks.map(b=>b.id)).size,plan.blocks.length);
     assert.ok(byId.get(plan.blocks[0].id).intro);
     for (const b of plan.blocks) { const a=byId.get(b.id); assert.equal(conflicts(a,settings).length,0); assert.ok(b.minutes>=a.minimum); assert.ok(!a.facilities.includes('wall')); if(level==='Beginner') assert.equal(a.level,'Beginner'); }
+  }
+});
+test('3–8 distinct activities fit at the true minimum when compatible, with one minute per transition',()=>{
+  for (const players of [1,2,3,4]) for (const level of ['Beginner','Intermediate']) {
+    for (const activityCount of [3,4,5,6,7,8]) {
+      const settings={...defaults,players,level,activityCount,focus:'Serve and return',goal:'Match preparation'};
+      const pool=compatible(settings);
+      if(pool.length<activityCount) {
+        assert.throws(()=>generate(settings),error=>{
+          const alternative=error.message.match(/Try (\d+) activities at (\d+) minutes/);
+          assert.ok(alternative);
+          assert.equal(generate({...settings,activityCount:Number(alternative[1]),duration:Number(alternative[2])}).blocks.length,Number(alternative[1]));
+          return true;
+        });
+        continue;
+      }
+      const minimum=Math.min(...pool.filter(a=>a.intro).map(intro=>intro.minimum+
+        pool.filter(a=>a!==intro).map(a=>a.minimum).sort((a,b)=>a-b).slice(0,activityCount-1).reduce((a,b)=>a+b,0)
+      ))+activityCount-1;
+      for(const duration of [Math.max(15,minimum),90]) {
+        const plan=generate({...settings,duration});
+        assert.deepEqual(plan,generate({...settings,duration}));
+        assert.equal(plan.blocks.length,activityCount);
+        assert.equal(new Set(plan.blocks.map(b=>b.id)).size,activityCount);
+        assert.equal(plan.blocks.reduce((sum,b)=>sum+b.minutes,0)+activityCount-1,duration);
+        assert.ok(byId.get(plan.blocks[0].id).intro);
+        for(const {id,minutes} of plan.blocks) {
+          const a=byId.get(id);
+          assert.ok(pool.includes(a));
+          assert.ok(Number.isInteger(minutes)&&minutes>=a.minimum);
+          if(duration===90&&id!==plan.blocks[0].id) assert.ok(minutes>a.minimum);
+        }
+      }
+      if(minimum>15) assert.throws(()=>generate({...settings,duration:minimum-1}),new RegExp(`Try ${minimum} minutes`));
+    }
+  }
+});
+test('missing generation count defaults to three and invalid generation inputs are rejected',()=>{
+  const {activityCount,...legacy}=defaults;
+  assert.deepEqual(generate(legacy),generate(defaults));
+  for (const invalid of [null,0,2,9,4.5,'4',NaN]) {
+    assert.throws(()=>generate({...defaults,activityCount:invalid}),/Choose 3 to 8 activities/);
   }
 });
 test('wall and explicit player compatibility; unavailable facility never selected',()=>{
@@ -48,6 +92,30 @@ test('versioned persistence restores known ids and rejects malformed, incompatib
   const unavailable={getItem(){throw new Error('blocked');},setItem(){throw new Error('blocked');}};
   assert.equal(load(unavailable).unavailable,true); assert.equal(save(unavailable,plan),false);
   let raw=null; const memory={getItem(){return raw;},setItem(k,v){raw=v;}}; assert.equal(save(memory,plan),true); assert.deepEqual(load(memory).session,plan);
+});
+test('manual edits and legacy sessions preserve blocks, exports report the actual count, and regeneration uses the saved setting',()=>{
+  const plan=generate({...defaults,level:'Intermediate',activityCount:6});
+  const edited=add(plan,compatible(plan.settings).find(a=>!plan.blocks.some(b=>b.id===a.id)).id);
+  edited.blocks.splice(0,2);
+  edited.blocks.reverse();
+  edited.blocks[0].minutes++;
+  const restored=restore(JSON.stringify(edited));
+  assert.deepEqual(restored,edited);
+  assert.equal(restored.settings.activityCount,6);
+  assert.equal(restored.blocks.length,5);
+  assert.equal(generate(restored.settings).blocks.length,6);
+  assert.match(summary(restored),/5 activities/);
+  assert.equal((summary(restored).match(/Transition \/ retrieve/g)||[]).length,4);
+  const report=printReport(restored);
+  assert.match(report,/5 activities/);
+  assert.equal((report.match(/class="report-activity"/g)||[]).length,5);
+  assert.equal((report.match(/Next: 1 minute/g)||[]).length,4);
+  for(const optionalCount of [undefined,'6',null,99]){
+    const legacy=restore(JSON.stringify({...edited,settings:{...edited.settings,activityCount:optionalCount}}));
+    assert.deepEqual(legacy.blocks,edited.blocks);
+    assert.equal(legacy.edited,true);
+    assert.equal(legacy.settings.activityCount,3);
+  }
 });
 test('ad modes fail closed on public origins and live is impossible, even with query/config/consent',()=>{
   assert.equal(advertising.mode,'off'); assert.equal(advertising.provider,null); assert.equal(advertising.consent(),'unknown');
